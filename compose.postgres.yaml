@@ -1,0 +1,28 @@
+# compose.yaml과 함께 실행하는 로컬 PostgreSQL 통합 검증 환경
+services:
+  api:
+    environment:
+      # db는 Compose 내부에서만 접근하는 서비스 이름이다.
+      DATABASE_URL: postgresql+psycopg://didgo:local-didgo@db:5432/didgo
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:17
+    environment:
+      # 개발 전용 계정이다. 배포할 때는 별도 자격 증명을 설정한다.
+      POSTGRES_USER: didgo
+      POSTGRES_PASSWORD: local-didgo
+      POSTGRES_DB: didgo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      # 달러 기호 두 개는 Compose 대신 컨테이너가 변수를 읽도록 한다.
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+
+volumes:
+  postgres_data:

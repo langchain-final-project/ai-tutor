@@ -1,0 +1,21 @@
+# 팀원 개인 개발용 기본 구성이다. SQLite는 API 컨테이너 안에서 파일로 열린다.
+services:
+  api:
+    build: ./backend
+    ports:
+      # 기본 API는 이 컴퓨터에서만 접속할 수 있다.
+      - "127.0.0.1:${API_PORT:-8000}:8000"
+    environment:
+      DATABASE_URL: sqlite:////var/lib/didgo/dev.db
+    volumes:
+      # 컨테이너를 다시 만들어도 로컬 SQLite 파일을 보존한다.
+      - sqlite_data:/var/lib/didgo
+    healthcheck:
+      # HTTP 상태와 실제 DB 연결을 함께 확인한다.
+      test: ["CMD", "python", "-c", "from urllib.request import urlopen; urlopen('http://127.0.0.1:8000/health', timeout=3).close()"]
+      interval: 5s
+      timeout: 4s
+      retries: 6
+
+volumes:
+  sqlite_data:

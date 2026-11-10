@@ -1,0 +1,11 @@
+# 이미지에 로컬 실행 파일, 비밀값, 데이터베이스가 복사되지 않게 합니다.
+.venv/
+__pycache__/
+.pytest_cache/
+*.egg-info/
+build/
+.env*
+*.db
+*.db-*
+*.sqlite3
+*.sqlite3-*

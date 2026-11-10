@@ -1,0 +1,19 @@
+# 개인 설정, 로컬 DB, 파이썬·노드 실행 결과는 저장소에서 제외한다.
+.env
+.env.*
+!.env.example
+*.db
+*.db-*
+*.sqlite
+*.sqlite-*
+*.sqlite3
+*.sqlite3-*
+.venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.egg-info/
+build/
+node_modules/
+dist/
+.DS_Store
