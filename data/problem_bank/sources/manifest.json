@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "ocr50-v1",
+  "archives": {
+    "problem_bank": {
+      "original_filename": "딛고_문제은행.zip",
+      "sha256": "a4e8bd8650d0c2edd113f5584ae1b2404321f541659a326013acf5dff4cc7d31",
+      "bytes": 5523567
+    },
+    "ocr50": {
+      "original_filename": "중1_OCR_비교_50문항.zip",
+      "sha256": "c89b22b9b00fdf4fee30a31a9ffb9e42fd7ba97815032443c21ba536ad22cc7a",
+      "bytes": 1783596
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "format_version": 1,
+  "filename": "problem_bank.seed.sqlite3",
+  "bytes": 45834240,
+  "sha256": "7ed034723c9e12ff2d6cc242395646cffcfb7418fc840709cc81fcad6a3ee8df",
+  "counts": {
+    "questions": 30339,
+    "units": 24,
+    "topics": 1165,
+    "benchmark_sets": 1,
+    "benchmark_items": 50,
+    "benchmark_assets": 100,
+    "uploaded_problems": 0,
+    "problem_ocr_results": 0,
+    "problem_classifications": 0,
+    "problem_classification_candidates": 0
+  },
+  "operational_tables": [
+    "uploaded_problems",
+    "problem_ocr_results",
+    "problem_classifications",
+    "problem_classification_candidates"
+  ],
+  "benchmark_id": "ocr50-v1",
+  "benchmark_sha256": "393e7c7c905074979c43012cb83e779fe2265cc12355bd950765c386cf027207",
+  "classification_schema": "problem-classification-v1",
+  "classification_schema_sha256": "77dbfc6d2cd32518614918c31f4dfc48e0307cd7541e76fa1e2bf37cb7bd4f2b"
+}
