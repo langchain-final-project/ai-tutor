@@ -1,2 +1,6 @@
-# 일차방정식 파서, 중간식 판정, 검산, 단계 힌트를 구현할 패키지
-# 모델 , 데이터베이스와 상호작용하는 기능을 구현할 패키지
+# 풀이 검증의 공개 함수
+# 입출력과 사용 조건은 solution_service.py 보기!
+
+from .solution_service import evaluate_reviewed_solution
+
+__all__ = ["evaluate_reviewed_solution"]
