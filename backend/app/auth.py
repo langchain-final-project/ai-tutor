@@ -215,6 +215,19 @@ def create_auth_router(engine: Engine) -> APIRouter:
         )
         return UserID(user_id=user.id)
 
+    @router.post("/auth/logout", status_code=204, response_class=Response)
+    def logout(request: Request) -> Response:
+        token = request.cookies.get(SESSION_COOKIE)
+        if token:
+            with engine.begin() as connection:
+                connection.execute(delete(auth_sessions).where(auth_sessions.c.token_hash == token_digest(token)))
+
+        response = Response(status_code=204)
+        response.delete_cookie(
+            SESSION_COOKIE, secure=request.url.scheme == "https", httponly=True, samesite="lax",
+        )
+        return response
+
     @router.get("/me", response_model=Profile)
     def me(request: Request) -> Profile:
         token = request.cookies.get(SESSION_COOKIE)

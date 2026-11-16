@@ -10,9 +10,12 @@ export class ApiError extends Error {
   }
 }
 
+function send(path: string, options: RequestInit) {
+  return fetch(`/api${path}`, { ...options, credentials: "same-origin" });
+}
+
 async function request<T>(path: string, body?: Login | Signup, signal?: AbortSignal) {
-  const response = await fetch(`/api${path}`, {
-    credentials: "same-origin",
+  const response = await send(path, {
     signal,
     ...(body && {
       method: "POST",
@@ -28,6 +31,10 @@ async function request<T>(path: string, body?: Login | Signup, signal?: AbortSig
 export const auth = {
   signUp: (body: Signup) => request<Account>("/auth/signup", body),
   login: (body: Login) => request<Account>("/auth/login", body),
+  async logout() {
+    const response = await send("/auth/logout", { method: "POST" });
+    if (!response.ok) throw new ApiError(response.status, null);
+  },
   profile: (signal?: AbortSignal) => request<Profile>("/me", undefined, signal),
 };
 
