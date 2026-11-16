@@ -18,6 +18,18 @@ TEXT_PROMPT = (
 )
 
 
+PROBLEM_PROMPT = (
+    "OCR transcription only. Read the Korean math problem in the image and "
+    "transcribe all visible Korean text, mathematical expressions, question "
+    "numbers, and answer choices in their original reading order. Keep Korean in "
+    "Korean; do not translate. Write mathematical expressions in LaTeX enclosed by "
+    "\\( and \\). Do not solve, simplify, correct, explain, or add missing content. "
+    "Preserve every number, sign, exponent, fraction, and choice label. If a part "
+    "is unreadable, write [UNREADABLE] at that location. Output only the "
+    "transcription."
+)
+
+
 def _read(client, image, prompt, region, model, max_tokens=1024):
     yield {"type": "region_start", "region_id": region.id, "model": model, "kind": region.kind}
     result = {"text": "", "finish_reason": "error", "issues": []}
@@ -54,8 +66,23 @@ def _figure_data(text: str) -> dict:
 
 
 class OCRPipeline:
-    def __init__(self, paddle: Backend, qwen: Backend | None = None):
+    def __init__(
+        self,
+        paddle: Backend,
+        qwen: Backend | None = None,
+        formula=None,
+        *,
+        primary_engine="paddle",
+        rotation=0,
+    ):
         self.paddle, self.qwen = paddle, qwen
+        self.formula = formula
+        if primary_engine not in {"paddle", "qwen"}:
+            raise ValueError("primary_engine must be paddle or qwen")
+        if rotation not in {0, 90, 180, 270}:
+            raise ValueError("rotation must be 0, 90, 180 or 270")
+        self.primary_engine = primary_engine
+        self.rotation = rotation
 
     def recognize(self, image: bytes, regions: list[Region] | None = None, *, check_text: bool = False) -> dict:
         """최종 결과만 반환한다. 증분 출력은 stream()을 사용한다."""
@@ -69,10 +96,13 @@ class OCRPipeline:
 
         영역을 생략하면 전체를 본문으로 읽는다. 자동 도형·표 탐지는 수행하지 않는다.
         formula 영역은 문장이 섞이지 않은 수식에만 지정하며 후보를 본문에 덮어쓰지 않는다.
+        영역 좌표는 EXIF 보정과 추가 반시계 회전까지 적용된 이미지 기준이다.
         """
         if check_text and self.qwen is None:
             raise ValueError("보조 판독에는 Qwen 모델 또는 서버 설정이 필요합니다.")
         source = open_image(image)
+        if self.rotation:
+            source = source.rotate(self.rotation, expand=True)
         selected = list(regions) if regions is not None else [Region("problem")]
         if not selected or len(selected) > 32:
             raise ValueError("영역은 서로 다른 ID로 1~32개 지정해 주세요.")
@@ -94,14 +124,22 @@ class OCRPipeline:
             results[region.id] = {"id": region.id, "kind": region.kind, "bbox": region.bbox,
                                   "text": "", "finish_reason": "not_processed", "usable": False, "issues": []}
 
-        # 로컬 GGUF 두 개가 GPU를 동시에 차지하지 않도록 Paddle 단계를 먼저 끝낸다.
-        paddle_regions = [r for r in selected if r.kind != "figure"]
+        # 주 OCR 단계를 끝낸 뒤 보조 판독을 실행한다.
+        paddle_regions = [r for r in selected if r.kind != "figure" and not (self.formula is not None and r.kind == "formula")]
         if paddle_regions:
-            yield {"type": "stage", "stage": "paddle"}
+            yield {"type": "stage", "stage": self.primary_engine}
             try:
                 with self.paddle.connect() as client:
                     for region in paddle_regions:
-                        record = yield from _read(client, prepared[region.id], PADDLE_TASKS[region.kind], region, "paddle")
+                        prompt = (
+                            PROBLEM_PROMPT
+                            if self.primary_engine == "qwen" and region.kind == "text"
+                            else PADDLE_TASKS[region.kind]
+                        )
+                        record = yield from _read(
+                            client, prepared[region.id], prompt,
+                            region, self.primary_engine,
+                        )
                         results[region.id].update(record)
                         if region.kind == "formula":
                             record["issues"].append("수식 재인식 후보입니다. 확인 없이 본문을 대체하지 마세요.")
@@ -113,6 +151,36 @@ class OCRPipeline:
                                 record["issues"].append(str(error))
                         if record["finish_reason"] == "error":
                             break
+            except (OCRError, OSError) as error:
+                issues.append(str(error))
+
+        formula_regions = (
+            [r for r in selected if r.kind == "formula"]
+            if self.formula is not None
+            else []
+        )
+
+        if formula_regions:
+            yield {"type": "stage", "stage": "formula"}
+
+            try:
+                with self.formula.connect() as client:
+                    for region in formula_regions:
+                        record = yield from _read(
+                            client,
+                            prepared[region.id],
+                            PADDLE_TASKS["formula"],
+                            region,
+                            "pp-formulanet-plus-m",
+                        )
+
+                        record["issues"].append(
+                            "수식 재인식 후보입니다. "
+                            "확인 없이 본문을 대체하지 마세요."
+                        )
+
+                        results[region.id].update(record)
+
             except (OCRError, OSError) as error:
                 issues.append(str(error))
 
@@ -161,5 +229,6 @@ class OCRPipeline:
         usable = sum(r["usable"] for r in results.values())
         status = "failed" if not usable else "incomplete" if usable < len(results) else "needs_review"
         yield {"type": "result", "result": {"status": status, "text": text,
-               "image_size": list(source.size), "uncovered_dark_pixels": outside,
+               "image_size": list(source.size), "rotation_ccw": self.rotation,
+               "uncovered_dark_pixels": outside,
                "issues": issues, "regions": list(results.values())}}

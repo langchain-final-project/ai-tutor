@@ -18,6 +18,18 @@ def main() -> int:
     parser.add_argument("--check-text", action="store_true", help="Qwen으로 본문을 한 번 더 읽어 차이를 표시")
     parser.add_argument("--server-binary", default="llama-server")
     parser.add_argument("--timeout", type=float, default=90)
+    parser.add_argument(
+        "--ocr-engine", choices=("paddle", "qwen"), default="paddle",
+        help="문제 전체를 읽을 주 OCR 엔진",
+    )
+    parser.add_argument(
+        "--rotate", type=int, choices=(0, 90, 180, 270), default=0,
+        help="EXIF 보정 후 추가로 적용할 반시계 방향 회전 각도",
+    )
+    parser.add_argument("--formula-engine", choices=("llama", "plus-m"), default="llama",
+        help="수식 영역 인식기. 기본값은 기존 llama.cpp 방식",
+    )
+    parser.add_argument("--formula-model-dir", type=Path, help="다운로드된 PP-FormulaNet_plus-M 모델 폴더")
     for name in ["paddle", "qwen"]:
         group = parser.add_mutually_exclusive_group()
         group.add_argument(f"--{name}-url", help="실행 중인 llama.cpp 서버 주소. /v1은 생략 가능")
@@ -37,6 +49,8 @@ def main() -> int:
                        timeout=args.timeout, image_tokens=(256, 2048) if name == "qwen" else None)
 
     try:
+        if args.ocr_engine == "qwen" and args.check_text:
+            raise ValueError("Qwen이 주 OCR일 때는 --check-text를 함께 사용하지 않습니다.")
         regions = None
         if args.regions:
             data = json.loads(args.regions.read_text(encoding="utf-8-sig"))
@@ -44,7 +58,23 @@ def main() -> int:
                 raise ValueError("영역 JSON은 객체 목록이어야 합니다.")
             regions = [Region(id=r["id"], kind=r.get("kind", "text"),
                               bbox=tuple(r["bbox"]) if r.get("bbox") is not None else None) for r in data]
-        pipeline = OCRPipeline(backend("paddle", required=True), backend("qwen"))
+        formula = None
+
+        if args.formula_engine == "plus-m":
+            from app.ocr.formula import FormulaBackend
+            formula = FormulaBackend( device='cpu', model_dir = args.formula_model_dir,)
+
+        primary = backend(args.ocr_engine, required=True)
+        secondary = backend("qwen") if args.ocr_engine == "paddle" else None
+        pipeline = OCRPipeline(
+            primary,
+            secondary,
+            formula=formula,
+            primary_engine=args.ocr_engine,
+            rotation=args.rotate,
+        )
+
+        # pipeline = OCRPipeline(backend("paddle", required=True), backend("qwen"))
         result = None
         for event in pipeline.stream(args.image.read_bytes(), regions, check_text=args.check_text):
             if args.stream:
