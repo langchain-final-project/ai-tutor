@@ -1,0 +1,53 @@
+﻿case_id,block_order,expected_latex,pix2tex_latex,paddle_formula_latex,paddle_match,seconds,error,crop_path
+case_001,1,4 x-7 \leq x-(5-x),\pm x-7\ \ z-\ a-(5-x\ ),4x-7\leq x-(5-x),True,2.923,,dataset/integrated_benchmark/case_001/01_formula.png
+case_002,1,(-\sqrt{19})^{2}-\sqrt{5}^{2},(-{\sqrt{19}})^{2}-{\sqrt{5}}^{2},(-\sqrt{19})^{2}-\sqrt{5}^{2},True,1.706,,dataset/integrated_benchmark/case_002/01_formula.png
+case_003,1,\sqrt{25 x^{2}-30 x y+9 y^{2}},\sqrt{25x^{2}-30x y+9y^{2}},\sqrt{25x^{2}-30xy+9y^{2}},True,1.67,,dataset/integrated_benchmark/case_003/01_formula.png
+case_004,1,(x-8)(x+2)=0,(x-8)(x+2)=0,(x-8)(x+2)=0,True,1.632,,dataset/integrated_benchmark/case_004/01_formula.png
+case_005,1,(\sqrt{2})^{2}+(-\sqrt{9})^{2},({\sqrt{2}})^{2}+(-{\sqrt{9}})^{2},(\sqrt{2})^{2}+(-\sqrt{9})^{2},True,1.742,,dataset/integrated_benchmark/case_005/01_formula.png
+case_006,1,(-\sqrt{6})^{2}-\sqrt{8}^{2},(-{\sqrt{6}})^{2}-{\sqrt{8}}^{2},(-{\sqrt{6}})^{2}-{\sqrt{8}}^{2},True,2.039,,dataset/integrated_benchmark/case_006/01_formula.png
+case_007,1,\sqrt{36 x^{2}-24 x y+9 y^{2}},{\sqrt{36x^{2}-24x y+9y^{2}}},\sqrt{36x^{2}-24xy+9y^{2}},True,1.689,,dataset/integrated_benchmark/case_007/01_formula.png
+case_008,1,(x+7)(x-5),(x+7)(x-5),(x+7)(x-5),True,1.589,,dataset/integrated_benchmark/case_008/01_formula.png
+case_009,1,\{(8-2) \div 3\}-3 \times(-4),\mathbf{f}\left(\mathbf{8}-2\right)\mp3\right)-3\times\left(-4\right),\left\{\left(8-2\right)\div3\right\}-3\times\left(-4\right),True,2.051,,dataset/integrated_benchmark/case_009/01_formula.png
+case_010,1,\sqrt{-10}+\sqrt{-40},{\sqrt{-10}}+{\sqrt{-40}},\sqrt{-10}+\sqrt{-40},True,1.605,,dataset/integrated_benchmark/case_010/01_formula.png
+case_011,1,(x+9)(x-6),(x+9)(x-6),(x+9)(x-6),True,1.654,,dataset/integrated_benchmark/case_011/01_formula.png
+case_012,1,(-\sqrt{4})^{2}-\sqrt{2}^{2},(-{\sqrt{4}})^{2}-{\sqrt{2}}^{2},(-{\sqrt{4}})^{2}-{\sqrt{2}}^{2},True,1.993,,dataset/integrated_benchmark/case_012/01_formula.png
+case_013,1,(-\sqrt{8})^{2}-\sqrt{5}^{2},(-{\sqrt{8}})^{2}-{\sqrt{5}}^{2},(-{\sqrt{8}})^{2}-{\sqrt{5}}^{2},True,2.067,,dataset/integrated_benchmark/case_013/01_formula.png
+case_014,1,(-\sqrt{22})^{2}-\sqrt{9}^{2},(-{\sqrt{22}})^{2}-{\sqrt{9}}^{2},(-{\sqrt{22}})^{2}-{\sqrt{9}}^{2},True,2.008,,dataset/integrated_benchmark/case_014/01_formula.png
+case_015,1,(\sqrt{8})^{2}+(-\sqrt{2})^{2},({\sqrt{8}})^{2}+(-{\sqrt{2}})^{2},(\sqrt{8})^{2}+(-\sqrt{2})^{2},True,1.914,,dataset/integrated_benchmark/case_015/01_formula.png
+case_016,1,(-\sqrt{6})^{2}-\sqrt{3}^{2},(-{\sqrt{6}})^{2}-{\sqrt{3}}^{2},(-{\sqrt{6}})^{2}-{\sqrt{3}}^{2},True,1.99,,dataset/integrated_benchmark/case_016/01_formula.png
+case_017,1,\left\{\begin{aligned} 3 x+2 y & =-4 \\ -x+2 y & =4\end{aligned}\right.,\left\{\begin{array}{l l}{{3x+2y=-4}}\\ {{-x+2y=4}}\end{array}\right.,\left\{\begin{array}{l}{\mathrm{3}x\mathrm{^{+}2}y\mathrm{^{=-4}}}\\ {\mathrm{\bar{\partial}^{-}}x\mathrm{^{+}2}y\mathrm{\bar{\partial}^{=4}}}\end{array}\right.,False,3.457,,dataset/integrated_benchmark/case_017/01_formula.png
+case_018,1,(-\sqrt{5})^{2}-\sqrt{4}^{2},(-{\sqrt{5}})^{2}-{\sqrt{4}}^{2},(-{\sqrt{5}})^{2}-{\sqrt{4}}^{2},True,1.919,,dataset/integrated_benchmark/case_018/01_formula.png
+case_019,1,(x+3)(2 y-5),(x+3)(2y-5),(x+3)(2y-5),True,1.668,,dataset/integrated_benchmark/case_019/01_formula.png
+case_020,1,\sqrt{(4 a)^{2}}-\sqrt{(-2 a)^{2}},{\sqrt{(4a)^{2}}}-{\sqrt{(-2a)^{2}}},\sqrt{(4a)^{2}}-\sqrt{(-2a)^{2}},True,1.676,,dataset/integrated_benchmark/case_020/01_formula.png
+case_021,1,\frac{\sqrt{-8}}{\sqrt{2}},\frac{\sqrt{-8}}{\sqrt{2}},\frac{\sqrt{-8}}{\sqrt{2}},True,1.594,,dataset/integrated_benchmark/case_021/01_formula.png
+case_022,1,\left\{\begin{array}{l}\frac{1}{3} x+\frac{5}{6} y=\frac{4}{3} \\ 0. 2 x+0. 3 y=0. 4\end{array}\right.,\textstyle\left\{{\frac{1}{3}}x+{\frac{5}{6}}y={\frac{4}{3}}}\\ {0.2x+0.3y=0.4,\begin{cases}\dfrac{1}{3}x+\dfrac{5}{6}y=\dfrac{4}{3}\\0.2x+0.3y=0.4\end{cases},False,2.089,,dataset/integrated_benchmark/case_022/01_formula.png
+case_023,1,(-\sqrt{21})^{2}-\sqrt{4}^{2},(-{\sqrt{21}})^{2}-{\sqrt{4}}^{2},(-{\sqrt{21}})^{2}-{\sqrt{4}}^{2},True,1.974,,dataset/integrated_benchmark/case_023/01_formula.png
+case_024,1,(-\sqrt{16})^{2}-\sqrt{2}^{2},(-{\sqrt{16}})^{2}-{\sqrt{2}}^{2},(-{\sqrt{16}})^{2}-{\sqrt{2}}^{2},True,2.06,,dataset/integrated_benchmark/case_024/01_formula.png
+case_025,1,(-\sqrt{12})^{2}-\sqrt{4}^{2},(-{\sqrt{12}})^{2}-{\sqrt{4}}^{2},(-{\sqrt{12}})^{2}-{\sqrt{4}}^{2},True,1.966,,dataset/integrated_benchmark/case_025/01_formula.png
+case_026,1,x^{2}-4 x=0,x^{2}-4x=0,x^{2}-4x=0,True,1.614,,dataset/integrated_benchmark/case_026/01_formula.png
+case_027,1,(-\sqrt{3})^{2}-\sqrt{2}^{2},(-{\sqrt{3}})^{2}-{\sqrt{2}}^{2},(-{\sqrt{3}})^{2}-{\sqrt{2}}^{2},True,1.941,,dataset/integrated_benchmark/case_027/01_formula.png
+case_028,1,(-\sqrt{17})^{2}-\sqrt{4}^{2},\left(-{\sqrt{17}}\right)^{2}-{\sqrt{4}}^{2},(-\sqrt{17})^{2}-\sqrt{4}^{2},True,1.729,,dataset/integrated_benchmark/case_028/01_formula.png
+case_029,1,(-\sqrt{12})^{2}-\sqrt{4}^{2},(-{\sqrt{12}})^{2}-{\sqrt{4}}^{2},(-{\sqrt{12}})^{2}-{\sqrt{4}}^{2},True,1.964,,dataset/integrated_benchmark/case_029/01_formula.png
+case_030,1,(\sqrt{10})^{2}+(-\sqrt{3})^{2},({\sqrt{10}})^{2}+(-{\sqrt{3}})^{2},(\sqrt{10})^{2}+(-\sqrt{3})^{2},True,1.753,,dataset/integrated_benchmark/case_030/01_formula.png
+case_031,1,x^{2}+8 x+15,x^{2}+8x+15,x^{2}+8x+15,True,1.643,,dataset/integrated_benchmark/case_031/01_formula.png
+case_032,1,x^{2}+3 x=0,x^{2}+3x=0,x^{2}+3x=0,True,1.619,,dataset/integrated_benchmark/case_032/01_formula.png
+case_033,1,\sqrt{-8}-\sqrt{-2},{\sqrt{-8}}-{\sqrt{-2}},\sqrt{-8}-\sqrt{-2},True,1.574,,dataset/integrated_benchmark/case_033/01_formula.png
+case_034,1,(\sqrt{5})^{2}+(-\sqrt{6})^{2},({\sqrt{5}})^{2}+(-{\sqrt{6}})^{2},(\sqrt{5})^{2}+(-\sqrt{6})^{2},True,1.768,,dataset/integrated_benchmark/case_034/01_formula.png
+case_035,1,(-\sqrt{9})^{2}-\sqrt{8}^{2},(-{\sqrt{9}})^{2}-{\sqrt{8}}^{2},(-{\sqrt{9}})^{2}-{\sqrt{8}}^{2},True,2.061,,dataset/integrated_benchmark/case_035/01_formula.png
+case_036,1,(-\sqrt{25})^{2}-\sqrt{2}^{2},(-{\sqrt{25}})^{2}-{\sqrt{2}}^{2},(-\sqrt{25})^{2}-\sqrt{2}^{2},True,1.705,,dataset/integrated_benchmark/case_036/01_formula.png
+case_037,1,\sqrt{36 x^{2}-12 x y+y^{2}},{\sqrt{36x^{2}-12x y+y^{2}}},\sqrt{36x^{2}-12xy+y^{2}},True,1.632,,dataset/integrated_benchmark/case_037/01_formula.png
+case_038,1,(\sqrt{10})^{2}+(-\sqrt{4})^{2},({\sqrt{10}})^{2}+(-{\sqrt{4}})^{2},(\sqrt{10})^{2}+(-\sqrt{4})^{2},True,1.771,,dataset/integrated_benchmark/case_038/01_formula.png
+case_039,1,(-\sqrt{20})^{2}-\sqrt{6}^{2},(-{\sqrt{20}})^{2}-{\sqrt{6}}^{2},(-\sqrt{20})^{2}-\sqrt{6}^{2},True,1.707,,dataset/integrated_benchmark/case_039/01_formula.png
+case_040,1,\sqrt{7} \sqrt{-1},{\sqrt{7}}{\sqrt{-1}},\sqrt{7}\sqrt{-1},True,1.687,,dataset/integrated_benchmark/case_040/01_formula.png
+case_041,1,(\sqrt{6})^{2}+(-\sqrt{3})^{2},({\sqrt{6}})^{2}+(-{\sqrt{3}})^{2},({\sqrt{6}})^{2}+(-{\sqrt{3}})^{2},True,2.013,,dataset/integrated_benchmark/case_041/01_formula.png
+case_042,1,(-\sqrt{18})^{2}-\sqrt{8}^{2},(-{\sqrt{18}})^{2}-{\sqrt{8}}^{2},(-{\sqrt{18}})^{2}-{\sqrt{8}}^{2},True,1.997,,dataset/integrated_benchmark/case_042/01_formula.png
+case_043,1,x(x+11)+10=0,x(x+11)+10=0,x(x+11)+10=0,True,1.689,,dataset/integrated_benchmark/case_043/01_formula.png
+case_044,1,\left\{\begin{array}{l}5 x-4 y=1 \\ -3 x+2 y=3\end{array}\right.,(\Theta)~\left\{\frac{5{\alpha}-4{\gamma}/\ -{}~1}{\Im{\alpha}+2{\gamma}/\equiv{}~3}\right.,\begin{array}{l}(6)\begin{array}{l}\left\{\begin{aligned}5x-4y=1\\ -3x+2y=3\end{aligned}\right.\end{array}\end{array},False,2.453,,dataset/integrated_benchmark/case_044/01_formula.png
+case_045,1,\left\{\begin{array}{r}7 x+4 y=18 \\ 3 x-4 y=2\end{array}\right.,"\left\{\begin{array}{l l}{7x+4y=18}\\ {3x\,^{-4}y^{=2}}\end{array}\right.",\left\{\begin{aligned}7x+4y=18\\ 3x-4y=2\end{aligned}\right.,False,2.011,,dataset/integrated_benchmark/case_045/01_formula.png
+case_046,1,x^{2}+5 x=0,x^{2}+5x=0,x^{2}+5x=0,True,1.648,,dataset/integrated_benchmark/case_046/01_formula.png
+case_047,1,x^{2}-2 x=0,x^{2}-2x=0,x^{2}-2x=0,True,1.629,,dataset/integrated_benchmark/case_047/01_formula.png
+case_048,1,\left\{\begin{array}{l}3(x-y)+4 y=2 \\ 7 x-2(3 x-y)=14\end{array}\right.,\begin{array}{c}{{\left\{3\left(x-y\right)+4y=2}}\\ {{\left(7x-2(3x-y)=14}}\end{array}\right.,\begin{cases}3\left(x-y\right)+4y=2\\ 7x-2\left(3x-y\right)=14\end{cases},False,2.086,,dataset/integrated_benchmark/case_048/01_formula.png
+case_049,1,\left\{\begin{array}{c}x=1-y \\ 2 x+3 y=9\end{array}\right.,(\d1)\ \left\{\begin{array}{l}{{\mathcal{X}^{=}\d0-\mathcal{Y}}}\\ {{\sum\mathcal{X}^{+}\mathcal{Y}y^{=}\Theta}}\end{array}\right.,\begin{array}{r}{(1)\;\left\{\begin{array}{l l}{x\bar{\bf\Phi}1-y}\\ {2x\bar{\bf\Phi}3y\bar{\bf\Phi}9}\end{array}\right.}\end{array},False,2.77,,dataset/integrated_benchmark/case_049/01_formula.png
+case_050,1,x^{2}+2 x=0,x^{2}+2x=0,x^{2}+2x=0,True,1.847,,dataset/integrated_benchmark/case_050/01_formula.png
+case_051,1,x^{2}-6 x=0,x^{I}-6x=6,x^{2}-6x=0,True,1.814,,dataset/integrated_benchmark/case_051/01_formula.png
+case_052,1,\left\{\begin{array}{c}5 x+2 y=15 \\ y=4 x+1\end{array}\right.,\left\{\begin{array}{l l}{5x^{+}2y^{=}15}\\ {y^{-}4x^{+}1}\end{array}\right.,\left\{\begin{aligned}5x+2y=15\\ y=4x+1\end{aligned}\right.,False,2.117,,dataset/integrated_benchmark/case_052/01_formula.png
