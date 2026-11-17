@@ -365,6 +365,23 @@ def get_submission(
         else "needs_review"
     )
 
+    # 학생 수정본도 최초 OCR 결과를 참조하므로 방향 정보가 함께 복원된다.
+    result["image_rotation_ccw"] = 0
+    result["image_orientation"] = None
+    if latest is not None and latest["source_ocr_result_id"] is not None:
+        ocr = _fetch_one(
+            connection,
+            "SELECT raw_response_json FROM problem_ocr_results WHERE id = ?",
+            (latest["source_ocr_result_id"],),
+        )
+        if ocr and ocr["raw_response_json"]:
+            raw = json.loads(ocr["raw_response_json"])
+            rotation = raw.get("rotation_ccw", 0)
+            if type(rotation) is int and rotation in {0, 90, 180, 270}:
+                result["image_rotation_ccw"] = rotation
+            if isinstance(raw.get("orientation"), dict):
+                result["image_orientation"] = raw["orientation"]
+
     return result
 
 

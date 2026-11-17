@@ -74,6 +74,7 @@ class OCRPipeline:
         *,
         primary_engine="paddle",
         rotation=0,
+        orientation_detector=None,
     ):
         self.paddle, self.qwen = paddle, qwen
         self.formula = formula
@@ -83,6 +84,7 @@ class OCRPipeline:
             raise ValueError("rotation must be 0, 90, 180 or 270")
         self.primary_engine = primary_engine
         self.rotation = rotation
+        self.orientation_detector = orientation_detector
 
     def recognize(self, image: bytes, regions: list[Region] | None = None, *, check_text: bool = False) -> dict:
         """최종 결과만 반환한다. 증분 출력은 stream()을 사용한다."""
@@ -101,6 +103,19 @@ class OCRPipeline:
         if check_text and self.qwen is None:
             raise ValueError("보조 판독에는 Qwen 모델 또는 서버 설정이 필요합니다.")
         source = open_image(image)
+        orientation = None
+        if self.orientation_detector is not None:
+            if regions is not None or self.rotation:
+                orientation = {"status": "skipped", "rotation_ccw": 0, "reason": "explicit_coordinates_or_rotation"}
+            else:
+                yield {"type": "stage", "stage": "orientation"}
+                orientation = self.orientation_detector.detect(source)
+                angle = orientation.get("rotation_ccw", 0)
+                if angle not in {0, 90, 180, 270}:
+                    raise ValueError("자동 방향 보정 각도가 올바르지 않습니다.")
+                if angle:
+                    source = source.rotate(angle, expand=True)
+                yield {"type": "orientation", **orientation}
         if self.rotation:
             source = source.rotate(self.rotation, expand=True)
         selected = list(regions) if regions is not None else [Region("problem")]
@@ -111,6 +126,8 @@ class OCRPipeline:
         if len({r.id for r in selected}) != len(selected):
             raise ValueError("영역 ID가 중복됐습니다.")
         issues = []
+        if orientation is not None and orientation["status"] in {"uncertain", "unavailable"}:
+            issues.append("사진 방향을 확실하게 판단하지 못했습니다. 원본 방향과 인식 내용을 확인해 주세요.")
         if regions is None:
             issues.append("전체 이미지를 본문으로 읽습니다. 표·도형은 별도 영역 지정과 확인이 필요합니다.")
         outside = uncovered_content(source, selected)
@@ -229,6 +246,8 @@ class OCRPipeline:
         usable = sum(r["usable"] for r in results.values())
         status = "failed" if not usable else "incomplete" if usable < len(results) else "needs_review"
         yield {"type": "result", "result": {"status": status, "text": text,
-               "image_size": list(source.size), "rotation_ccw": self.rotation,
+               "image_size": list(source.size),
+               "rotation_ccw": (self.rotation + (orientation or {}).get("rotation_ccw", 0)) % 360,
+               "orientation": orientation,
                "uncovered_dark_pixels": outside,
                "issues": issues, "regions": list(results.values())}}

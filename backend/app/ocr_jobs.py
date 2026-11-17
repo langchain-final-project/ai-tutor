@@ -17,6 +17,7 @@ from app.db.submissions import (
     submission_connection,
 )
 from app.ocr import Backend, OCRPipeline
+from app.ocr.orientation import get_orientation_detector
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +31,10 @@ def build_qwen_pipeline():
         timeout=float(os.getenv("DIDGO_OCR_TIMEOUT", "120")),
         image_tokens=(256, 2048),
     )
-    return OCRPipeline(backend, primary_engine="qwen")
+    return OCRPipeline(
+        backend, primary_engine="qwen",
+        orientation_detector=get_orientation_detector(),
+    )
 
 
 class OCRJobManager:
@@ -39,9 +43,9 @@ class OCRJobManager:
         database: str | Path,
         *,
         pipeline_factory=build_qwen_pipeline,
-        model_name="Qwen3-VL-2B",
+        model_name="Qwen3-VL-4B-Instruct",
         model_version=None,
-        pipeline_version="qwen-api-v1",
+        pipeline_version="qwen-api-v2-orientation",
     ):
         self.database = Path(database)
         self.pipeline_factory = pipeline_factory

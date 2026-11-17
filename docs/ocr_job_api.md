@@ -12,6 +12,7 @@
 $env:DIDGO_API_TOKEN = 'local-test-token'
 $env:DIDGO_DEV_USER_ID = 'local-student'
 $env:DIDGO_QWEN_URL = 'http://127.0.0.1:8081/v1'
+$env:DIDGO_OCR_TIMEOUT = '300'
 
 .\.venv\api312\Scripts\python.exe -B -m uvicorn app.submission_api:app --app-dir backend --host 127.0.0.1 --port 8001 --workers 1
 ```
@@ -20,6 +21,36 @@ $env:DIDGO_QWEN_URL = 'http://127.0.0.1:8081/v1'
 `8001`은 사진 API의 포트이며 Qwen 모델 서버의 포트와는 별개입니다.
 모델 서버를 실행하는 명령은 모델 파일 경로와 실행 환경에 따라 다릅니다.
 모델 서버가 없으면 OCR 작업은 `failed`가 되고 실패 이력을 남깁니다.
+
+### 사진 방향 자동 보정
+
+사진 API는 EXIF 보정 후 `PP-LCNet_x1_0_doc_ori`로 90도 단위 방향을 판별하고,
+보정한 사진을 Qwen에 전달합니다. 실행 환경을 처음 준비할 때 설치합니다.
+
+```powershell
+.\.venv\api312\Scripts\python.exe -m pip install -r backend/requirements-orientation.txt
+.\.venv\api312\Scripts\python.exe -B backend/scripts/setup_orientation_model.py
+```
+
+모델은 `.venv/ocr-models/PP-LCNet_x1_0_doc_ori`에 저장하며, 공식 리비전과
+파일 해시를 검사합니다. API 프로세스에서 한 번 로딩한 모델을 재사용합니다.
+요청 처리 중에 모델을 자동 다운로드하지 않습니다. 설치 후 API를 재시작합니다.
+
+네 방향의 분류 결과를 원래 좌표로 환산해 모두 일치하고, 평균 점수 0.8 이상,
+차순위와의 점수 차이 0.25 이상일 때만 자동 회전합니다. 이는 초기 운용 규칙이며
+실제 촬영 문제에 대한 정확도 확률로 해석하면 안 됩니다. 작은 수식 조각·저대비 사진,
+불확실한 결과·모델 미설치에는 자동 회전을 적용하지 않고 확인 필요 정보를 남깁니다.
+미세한 기울기, 원근 왜곡, 도형·표 영역 분리는 이 기능의 대상이 아닙니다.
+
+`GET /submissions/{id}`의 `image_rotation_ccw`, `image_orientation`으로 결과를
+확인합니다. OCR 실행 이력에도 판별 근거와 적용 각도가 남습니다.
+학생 수정·확인 후에도 최초 OCR 결과의 방향 정보를 유지합니다.
+
+- `GET /submissions/{id}/photo`: 업로드한 원본 바이트
+- `GET /submissions/{id}/photo?corrected=true`: EXIF와 OCR 회전을 적용한 PNG 표시본
+
+원본 파일은 덮어쓰지 않습니다. 수동 회전이나 명시적인 영역 좌표가 지정된
+`OCRPipeline` 호출에서는 자동 방향 판별을 생략해 좌표가 바뀌는 것을 방지합니다.
 
 `004`, `005` 마이그레이션을 적용한 개인 작업용 DB를 사용합니다.
 서버 시작 시 작업 관리자가 시작되고, 종료 시 진행 중인 작업을 기다린 뒤 정리합니다.

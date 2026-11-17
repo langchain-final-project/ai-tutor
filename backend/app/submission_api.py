@@ -29,6 +29,11 @@ from app.db.submissions import (
 )
 from app.ocr_api import create_ocr_router
 from app.ocr_jobs import OCRJobManager, build_qwen_pipeline
+from app.ocr.images import open_image
+from app.ocr.quality import (
+    inspect_photo_quality,
+    evaluate_photo_quality,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 MAX_IMAGE_BYTES = 30 * 1024 * 1024
@@ -283,12 +288,32 @@ def create_submission_app(
     def read_photo(
         submission_id: int,
         student_id: Annotated[str, Depends(current_owner)],
+        corrected: bool = False,
     ):
         with submission_connection(database) as connection:
             photo = get_uploaded_photo(
                 connection,
                 submission_id=submission_id,
                 owner_id=student_id,
+            )
+
+            rotation = 0
+            if corrected:
+                current = get_submission(
+                    connection, submission_id=submission_id, owner_id=student_id,
+                )
+                rotation = current["image_rotation_ccw"]
+
+        if corrected:
+            with open_image(photo["image_content"]) as image:
+                with image.rotate(rotation, expand=True) as upright:
+                    output = BytesIO()
+                    upright.save(output, format="PNG")
+            filename = Path(photo["original_filename"]).stem + "-upright.png"
+            return Response(
+                content=output.getvalue(),
+                media_type="image/png",
+                headers={"Content-Disposition": "inline; filename*=UTF-8''" + quote(filename)},
             )
 
         return Response(
