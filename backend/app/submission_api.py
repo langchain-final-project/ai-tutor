@@ -1,4 +1,4 @@
-"""사진 제출·조회·수정·확인을 위한 로컬 개발 API."""
+# 텍스트·사진 질문 접수와 확인 API
 
 from contextlib import asynccontextmanager
 from io import BytesIO
@@ -19,6 +19,7 @@ from starlette.concurrency import run_in_threadpool
 
 from app.db.submissions import (
     create_photo_submission,
+    create_text_submission,
     get_input_version_history,
     get_ocr_history,
     get_submission,
@@ -29,6 +30,7 @@ from app.db.submissions import (
 )
 from app.ocr_api import create_ocr_router
 from app.ocr_jobs import OCRJobManager, build_qwen_pipeline
+from app.solution_api import create_solution_router
 
 ROOT = Path(__file__).resolve().parents[2]
 MAX_IMAGE_BYTES = 30 * 1024 * 1024
@@ -44,8 +46,15 @@ class InputBody(BaseModel):
     expected_version_number: int = Field(ge=1, strict=True)
 
 
+class TextSubmissionBody(BaseModel):
+    """현재 텍스트 검증 흐름에는 실수 범위의 등식 한 개를 입력한다."""
+
+    model_config = ConfigDict(extra="forbid")
+    content_text: str = Field(min_length=1, max_length=10000, strict=True)
+
+
 def validate_photo(content: bytes) -> str:
-    """실제 이미지 내용을 검사하고 MIME 형식을 반환한다."""
+    # 실제 이미지 내용을 검사하고 MIME 형식을 반환
     if not content:
         raise HTTPException(400, "빈 사진 파일입니다.")
 
@@ -115,8 +124,8 @@ def create_submission_app(
     owner_id: str | None = None,
     pipeline_factory=build_qwen_pipeline,
 ) -> FastAPI:
-    database = Path(database) if database is not None else (
-        ROOT / "data/problem_bank/didgo.sqlite3"
+    database = Path(database) if database is not None else Path(
+        os.getenv("DIDGO_DATABASE", str(ROOT / "data/problem_bank/didgo.sqlite3"))
     )
 
     token = (
@@ -134,14 +143,14 @@ def create_submission_app(
 
     @asynccontextmanager
     async def lifespan(_app):
-        # DB 복구와 모델 작업의 종료 대기는 별도 스레드에서 처리한다.
+        # DB 복구와 모델 작업의 종료 대기는 별도 스레드에서 처리 진행
         await run_in_threadpool(manager.start)
         try:
             yield
         finally:
             await run_in_threadpool(manager.shutdown)
 
-    app = FastAPI(title="딛고 사진 제출 API", lifespan=lifespan)
+    app = FastAPI(title="딛고 질문·풀이 검증 API", lifespan=lifespan)
     app.state.ocr_jobs = manager
 
     def current_owner(
@@ -227,6 +236,20 @@ def create_submission_app(
             connection.execute("SELECT 1")
 
         return {"status": "ok", "database": "sqlite"}
+
+    @app.post("/submissions/text", status_code=201)
+    def submit_text(
+        body: TextSubmissionBody,
+        student_id: Annotated[str, Depends(current_owner)],
+    ):
+        """질문과 확인 대기 중인 첫 입력 버전을 함께 저장한다."""
+        with submission_connection(database) as connection:
+            ids = create_text_submission(
+                connection, owner_id=student_id, content_text=body.content_text,
+            )
+            return get_submission(
+                connection, submission_id=ids["submission_id"], owner_id=student_id,
+            )
 
     @app.post("/submissions/photo", status_code=201)
     def upload_photo(
@@ -382,6 +405,7 @@ def create_submission_app(
             )
 
     app.include_router(create_ocr_router(manager, current_owner))
+    app.include_router(create_solution_router(database, current_owner))
 
     return app
 
