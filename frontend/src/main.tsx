@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { FormEvent, InputHTMLAttributes } from "react";
+import type { FormEvent, InputHTMLAttributes, ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import "@fontsource-variable/noto-sans-kr";
 import { ApiError, auth, authMessage } from "./auth";
@@ -69,11 +69,40 @@ function Field({ label, ...props }: InputHTMLAttributes<HTMLInputElement> & { la
   );
 }
 
+function AuthFrame({ page, children }: { page: "login" | "signup"; children: ReactNode }) {
+  return (
+    <div className={`auth-page ${page}`}>
+      <header className="site-header">
+        <a className="brand" href={loginUrl} aria-label="딛고 로그인">
+          <span className="brand-tile"><img src={logo} alt="" /></span>
+          <span className="desktop-only">{slogan}</span>
+        </a>
+        <span className="subject">중학 수학</span>
+      </header>
+      <main className="auth-layout">{children}</main>
+      <footer className="site-footer">
+        <span className="desktop-only">© {new Date().getFullYear()} 딛고. {slogan}.</span>
+        {page === "signup" && (
+          <div className="footer-items">
+            <span>개인정보처리방침</span>
+            <span className="desktop-only">문의하기</span>
+          </div>
+        )}
+        <span className="mobile-only">{slogan} · 딛고</span>
+      </footer>
+    </div>
+  );
+}
+
 function AuthPage({ signup }: { signup: boolean }) {
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const registered = !signup && new URLSearchParams(location.search).get("registered") === "1";
+  const search = new URLSearchParams(location.search);
+  const accountNotice = search.get("account") === "password-changed"
+    ? "비밀번호를 변경했어요. 새 비밀번호로 로그인해 주세요."
+    : "";
+  const loginNotice = signup ? "" : accountNotice || (search.get("registered") === "1"
+    ? "회원가입이 완료됐어요. 가입한 계정으로 로그인해 주세요." : "");
   const action = signup ? "회원가입" : "로그인";
 
   useEffect(() => {
@@ -94,7 +123,6 @@ function AuthPage({ signup }: { signup: boolean }) {
     const email = String(values.get("email")).trim();
     const password = String(values.get("password"));
     setError("");
-    setNotice("");
     const confirmation = String(values.get("password_confirmation") ?? "");
     if (signup && password !== confirmation) {
       setError("비밀번호와 비밀번호 확인이 일치하지 않아요.");
@@ -121,84 +149,59 @@ function AuthPage({ signup }: { signup: boolean }) {
   }
 
   return (
-    <div className={`auth-page ${signup ? "signup" : "login"}`}>
-      <div className="desktop-strip"><span>학생 웹 · {action}</span><span>일차방정식 · 딛고</span></div>
-      <header className="site-header">
-        <a className="brand" href={loginUrl} aria-label="딛고 로그인">
-          <span className="brand-tile"><img src={logo} alt="" /></span>
-          <span className="desktop-only">{slogan}</span>
-        </a>
-        <div className="header-links">
-          <a className="desktop-only" href="#introduction-title">서비스 소개</a>
-          <span className="subject">중학 수학</span>
+    <AuthFrame page={signup ? "signup" : "login"}>
+      <Introduction signup={signup} />
+      <section className="auth-card" aria-labelledby="auth-title">
+        {signup && <a className="back-link" href={loginUrl}>‹ 로그인으로</a>}
+        <div className="welcome">
+          <h1 id="auth-title">
+            {signup ? "딛고와 첫걸음을 시작해요" :
+              <><span className="mobile-only">다시 만나 반가워요</span><span className="desktop-only">딛고에 로그인</span></>}
+          </h1>
+          <p>{signup ? "계정을 만들고, 나만의 이해를 쌓아가요." :
+            <><span className="mobile-only">로그인하고 나만의 학습을 이어가요.</span><span className="desktop-only">오늘의 한 걸음, 여기서 시작해요.</span></>}</p>
         </div>
-      </header>
-      <main className="auth-layout">
-        <Introduction signup={signup} />
-        <section className="auth-card" aria-labelledby="auth-title">
-          {signup && <a className="back-link" href={loginUrl}>‹ 로그인으로</a>}
-          <div className="welcome">
-            <h1 id="auth-title">
-              {signup ? "딛고와 첫걸음을 시작해요" :
-                <><span className="mobile-only">다시 만나 반가워요</span><span className="desktop-only">딛고에 로그인</span></>}
-            </h1>
-            <p>{signup ? "계정을 만들고, 나만의 이해를 쌓아가요." :
-              <><span className="mobile-only">로그인하고 나만의 학습을 이어가요.</span><span className="desktop-only">오늘의 한 걸음, 여기서 시작해요.</span></>}</p>
+        {!signup && (
+          <div className="mobile-only learning-message">
+            <strong>정답보다 중요한 건,<br />내가 이해한 한 단계.</strong>
+            <div className="motif" aria-hidden="true"><i /><i /><i /></div>
           </div>
-          {!signup && (
-            <div className="mobile-only learning-message">
-              <strong>정답보다 중요한 건,<br />내가 이해한 한 단계.</strong>
-              <div className="motif" aria-hidden="true"><i /><i /><i /></div>
-            </div>
-          )}
-          {registered && <p className="status" role="status">회원가입이 완료됐어요. 가입한 계정으로 로그인해 주세요.</p>}
-          <form className="auth-form" onSubmit={submit}>
-            <div className="fields">
-              {signup && <Field label="이름" name="name" placeholder="이름을 입력해 주세요" autoComplete="name" />}
-              <Field label={signup ? "이메일" : "아이디(이메일)"} name="email" type="email" autoComplete="username"
-                placeholder={signup ? "이메일 주소를 입력해 주세요" : "이메일을 입력해 주세요"} />
-              <Field label="비밀번호" name="password" type="password" placeholder="비밀번호를 입력해 주세요"
-                autoComplete={signup ? "new-password" : "current-password"} />
-              {signup && <Field label="비밀번호 확인" name="password_confirmation" type="password"
-                placeholder="비밀번호를 한 번 더 입력해 주세요" autoComplete="new-password" />}
-            </div>
-            {signup ? <p className="field-note">비밀번호와 비밀번호 확인에 같은 비밀번호를 입력해 주세요.</p> :
-              <label className="remember"><input name="remember_me" type="checkbox" />로그인 상태 유지</label>}
-            {error && <p className="error" role="alert">{error}</p>}
-            <button className="primary" type="submit" disabled={pending}>{pending ? `${action} 중…` : action}</button>
-          </form>
-          {!signup && (
-            <div className="recovery">
-              <button type="button" onClick={() => setNotice("가입할 때 사용한 이메일로 로그인해 주세요.")}>아이디 찾기</button>
-              <button type="button" onClick={() => setNotice("비밀번호 찾기는 준비 중이에요.")}>비밀번호 찾기</button>
-              {notice && <p role="status">{notice}</p>}
-            </div>
-          )}
-          <p className="switch-form">
-            {signup ? "이미 딛고 계정이 있나요?" : "아직 딛고 계정이 없나요?"}
-            <a href={signup ? loginUrl : signupUrl}>{signup ? "로그인" : "회원가입"}</a>
-          </p>
-          {!signup && <div className="desktop-only continue-note">
-            <strong>어제의 이해를 오늘의 자신감으로.</strong>
-            <p>지난 풀이와 학습 기록을 이어서 확인해요.</p>
-          </div>}
-        </section>
-      </main>
-      <footer className="site-footer">
-        <span className="desktop-only">© {new Date().getFullYear()} 딛고. {slogan}.</span>
-        <div className="footer-items">
-          {!signup && <span>이용약관</span>}
-          <span>개인정보처리방침</span>
-          <span className="desktop-only">문의하기</span>
-        </div>
-        <span className="mobile-only">{slogan} · 딛고</span>
-      </footer>
-    </div>
+        )}
+        {loginNotice && <p className="status" role="status">{loginNotice}</p>}
+        <form className="auth-form" onSubmit={submit}>
+          <div className="fields">
+            {signup && <Field label="이름" name="name" placeholder="이름을 입력해 주세요" autoComplete="name" />}
+            <Field label="이메일" name="email" type="email" autoComplete="username"
+              placeholder={signup ? "이메일 주소를 입력해 주세요" : "이메일을 입력해 주세요"} />
+            <Field label="비밀번호" name="password" type="password" placeholder="비밀번호를 입력해 주세요"
+              autoComplete={signup ? "new-password" : "current-password"} />
+            {signup && <Field label="비밀번호 확인" name="password_confirmation" type="password"
+              placeholder="비밀번호를 한 번 더 입력해 주세요" autoComplete="new-password" />}
+          </div>
+          {signup ? <p className="field-note">비밀번호와 비밀번호 확인에 같은 비밀번호를 입력해 주세요.</p> :
+            <label className="remember"><input name="remember_me" type="checkbox" />로그인 상태 유지</label>}
+          {error && <p className="error" role="alert">{error}</p>}
+          <button className="primary" type="submit" disabled={pending}>{pending ? `${action} 중…` : action}</button>
+        </form>
+        <p className="switch-form">
+          {signup ? "이미 딛고 계정이 있나요?" : "아직 딛고 계정이 없나요?"}
+          <a href={signup ? loginUrl : signupUrl}>{signup ? "로그인" : "회원가입"}</a>
+        </p>
+        {!signup && <div className="desktop-only continue-note">
+          <strong>어제의 이해를 오늘의 자신감으로.</strong>
+          <p>지난 풀이와 학습 기록을 이어서 확인해요.</p>
+        </div>}
+      </section>
+    </AuthFrame>
   );
 }
 
-createRoot(document.getElementById("root")!).render(
-  location.pathname === homeUrl
-    ? <HomePage loginUrl={loginUrl} />
-    : <AuthPage signup={location.pathname === signupUrl} />,
-);
+function App() {
+  switch (location.pathname) {
+    case homeUrl: return <HomePage loginUrl={loginUrl} />;
+    case signupUrl: return <AuthPage signup />;
+    default: return <AuthPage signup={false} />;
+  }
+}
+
+createRoot(document.getElementById("root")!).render(<App />);

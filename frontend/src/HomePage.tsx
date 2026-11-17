@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { ApiError, auth } from "./auth";
+import type { Profile } from "./auth";
+import { AccountSettings } from "./AccountSettings";
 import logo from "./assets/didgo.svg";
 import "./home.css";
 
@@ -56,14 +58,12 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
   const [expanded, setExpanded] = useState<Category["id"] | null>(
     () => selection.category.children ? selection.category.id : null,
   );
-  const [session, setSession] = useState<"checking" | "ready" | "unavailable">("checking");
-  const [loggingOut, setLoggingOut] = useState(false);
-  const [logoutError, setLogoutError] = useState(false);
+  const [session, setSession] = useState<Profile | "checking" | "unavailable">("checking");
 
   useEffect(() => {
     const controller = new AbortController();
-    auth.profile(controller.signal).then(() => {
-      if (!controller.signal.aborted) setSession("ready");
+    auth.profile(controller.signal).then((profile) => {
+      if (!controller.signal.aborted) setSession(profile);
     }).catch((error: unknown) => {
       if (controller.signal.aborted) return;
       if (error instanceof ApiError && error.status === 401) {
@@ -85,31 +85,19 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
     return () => window.removeEventListener("hashchange", syncSelection);
   }, []);
 
-  async function logout() {
-    if (loggingOut) return;
-    setLoggingOut(true);
-    setLogoutError(false);
-    try {
-      await auth.logout();
-      location.replace(loginUrl);
-    } catch {
-      setLogoutError(true);
-      setLoggingOut(false);
-    }
-  }
-
   const { category, item } = selection;
   const title = item?.label ?? category.title ?? category.label;
+  const inSettings = category.id === "settings";
+  const profile = typeof session === "object" ? session : null;
 
   return (
     <div className="student-page">
       <header className="student-header">
         <a className="student-brand" href="#home" aria-label="딛고 학습 홈"><img src={logo} alt="" /></a>
-        <span className="student-header-title">{categories[0].title}</span>
         <span className="subject">중학 수학</span>
       </header>
 
-      {session === "ready" && (
+      {profile && (
         <>
           <nav className="student-sidebar" aria-label="웹 주요 메뉴">
             <ul>
@@ -151,7 +139,7 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
         </>
       )}
 
-      <main className="student-content" aria-labelledby="student-title">
+      <main className={inSettings ? "student-content student-content--settings" : "student-content"} aria-labelledby="student-title">
         <h1 id="student-title">{title}</h1>
         {session === "checking" && <p role="status">로그인 상태를 확인하고 있어요.</p>}
         {session === "unavailable" && (
@@ -160,7 +148,7 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
             <button type="button" className="primary" onClick={() => location.reload()}>다시 시도</button>
           </div>
         )}
-        {session === "ready" && (
+        {profile && (
           <>
             {!item && category.children && (
               <nav className="student-category-links" aria-label={`${category.label} 하위 메뉴`}>
@@ -169,14 +157,7 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
                 ))}
               </nav>
             )}
-            {category.id === "settings" && (
-              <div className="student-settings">
-                {logoutError && <p className="error" role="alert">로그아웃하지 못했어요. 잠시 후 다시 시도해 주세요.</p>}
-                <button className="primary" type="button" onClick={logout} disabled={loggingOut}>
-                  {loggingOut ? "로그아웃 중…" : "로그아웃"}
-                </button>
-              </div>
-            )}
+            {inSettings && <AccountSettings loginUrl={loginUrl} email={profile.email} />}
           </>
         )}
       </main>

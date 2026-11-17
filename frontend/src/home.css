@@ -18,9 +18,9 @@
 }
 
 .student-brand { display: inline-flex; align-items: center; min-height: 44px; }
-.student-brand img { display: block; }
+.student-brand img { display: block; width: 76px; height: auto; }
 .student-brand:focus-visible { outline-color: var(--yellow); }
-.student-header-title, .student-sidebar { display: none; }
+.student-sidebar { display: none; }
 .student-icon { flex: none; width: 20px; height: 20px; }
 
 .student-content {
@@ -31,6 +31,7 @@
 
 .student-content h1 { font-size: clamp(23px, 3vw, 30px); }
 .student-content > p { margin-top: 12px; color: var(--muted); }
+.student-content--settings { padding-top: 20px; background: #f6f8fc; }
 .student-category-links, .student-settings { display: grid; margin-top: 16px; }
 .student-category-links { gap: 10px; }
 .student-settings { max-width: 360px; gap: 12px; }
@@ -83,17 +84,11 @@
     grid-template: "header header" auto "navigation content" minmax(0, 1fr) / var(--sidebar-width) minmax(0, 1fr);
   }
 
-  .student-header {
-    display: grid;
-    grid-template-columns: var(--sidebar-width) minmax(0, 1fr) auto;
-    gap: 0;
-    padding: 0;
-  }
-
-  .student-brand { justify-self: start; margin-left: 24px; }
-  .student-header-title { display: inline; padding-inline: 28px; font-weight: 700; }
-  .student-header .subject { margin-right: 24px; }
+  .student-header { padding-inline: 24px; }
+  .student-brand img { width: 88px; }
   .student-content { padding: 24px 28px 32px; }
+  .student-content--settings { padding: 38px 48px 32px; }
+  .student-content--settings > h1 { font-size: 31px; line-height: 1.25; }
   .student-tabs, .student-category-links { display: none; }
 
   .student-sidebar {

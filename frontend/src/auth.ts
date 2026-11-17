@@ -1,6 +1,7 @@
 type Credentials = { email: string; password: string };
 type Signup = Credentials & { name: string; password_confirmation: string };
 type Login = Credentials & { remember_me: boolean };
+type PasswordChange = { current_password: string; new_password: string; password_confirmation: string };
 type Account = { user_id: string };
 export type Profile = Account & { name: string; email: string };
 
@@ -35,8 +36,23 @@ export const auth = {
     const response = await send("/auth/logout", { method: "POST" });
     if (!response.ok) throw new ApiError(response.status, null);
   },
+  changePassword: (body: PasswordChange) => accountRequest("/me/password", "PATCH", body),
+  withdraw: (password: string) => accountRequest("/me/withdrawal", "POST", { password }),
   profile: (signal?: AbortSignal) => request<Profile>("/me", undefined, signal),
 };
+
+async function accountRequest(
+  path: string, method: "PATCH" | "POST", body: PasswordChange | { password: string },
+) {
+  const response = await send(path, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (response.status === 204) return;
+  const payload = await response.json().catch(() => null);
+  throw new ApiError(response.status, payload?.detail);
+}
 
 export function authMessage(error: unknown) {
   if (!(error instanceof ApiError)) return "서버에 연결할 수 없어요. 잠시 후 다시 시도해 주세요.";
