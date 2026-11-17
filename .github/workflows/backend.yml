@@ -1,0 +1,64 @@
+name: Backend
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+      - name: Install dependencies
+        run: python -m pip install './backend[test]' -r backend/requirements-submission-api.txt -r backend/requirements-type-model.txt
+      - name: Check syntax and run tests
+        run: |
+          python -m compileall -q backend/app backend/scripts
+          python -m pytest -q backend/tests
+      - name: Verify HTTP flow and restart persistence
+        env:
+          DIDGO_DATABASE: ${{ runner.temp }}/solution-flow.sqlite3
+          DIDGO_API_TOKEN: ci-local-token
+          DIDGO_DEV_USER_ID: ci-student
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -B backend/scripts/setup_solution_flow.py --database "$DIDGO_DATABASE" --create-empty
+          server_pid=
+          cleanup() {
+            if [[ -n "$server_pid" ]]; then
+              kill "$server_pid" 2>/dev/null || true
+              wait "$server_pid" 2>/dev/null || true
+            fi
+          }
+          trap cleanup EXIT
+          start_api() {
+            python -m uvicorn app.submission_api:app --app-dir backend --host 127.0.0.1 --port 8765 --workers 1 >"$RUNNER_TEMP/solution-api.log" 2>&1 &
+            server_pid=$!
+            for attempt in {1..40}; do
+              if curl --fail --silent --max-time 2 http://127.0.0.1:8765/health >/dev/null; then return; fi
+              if ! kill -0 "$server_pid" 2>/dev/null; then break; fi
+              sleep 0.25
+            done
+            cat "$RUNNER_TEMP/solution-api.log"
+            return 1
+          }
+          start_api
+          python -B backend/scripts/demo_solution_flow.py --base-url http://127.0.0.1:8765 --token "$DIDGO_API_TOKEN"
+          submission_id=$(curl --fail --silent --show-error -H "Authorization: Bearer $DIDGO_API_TOKEN" 'http://127.0.0.1:8765/submissions?limit=1' | python -c 'import json, sys; print(json.load(sys.stdin)[0]["id"])')
+          snapshot() {
+            for suffix in verification feedback/history; do
+              curl --fail --silent --show-error -H "Authorization: Bearer $DIDGO_API_TOKEN" "http://127.0.0.1:8765/submissions/$submission_id/$suffix"
+            done
+          }
+          snapshot >"$RUNNER_TEMP/before-restart.snapshot"
+          cleanup
+          server_pid=
+          start_api
+          snapshot >"$RUNNER_TEMP/after-restart.snapshot"
+          cmp "$RUNNER_TEMP/before-restart.snapshot" "$RUNNER_TEMP/after-restart.snapshot"

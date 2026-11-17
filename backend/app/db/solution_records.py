@@ -16,6 +16,7 @@ from app.tutor.step_verifier import input_fingerprint
 
 class ConflictError(ValueError):
      # 충돌 오류, 클라이언트가 최신 버전을 다시 조회해야 함
+    pass
 
 
 @contextmanager # DB 연결 컨텍스트 관리자, 쓰기 모드일 경우 즉시 트랜잭션 시작

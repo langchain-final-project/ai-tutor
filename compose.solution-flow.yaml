@@ -1,0 +1,38 @@
+# .env.example을 .env로 복사한 뒤 compose.yaml과 함께 실행한다.
+# docker compose -f compose.yaml -f compose.solution-flow.yaml up --build --wait
+services:
+  solution-flow-init:
+    build: ./backend
+    command:
+      - python
+      - -B
+      - scripts/setup_solution_flow.py
+      - --database
+      - /var/lib/didgo-solution/solution-flow.sqlite3
+      - --create-empty
+    volumes:
+      - solution_data:/var/lib/didgo-solution
+    restart: "no"
+
+  api:
+    command:
+      - uvicorn
+      - app.submission_api:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --workers
+      - "1"
+    environment:
+      DIDGO_DATABASE: /var/lib/didgo-solution/solution-flow.sqlite3
+      DIDGO_API_TOKEN: ${DIDGO_API_TOKEN:?개발용 DIDGO_API_TOKEN을 설정해 주세요}
+      DIDGO_DEV_USER_ID: ${DIDGO_DEV_USER_ID:-local-student}
+    volumes:
+      - solution_data:/var/lib/didgo-solution
+    depends_on:
+      solution-flow-init:
+        condition: service_completed_successfully
+
+volumes:
+  solution_data:

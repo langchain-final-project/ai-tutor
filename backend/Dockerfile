@@ -9,7 +9,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
 COPY . .
-RUN python -m pip install --no-cache-dir ".[test]"
+RUN python -m pip install --no-cache-dir ".[test]" -r requirements-submission-api.txt -r requirements-type-model.txt
 
 # 컨테이너 밖의 로컬 브라우저에서 접속할 수 있도록 전체 인터페이스에 바인딩합니다.
 EXPOSE 8000

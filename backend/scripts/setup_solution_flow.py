@@ -14,7 +14,7 @@ import tempfile
 
 
 ROOT = Path(__file__).resolve().parents[2]
-MIGRATIONS = ROOT / "backend/migrations"
+MIGRATIONS = Path(__file__).resolve().parents[1] / "migrations"
 DATABASE = ROOT / "data/local/solution-flow.sqlite3"
 BASE = (
     ("001_problem_bank.sqlite.sql", None),
