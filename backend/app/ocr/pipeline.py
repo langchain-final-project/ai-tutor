@@ -2,12 +2,15 @@
 
 from contextlib import closing
 import json
+import logging
 import re
 
 from .checks import compare_readings, text_issues
 from .images import Region, open_image, prepare, region_box, uncovered_content
 from .llama import Backend, OCRError
 from .tables import parse_table
+
+logger = logging.getLogger(__name__)
 
 
 PADDLE_TASKS = {"text": "OCR:", "table": "Table Recognition:", "formula": "Formula Recognition:"}
@@ -75,6 +78,7 @@ class OCRPipeline:
         primary_engine="paddle",
         rotation=0,
         orientation_detector=None,
+        layout_detector=None,
     ):
         self.paddle, self.qwen = paddle, qwen
         self.formula = formula
@@ -85,6 +89,7 @@ class OCRPipeline:
         self.primary_engine = primary_engine
         self.rotation = rotation
         self.orientation_detector = orientation_detector
+        self.layout_detector = layout_detector
 
     def recognize(self, image: bytes, regions: list[Region] | None = None, *, check_text: bool = False) -> dict:
         """최종 결과만 반환한다. 증분 출력은 stream()을 사용한다."""
@@ -96,7 +101,8 @@ class OCRPipeline:
     def stream(self, image: bytes, regions: list[Region] | None = None, *, check_text: bool = False):
         """stage/delta/region_complete/result 이벤트. delta는 검수 전의 임시 문자열이다.
 
-        영역을 생략하면 전체를 본문으로 읽는다. 자동 도형·표 탐지는 수행하지 않는다.
+        영역을 생략하면 전체를 본문으로 읽는다. layout_detector를 지정하면
+        방향 보정 후 영역 후보를 추가 분석하며, 주 OCR 입력은 그대로 유지한다.
         formula 영역은 문장이 섞이지 않은 수식에만 지정하며 후보를 본문에 덮어쓰지 않는다.
         영역 좌표는 EXIF 보정과 추가 반시계 회전까지 적용된 이미지 기준이다.
         """
@@ -118,6 +124,40 @@ class OCRPipeline:
                 yield {"type": "orientation", **orientation}
         if self.rotation:
             source = source.rotate(self.rotation, expand=True)
+
+        layout_detection = None
+        if self.layout_detector is not None:
+            yield {"type": "stage", "stage": "layout"}
+            try:
+                candidate = self.layout_detector.detect(source)
+                if not isinstance(candidate, dict) or candidate.get("status") not in {
+                    "detected", "not_detected", "unavailable",
+                }:
+                    raise ValueError("영역 검출 결과 형식이 올바르지 않습니다.")
+                layout_detection = dict(candidate)
+                if candidate["status"] in {"detected", "not_detected"}:
+                    # 영역 기능을 사용하지 않는 기존 CLI에는 추가 의존성을 요구하지 않는다.
+                    from .layout import ProblemLayout
+
+                    layout = ProblemLayout.model_validate(candidate.get("layout"))
+                    if tuple(layout.image_size) != source.size:
+                        raise ValueError("영역 좌표와 방향 보정된 이미지 크기가 다릅니다.")
+                    layout_detection["layout"] = layout.model_dump(mode="json")
+                else:
+                    layout_detection["layout"] = None
+                # 부가 분석의 잘못된 값 때문에 OCR 원문 저장이 실패하지 않게 한다.
+                json.dumps(layout_detection, allow_nan=False)
+            except Exception:
+                logger.exception("영역 검출 결과를 처리하지 못했습니다.")
+                layout_detection = {
+                    "status": "unavailable", "layout": None, "report": None,
+                    "message": "문제 영역을 구분하지 못했어요. 원본 사진과 인식 내용을 확인해 주세요.",
+                }
+            yield {
+                "type": "layout_complete", "status": layout_detection["status"],
+                "image_size": list(source.size),
+            }
+
         selected = list(regions) if regions is not None else [Region("problem")]
         if not selected or len(selected) > 32:
             raise ValueError("영역은 서로 다른 ID로 1~32개 지정해 주세요.")
@@ -126,6 +166,8 @@ class OCRPipeline:
         if len({r.id for r in selected}) != len(selected):
             raise ValueError("영역 ID가 중복됐습니다.")
         issues = []
+        if layout_detection is not None and layout_detection["status"] == "unavailable":
+            issues.append("문제 영역을 구분하지 못했습니다. 원본 사진과 인식 내용을 확인해 주세요.")
         if orientation is not None and orientation["status"] in {"uncertain", "unavailable"}:
             issues.append("사진 방향을 확실하게 판단하지 못했습니다. 원본 방향과 인식 내용을 확인해 주세요.")
         if regions is None:
@@ -249,5 +291,6 @@ class OCRPipeline:
                "image_size": list(source.size),
                "rotation_ccw": (self.rotation + (orientation or {}).get("rotation_ccw", 0)) % 360,
                "orientation": orientation,
+               "layout_detection": layout_detection,
                "uncovered_dark_pixels": outside,
                "issues": issues, "regions": list(results.values())}}

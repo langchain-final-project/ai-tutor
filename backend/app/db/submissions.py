@@ -368,6 +368,8 @@ def get_submission(
     # 학생 수정본도 최초 OCR 결과를 참조하므로 방향 정보가 함께 복원된다.
     result["image_rotation_ccw"] = 0
     result["image_orientation"] = None
+    result["selected_region"] = None
+    result["layout_detection"] = None
     if latest is not None and latest["source_ocr_result_id"] is not None:
         ocr = _fetch_one(
             connection,
@@ -381,6 +383,10 @@ def get_submission(
                 result["image_rotation_ccw"] = rotation
             if isinstance(raw.get("orientation"), dict):
                 result["image_orientation"] = raw["orientation"]
+            if isinstance(raw.get("selected_region"), dict):
+                result["selected_region"] = raw["selected_region"]
+            if isinstance(raw.get("layout_detection"), dict):
+                result["layout_detection"] = raw["layout_detection"]
 
     return result
 

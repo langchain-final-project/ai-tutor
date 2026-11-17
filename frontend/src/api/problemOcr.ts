@@ -3,18 +3,32 @@ import type {
   ProblemReview,
   ReviewBlock,
 } from "../types/problemReview";
+import type { PhotoRegion } from "../types/photoRegion";
 
 export type OcrPhase =
   | "idle"
   | "restoring"
   | "uploading"
+  | "quality_review"
+  | "region_review"
   | "queued"
   | "running"
   | "completed"
   | "failed";
 
+export type PhotoQuality = {
+  policy_version: string;
+  status: "warning" | "no_warning";
+  warnings: {
+    code: string;
+    message: string;
+  }[];
+};
+
 export type Submission = {
   id: number;
+  photo_quality?: PhotoQuality;
+  selected_region?: PhotoRegion | null;
   image_rotation_ccw?: number;
   image_orientation?: {
     status: "corrected" | "unchanged" | "uncertain" | "unavailable" | "skipped";
@@ -40,6 +54,7 @@ type OcrJob = {
   id: string;
   status: "queued" | "running" | "completed" | "failed";
   error_message: string | null;
+  selected_region?: PhotoRegion | null;
 };
 
 async function request<T>(
@@ -112,7 +127,7 @@ export async function loadReview(submissionId: number, signal: AbortSignal) {
 }
 
 export async function readReviewPhoto(submissionId: number, signal: AbortSignal): Promise<Blob> {
-  const response = await fetch(`/ocr-api/submissions/${submissionId}/photo?corrected=true`, { signal });
+  const response = await fetch(`/ocr-api/submissions/${submissionId}/photo?corrected=true&selected=true`, { signal });
   if (!response.ok) {
     throw new ReviewApiError(response.status, "문제 사진을 불러오지 못했습니다.");
   }
@@ -137,26 +152,41 @@ function waitForPoll(signal: AbortSignal): Promise<void> {
   });
 }
 
-export async function recognizePhoto(
+export async function uploadPhoto(
   file: File,
   signal: AbortSignal,
-  onStatus: (phase: OcrPhase) => void,
 ): Promise<Submission> {
-  onStatus("uploading");
-
   const form = new FormData();
   form.append("files", file);
 
-  const submission = await request<Submission>("/submissions/photo", {
+  return request<Submission>("/submissions/photo", {
     method: "POST",
     body: form,
     signal,
   });
+}
+
+export async function recognizeSubmission(
+  submission: Submission,
+  signal: AbortSignal,
+  onStatus: (phase: OcrPhase) => void,
+  region: PhotoRegion,
+): Promise<Submission> {
+  onStatus("queued");
 
   let job = await request<OcrJob>(`/submissions/${submission.id}/ocr`, {
     method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ region }),
     signal,
   });
+
+  const accepted = job.selected_region;
+  if (!accepted || accepted.coordinate_space !== region.coordinate_space ||
+    accepted.image_size.some((value, index) => value !== region.image_size[index]) ||
+    accepted.bbox.some((value, index) => value !== region.bbox[index])) {
+    throw new Error("선택한 문제 범위를 서버에서 확인하지 못했습니다. API 서버를 다시 시작해 주세요.");
+  }
 
   while (true) {
     signal.throwIfAborted();

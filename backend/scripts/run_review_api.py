@@ -10,6 +10,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "backend"))
 
 from app.submission_api import create_submission_app
+from app.db.ocr_regions import ensure_ocr_region_schema
 
 DATABASE = ROOT / "data/review-preview.sqlite3"
 
@@ -65,6 +66,8 @@ def prepare_database():
 
         if not required.issubset(tables):
             raise RuntimeError("화면 테스트용 DB 구조를 확인해 주세요.")
+
+        ensure_ocr_region_schema(connection)
 
 
 if __name__ == "__main__":

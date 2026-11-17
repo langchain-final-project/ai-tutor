@@ -1,5 +1,5 @@
 import { useRef, useState } from "react";
-import type { ChangeEvent } from "react";
+import type { ChangeEvent, ReactNode } from "react";
 import { PhotoViewer } from "./PhotoViewer";
 
 const acceptedTypes = new Set([
@@ -12,12 +12,14 @@ type PhotoPickerProps = {
   onSelect: (file: File) => boolean;
   imageUrl: string | null;
   disabled?: boolean;
+  photoContent?: ReactNode;
 };
 
 export function PhotoPicker({
   onSelect,
   imageUrl,
   disabled = false,
+  photoContent,
 }: PhotoPickerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
@@ -51,7 +53,7 @@ export function PhotoPicker({
   return (
     <div className="review-photo-picker">
       {imageUrl ? (
-      <PhotoViewer
+      photoContent ?? <PhotoViewer
         key={imageUrl}
         imageUrl={imageUrl}
         onError={() => {
@@ -111,7 +113,7 @@ export function PhotoPicker({
       )}
 
       <p className="review-help">
-        사진을 선택하면 업로드 후 문제 내용을 인식합니다.
+        사진을 선택하면 품질을 확인하고 문제 범위를 선택할 수 있어요.
       </p>
     </div>
   );

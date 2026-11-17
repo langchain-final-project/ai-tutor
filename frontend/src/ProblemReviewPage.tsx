@@ -3,7 +3,8 @@ import type { FormEvent } from "react";
 import { MathFormula } from "./components/MathFormula";
 import type { ContentPart, ProblemReview } from "./types/problemReview";
 import {
-  recognizePhoto,
+  uploadPhoto,
+  recognizeSubmission,
   createReviewProblem,
   loadReview,
   readReviewPhoto,
@@ -14,6 +15,9 @@ import {
 import type { OcrPhase, Submission } from "./api/problemOcr";
 import { MathPad } from "./components/MathPad";
 import { PhotoPicker } from "./components/PhotoPicker";
+import { PhotoRegionSelector } from "./components/PhotoRegionSelector";
+import type { PhotoRegion } from "./types/photoRegion";
+import { isFullPhotoRegion } from "./utils/photoRegion";
 import "./problem-review.css";
 
 function PartContent({ part }: { part: ContentPart }) {
@@ -56,7 +60,12 @@ const [phase, setPhase] = useState<OcrPhase>("idle");
 const [ocrError, setOcrError] = useState("");
 const ocrControllerRef = useRef<AbortController | null>(null);
 const [submission, setSubmission] = useState<Submission | null>(null);
+const [pendingPhoto, setPendingPhoto] = useState<{
+  submission: Submission;
+  imageUrl: string;
+} | null>(null);
 const [saving, setSaving] = useState<"save" | "confirm" | null>(null);
+const [photoRegion, setPhotoRegion] = useState<PhotoRegion | null>(null);
 const [saveNotice, setSaveNotice] = useState("");
 const [saveError, setSaveError] = useState("");
 const [needsReload, setNeedsReload] = useState(false);
@@ -124,6 +133,7 @@ async function restoreSubmission(id: number) {
     originalTextRef.current = result.originalText;
     setProblem(createReviewProblem(result.submission, result.originalText, imageUrl));
     setSubmission(result.submission);
+    setPhotoRegion(result.submission.selected_region ?? null);
     setSelectedId(null);
     setNeedsReload(false);
     setSaveError("");
@@ -148,13 +158,11 @@ async function startPhotoRecognition(file: File, imageUrl: string) {
   const controller = new AbortController();
   ocrControllerRef.current = controller;
 
-  let timedOut = false;
-  const timeout = window.setTimeout(() => {
-    timedOut = true;
-    controller.abort();
-  }, 360_000);
+  const timeout = window.setTimeout(() => controller.abort(), 30_000);
 
   setPhase("uploading");
+  setPendingPhoto(null);
+  setPhotoRegion(null);
   setOcrError("");
   setSelectedId(null);
   setProblem(createEmptyProblem(imageUrl));
@@ -168,12 +176,55 @@ async function startPhotoRecognition(file: File, imageUrl: string) {
   mathDialogRef.current?.close();
 
   try {
-    const result = await recognizePhoto(file, controller.signal, (nextPhase) => {
+    const uploaded = await uploadPhoto(file, controller.signal);
+    window.clearTimeout(timeout);
+    if (ocrControllerRef.current !== controller) return;
+
+    const quality = uploaded.photo_quality;
+    if (
+      !quality ||
+      !["warning", "no_warning"].includes(quality.status) ||
+      !Array.isArray(quality.warnings) ||
+      !quality.warnings.every((warning) =>
+        warning && typeof warning.code === "string" && typeof warning.message === "string"
+      )
+    ) {
+      throw new Error("사진 품질 검사 결과를 확인하지 못했습니다. API 서버를 확인해 주세요.");
+    }
+
+    setPendingPhoto({ submission: uploaded, imageUrl });
+    setPhase(quality.status === "warning" ? "quality_review" : "region_review");
+  } catch (error) {
+    if (ocrControllerRef.current !== controller) return;
+    setPhase("failed");
+    setOcrError(controller.signal.aborted
+      ? "사진 업로드 시간이 초과됐습니다. 다시 시도해 주세요."
+      : error instanceof Error ? error.message : "사진 업로드에 실패했습니다.");
+  } finally {
+    window.clearTimeout(timeout);
+    if (ocrControllerRef.current === controller) ocrControllerRef.current = null;
+    controller.abort();
+  }
+}
+
+async function recognizeUploadedPhoto(
+  uploaded: Submission,
+  imageUrl: string,
+  controller: AbortController,
+  region: PhotoRegion,
+) {
+  const timeout = window.setTimeout(() => controller.abort(), 360_000);
+  setPhase("queued");
+  setOcrError("");
+
+  try {
+    const result = await recognizeSubmission(uploaded, controller.signal, (nextPhase) => {
       if (ocrControllerRef.current === controller) setPhase(nextPhase);
-    });
+    }, region);
+    if (ocrControllerRef.current !== controller) return;
 
     let displayedUrl = imageUrl;
-    if (result.image_rotation_ccw) {
+    if (result.image_rotation_ccw || (result.selected_region && !isFullPhotoRegion(result.selected_region))) {
       const photo = await readReviewPhoto(result.id, controller.signal);
       if (ocrControllerRef.current !== controller) return;
       displayedUrl = URL.createObjectURL(photo);
@@ -182,13 +233,14 @@ async function startPhotoRecognition(file: File, imageUrl: string) {
     originalTextRef.current = result.latest_input!.content_text;
     setProblem(createReviewProblem(result, originalTextRef.current, displayedUrl));
     setSubmission(result);
+    setPhotoRegion(result.selected_region ?? null);
     rememberSubmission(result.id);
     setPhase("completed");
   } catch (error) {
     if (ocrControllerRef.current !== controller) return;
     setPhase("failed");
     setOcrError(
-      timedOut
+      controller.signal.aborted
         ? "인식 대기 시간을 초과했습니다. 서버 작업은 계속될 수 있습니다."
         : error instanceof Error
           ? error.message
@@ -199,11 +251,24 @@ async function startPhotoRecognition(file: File, imageUrl: string) {
     if (ocrControllerRef.current === controller) {
       ocrControllerRef.current = null;
     }
+    controller.abort();
   }
 }
 
+function continuePhotoRecognition() {
+  if (!pendingPhoto || phase !== "region_review" || !photoRegion ||
+    locked || ocrControllerRef.current) return;
+
+  const pending = pendingPhoto;
+  const controller = new AbortController();
+  ocrControllerRef.current = controller;
+  setPendingPhoto(null);
+
+  void recognizeUploadedPhoto(pending.submission, pending.imageUrl, controller, photoRegion);
+}
+
 function choosePhoto(file: File): boolean {
-  if (locked || saveControllerRef.current) return false;
+  if (locked || ocrControllerRef.current || saveControllerRef.current) return false;
 
   if (
     hasEdits &&
@@ -273,6 +338,8 @@ const phaseMessage: Record<OcrPhase, string> = {
   idle: "사진을 선택하면 인식한 내용이 여기에 표시됩니다.",
   restoring: "저장된 문제와 원본 사진을 불러오고 있어요.",
   uploading: "사진을 업로드하고 있어요.",
+  quality_review: "사진 상태를 확인하고 인식을 계속할지 선택해 주세요.",
+  region_review: "인식할 문제의 범위를 확인해 주세요.",
   queued: "문제 인식 순서를 기다리고 있어요.",
   running: "문제 사진을 읽고 있어요. 잠시 기다려 주세요.",
   completed: "인식이 완료됐어요. 원본과 비교해 주세요.",
@@ -367,7 +434,9 @@ function applyMathEdit(latex: string) {
       <header className="review-header">
         <span className="review-brand">딛고</span>
         <span className="review-badge">
-          {phase === "restoring" ? "불러오는 중" : busy ? "인식 중"
+          {phase === "region_review" ? "범위 확인"
+            : phase === "quality_review" ? "사진 확인"
+            : phase === "restoring" ? "불러오는 중" : busy ? "인식 중"
             : confirmed ? "확인 완료" : hasEdits ? "수정 중"
               : phase === "completed" ? "확인 대기" : "문제 등록"}
         </span>
@@ -383,16 +452,63 @@ function applyMathEdit(latex: string) {
           className="review-section"
           aria-labelledby="review-photo-title"
         >
-          <h2 id="review-photo-title">원본 사진</h2>
+          <h2 id="review-photo-title">
+            {submission?.selected_region && !isFullPhotoRegion(submission.selected_region)
+              ? "선택한 문제 사진" : "원본 사진"}
+          </h2>
 
-          <PhotoPicker onSelect={choosePhoto} imageUrl={problem.imageUrl} disabled={locked} />
+          <PhotoPicker
+            onSelect={choosePhoto}
+            imageUrl={problem.imageUrl}
+            disabled={locked}
+            photoContent={phase === "region_review" && pendingPhoto ? (
+              <PhotoRegionSelector
+                key={pendingPhoto.imageUrl}
+                imageUrl={pendingPhoto.imageUrl}
+                onChange={setPhotoRegion}
+              />
+            ) : undefined}
+          />
+          {phase === "quality_review" && pendingPhoto && (
+            <div className="review-quality-warning" role="region" aria-labelledby="review-quality-title">
+              <h3 id="review-quality-title">사진을 한 번 확인해 주세요</h3>
+              <ul>
+                {pendingPhoto.submission.photo_quality?.warnings.map((warning) => (
+                  <li key={warning.code}>{warning.message}</li>
+                ))}
+              </ul>
+              <p>
+                위의 사진 선택·재촬영 버튼으로 사진을 바꾸거나,
+                이 사진으로 인식을 계속할 수 있어요.
+              </p>
+              <button type="button" disabled={locked} onClick={() => setPhase("region_review")}>
+                이 사진으로 범위 선택
+              </button>
+            </div>
+          )}
+          {phase === "region_review" && pendingPhoto && (
+            <div className="review-region-actions">
+              <p className="review-help">
+                {isFullPhotoRegion(photoRegion)
+                  ? "전체 사진이 선택되어 있어요. 사진 전체를 인식할 수 있어요."
+                  : "선택한 범위만 인식해요. 본문·선택지·필요한 그림과 표가 모두 포함됐는지 확인해 주세요."}
+              </p>
+              <button
+                type="button"
+                disabled={locked || !photoRegion}
+                onClick={continuePhotoRecognition}
+              >
+                이 범위 인식하기
+              </button>
+            </div>
+          )}
           {submission?.image_orientation?.status === "corrected" && (
             <p className="review-help">사진 방향을 자동으로 보정했어요.</p>
           )}
           {(submission?.image_orientation?.status === "uncertain" ||
             submission?.image_orientation?.status === "unavailable") && (
             <p className="review-error" role="status">
-              사진 방향을 확실하게 판단하지 못했어요. 방향과 인식 내용을 확인해 주세요.
+              사진 방향을 확인해주세요. 인식된 내용과 맞으면 그대로 진행하세요.
             </p>
           )}
         </section>

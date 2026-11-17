@@ -30,6 +30,7 @@ from app.db.submissions import (
 from app.ocr_api import create_ocr_router
 from app.ocr_jobs import OCRJobManager, build_qwen_pipeline
 from app.ocr.images import open_image
+from app.ocr.selection import crop_photo_region
 from app.ocr.quality import (
     inspect_photo_quality,
     evaluate_photo_quality,
@@ -237,7 +238,9 @@ def create_submission_app(
     def upload_photo(
         files: Annotated[
             list[UploadFile],
-            File(min_length=1, max_length=1),
+            File(min_length=1, max_length=1, json_schema_extra={"items": {
+                "type":"string", "format":"binary",
+            }}),
         ],
         student_id: Annotated[str, Depends(current_owner)],
     ):
@@ -254,6 +257,13 @@ def create_submission_app(
             if not filename.strip() or len(filename) > 255:
                 raise HTTPException(422, "파일명을 확인해 주세요.")
 
+            quality_metrics = inspect_photo_quality(content)
+
+            photo_quality = {
+                **evaluate_photo_quality(quality_metrics),
+                "metrics": quality_metrics,
+            }
+
             with submission_connection(database) as connection:
                 ids = create_photo_submission(
                     connection,
@@ -263,11 +273,14 @@ def create_submission_app(
                     image_content=content,
                 )
 
-                return get_submission(
+                submission = get_submission(
                     connection,
                     submission_id=ids["submission_id"],
                     owner_id=student_id,
                 )
+
+            submission["photo_quality"] = photo_quality
+            return submission
 
         finally:
             upload.file.close()
@@ -289,6 +302,7 @@ def create_submission_app(
         submission_id: int,
         student_id: Annotated[str, Depends(current_owner)],
         corrected: bool = False,
+        selected: bool = False,
     ):
         with submission_connection(database) as connection:
             photo = get_uploaded_photo(
@@ -298,18 +312,24 @@ def create_submission_app(
             )
 
             rotation = 0
-            if corrected:
+            region = None
+            if corrected or selected:
                 current = get_submission(
                     connection, submission_id=submission_id, owner_id=student_id,
                 )
-                rotation = current["image_rotation_ccw"]
+                if corrected:
+                    rotation = current["image_rotation_ccw"]
+                if selected:
+                    region = current["selected_region"]
 
-        if corrected:
-            with open_image(photo["image_content"]) as image:
+        if corrected or selected:
+            content = crop_photo_region(photo["image_content"], region) if region else photo["image_content"]
+            with open_image(content) as image:
                 with image.rotate(rotation, expand=True) as upright:
                     output = BytesIO()
                     upright.save(output, format="PNG")
-            filename = Path(photo["original_filename"]).stem + "-upright.png"
+            suffix = "-selected" if region else ""
+            filename = Path(photo["original_filename"]).stem + suffix + "-upright.png"
             return Response(
                 content=output.getvalue(),
                 media_type="image/png",

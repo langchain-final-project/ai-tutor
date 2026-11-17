@@ -409,3 +409,124 @@
   position: relative;
   width: 100%;
 }
+
+.review-quality-warning {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e6bf59;
+  border-radius: 16px;
+  background: #fff8e5;
+}
+
+.review-quality-warning h3,
+.review-quality-warning p,
+.review-quality-warning ul {
+  margin: 0;
+}
+
+.review-quality-warning ul {
+  padding-left: 20px;
+}
+
+.review-quality-warning p,
+.review-quality-warning li {
+  line-height: 1.7;
+}
+
+.review-quality-warning button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--navy);
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+
+.review-quality-warning button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.review-region-selector,
+.review-region-preview,
+.review-region-actions {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.review-region-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.review-region-selector h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.review-region-heading button,
+.review-region-actions button {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--navy);
+  font: inherit;
+  cursor: pointer;
+}
+
+.review-region-actions button {
+  background: var(--navy);
+  color: white;
+}
+
+.review-region-heading button:disabled,
+.review-region-actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.review-region-stage {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--subtle);
+}
+
+.review-region-stage .ReactCrop {
+  max-height: min(55svh, 440px);
+  --rc-drag-handle-size: 24px;
+  --rc-drag-handle-mobile-size: 44px;
+  --rc-drag-handle-bg-colour: var(--navy);
+  --rc-focus-color: var(--blue);
+}
+
+.review-region-image {
+  image-orientation: from-image;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.review-region-preview {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.review-region-preview canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  width: auto;
+  height: auto;
+  margin-inline: auto;
+}
