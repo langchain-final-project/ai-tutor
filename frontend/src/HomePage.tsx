@@ -53,17 +53,24 @@ function getSelection() {
   return { category, item: category.children?.find(({ id }) => id === itemId) };
 }
 
-export function HomePage({ loginUrl }: { loginUrl: string }) {
+export function HomePage({ loginUrl, adminUrl }: { loginUrl: string; adminUrl: string }) {
   const [selection, setSelection] = useState(getSelection);
   const [expanded, setExpanded] = useState<Category["id"] | null>(
     () => selection.category.children ? selection.category.id : null,
   );
   const [session, setSession] = useState<Profile | "checking" | "unavailable">("checking");
+  const [canOpenAdmin, setCanOpenAdmin] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
     auth.profile(controller.signal).then((profile) => {
-      if (!controller.signal.aborted) setSession(profile);
+      if (controller.signal.aborted) return;
+      setSession(profile);
+      auth.adminSession(controller.signal).then(() => {
+        if (!controller.signal.aborted) setCanOpenAdmin(true);
+      }).catch(() => {
+        // The admin link stays hidden until the server confirms access.
+      });
     }).catch((error: unknown) => {
       if (controller.signal.aborted) return;
       if (error instanceof ApiError && error.status === 401) {
@@ -94,7 +101,10 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
     <div className="student-page">
       <header className="student-header">
         <a className="student-brand" href="#home" aria-label="딛고 학습 홈"><img src={logo} alt="" /></a>
-        <span className="subject">중학 수학</span>
+        <div className="student-header-actions">
+          <span className="subject">중학 수학</span>
+          {canOpenAdmin && <a className="student-admin-link" href={adminUrl}>관리자 페이지</a>}
+        </div>
       </header>
 
       {profile && (

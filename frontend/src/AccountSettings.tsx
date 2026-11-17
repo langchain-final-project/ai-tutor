@@ -1,6 +1,8 @@
 import { useRef, useState } from "react";
 import type { FormEvent } from "react";
 import { ApiError, auth, authMessage } from "./auth";
+import { AccountInquiry } from "./AccountInquiry";
+import { AccountInquiryHistory } from "./AccountInquiryHistory";
 import chevron from "./assets/settings-chevron.svg";
 import dangerChevron from "./assets/settings-chevron-danger.svg";
 import "./account-settings.css";
@@ -9,7 +11,7 @@ const actions = { password: "비밀번호 변경", withdrawal: "회원 탈퇴", 
 type AccountAction = keyof typeof actions;
 
 export function AccountSettings({ loginUrl, email }: { loginUrl: string; email: string }) {
-  const [editing, setEditing] = useState<Exclude<AccountAction, "logout"> | null>(null);
+  const [editing, setEditing] = useState<Exclude<AccountAction, "logout"> | "inquiry" | "inquiry-history" | null>(null);
   const [pending, setPending] = useState<AccountAction | null>(null);
   const [error, setError] = useState("");
   const accountForm = useRef<HTMLFormElement>(null);
@@ -95,6 +97,12 @@ export function AccountSettings({ loginUrl, email }: { loginUrl: string; email: 
           <button className="account-row" type="button" onClick={() => open("password")} disabled={pending !== null}>
             {actions.password}<img src={chevron} alt="" />
           </button>
+          <button className="account-row" type="button" onClick={() => open("inquiry")} disabled={pending !== null}>
+            문의하기<img src={chevron} alt="" />
+          </button>
+          <button className="account-row" type="button" onClick={() => open("inquiry-history")} disabled={pending !== null}>
+            내 문의<img src={chevron} alt="" />
+          </button>
           <button className="account-row" type="button" onClick={() => void submit("logout")} disabled={pending !== null}>
             {pending ? "로그아웃 중…" : actions.logout}<img src={chevron} alt="" />
           </button>
@@ -106,6 +114,9 @@ export function AccountSettings({ loginUrl, email }: { loginUrl: string; email: 
       </div>
     );
   }
+
+  if (editing === "inquiry") return <AccountInquiry loginUrl={loginUrl} onClose={() => open(null)} />;
+  if (editing === "inquiry-history") return <AccountInquiryHistory loginUrl={loginUrl} onClose={() => open(null)} />;
 
   const withdrawing = editing === "withdrawal";
   return (

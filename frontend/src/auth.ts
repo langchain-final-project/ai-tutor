@@ -2,8 +2,17 @@ type Credentials = { email: string; password: string };
 type Signup = Credentials & { name: string; password_confirmation: string };
 type Login = Credentials & { remember_me: boolean };
 type PasswordChange = { current_password: string; new_password: string; password_confirmation: string };
+type InquirySubmission = { category: string; title: string; body: string };
 type Account = { user_id: string };
 export type Profile = Account & { name: string; email: string };
+type InquiryStatus = "pending" | "answered";
+type InquirySummary = { inquiry_id: string; title: string; status: InquiryStatus };
+export type StudentInquiry = InquirySummary & { created_at: string };
+export type StudentInquiryPage = { items: StudentInquiry[]; next_cursor: string | null };
+export type StudentInquiryDetail = InquirySummary & {
+  body: string;
+  replies: { reply_id: string; body: string }[];
+};
 
 export class ApiError extends Error {
   constructor(public status: number, public detail: unknown) {
@@ -11,11 +20,11 @@ export class ApiError extends Error {
   }
 }
 
-function send(path: string, options: RequestInit) {
+export function send(path: string, options: RequestInit) {
   return fetch(`/api${path}`, { ...options, credentials: "same-origin" });
 }
 
-async function request<T>(path: string, body?: Login | Signup, signal?: AbortSignal) {
+async function request<T>(path: string, body?: Login | Signup | InquirySubmission, signal?: AbortSignal) {
   const response = await send(path, {
     signal,
     ...(body && {
@@ -38,7 +47,17 @@ export const auth = {
   },
   changePassword: (body: PasswordChange) => accountRequest("/me/password", "PATCH", body),
   withdraw: (password: string) => accountRequest("/me/withdrawal", "POST", { password }),
+  submitInquiry: (body: InquirySubmission) =>
+    request<{ inquiry_id: string; status: "pending" }>("/me/inquiries", body),
+  myInquiries: (cursor: string | undefined, signal: AbortSignal) =>
+    request<StudentInquiryPage>(cursor ? `/me/inquiries?cursor=${encodeURIComponent(cursor)}` : "/me/inquiries", undefined, signal),
+  myInquiry: (id: string, signal: AbortSignal) =>
+    request<StudentInquiryDetail>(`/me/inquiries/${encodeURIComponent(id)}`, undefined, signal),
   profile: (signal?: AbortSignal) => request<Profile>("/me", undefined, signal),
+  async adminSession(signal: AbortSignal) {
+    const response = await send("/admin/session", { signal });
+    if (response.status !== 204) throw new ApiError(response.status, null);
+  },
 };
 
 async function accountRequest(

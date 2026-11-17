@@ -43,6 +43,33 @@
 .account-form { display: grid; gap: 16px; }
 .account-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 
+.student-settings.account-inquiry { max-width: 560px; }
+.account-inquiry select, .account-inquiry textarea {
+  width: 100%;
+  min-height: 54px;
+  padding: 12px 15px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--paper);
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+}
+.account-inquiry textarea { resize: vertical; }
+
+.account-inquiry-list { list-style: none; margin: 0; padding: 0 16px; }
+.account-inquiry-list li + li { border-top: 1px solid var(--border); }
+.account-inquiry-list .account-row { min-height: 62px; padding: 10px 0; }
+.account-inquiry-row { display: grid; gap: 3px; min-width: 0; overflow-wrap: anywhere; }
+.account-inquiry-row .account-description { font-size: 13px; font-weight: 500; }
+.account-inquiry-detail { display: grid; gap: 10px; padding: 16px; }
+.account-inquiry-detail h3, .account-inquiry-detail h4 { margin: 0; }
+.account-inquiry-detail h3, .account-inquiry-text { overflow-wrap: anywhere; }
+.account-inquiry-text { white-space: pre-wrap; }
+.account-inquiry-reply { display: grid; gap: 6px; padding-top: 12px; border-top: 1px solid var(--border); }
+.account-inquiry-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 13px; }
+.account-inquiry-pagination .account-option { min-height: 40px; }
+
 .account-option {
   min-height: 54px;
   padding: 10px 16px;

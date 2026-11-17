@@ -3,6 +3,7 @@ import type { FormEvent, InputHTMLAttributes, ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import "@fontsource-variable/noto-sans-kr";
 import { ApiError, auth, authMessage } from "./auth";
+import { AdminPage } from "./AdminPage";
 import { HomePage } from "./HomePage";
 import logo from "./assets/didgo.svg";
 import "./styles.css";
@@ -10,6 +11,7 @@ import "./styles.css";
 const loginUrl = "/login";
 const signupUrl = "/signup";
 const homeUrl = "/home";
+const adminUrl = "/admin";
 const slogan = "한 걸음씩, 내 힘으로";
 const loginSteps = [
   ["문제에서 출발", "2x + 3 = 11", "궁금한 문제를 가져와요"],
@@ -198,7 +200,8 @@ function AuthPage({ signup }: { signup: boolean }) {
 
 function App() {
   switch (location.pathname) {
-    case homeUrl: return <HomePage loginUrl={loginUrl} />;
+    case adminUrl: return <AdminPage loginUrl={loginUrl} homeUrl={homeUrl} />;
+    case homeUrl: return <HomePage loginUrl={loginUrl} adminUrl={adminUrl} />;
     case signupUrl: return <AuthPage signup />;
     default: return <AuthPage signup={false} />;
   }

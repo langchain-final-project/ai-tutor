@@ -1,6 +1,10 @@
-from sqlalchemy import BigInteger, Column, DateTime, ForeignKey, MetaData, String, Table, Text
+from sqlalchemy import BigInteger, CheckConstraint, Column, DateTime, ForeignKey, Integer, MetaData, String, Table, Text
 
 metadata = MetaData()
+
+STUDENT_ROLE = "student"
+ADMIN_ROLE = "admin"
+USER_ROLE_CHECK = f"role IN ('{STUDENT_ROLE}', '{ADMIN_ROLE}')"
 
 users = Table(
     "users",
@@ -10,6 +14,9 @@ users = Table(
     Column("email", String(254), nullable=False, unique=True),
     Column("password_hash", Text, nullable=False),
     Column("created_at", DateTime(timezone=True), nullable=False),
+    Column("role", String(16), nullable=False, server_default=STUDENT_ROLE),
+    Column("version", Integer, nullable=False, server_default="1"),
+    CheckConstraint(USER_ROLE_CHECK, name="ck_users_role"),
 )
 
 auth_sessions = Table(

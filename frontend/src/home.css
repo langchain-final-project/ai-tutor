@@ -20,6 +20,19 @@
 .student-brand { display: inline-flex; align-items: center; min-height: 44px; }
 .student-brand img { display: block; width: 76px; height: auto; }
 .student-brand:focus-visible { outline-color: var(--yellow); }
+.student-header-actions { display: flex; align-items: center; gap: 10px; }
+.student-admin-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 5px 10px;
+  border: 1px solid var(--light-blue);
+  border-radius: 8px;
+  color: var(--paper);
+  font-size: 12px;
+}
+.student-admin-link:hover { background: var(--blue); text-decoration: none; }
+.student-admin-link:focus-visible { outline-color: var(--yellow); }
 .student-sidebar { display: none; }
 .student-icon { flex: none; width: 20px; height: 20px; }
 

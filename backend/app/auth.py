@@ -20,7 +20,8 @@ from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
-from app.db.auth import auth_sessions, login_attempts, users
+from app.db.auth import ADMIN_ROLE, STUDENT_ROLE, auth_sessions, login_attempts, users
+from app.member_management import register_member_routes
 
 SESSION_COOKIE = "didgo_session"
 DOMAIN_LABEL = re.compile(r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?")
@@ -171,6 +172,20 @@ def active_session(token_hash: str):
     )
 
 
+def require_admin(engine: Engine, request: Request) -> None:
+    token = request.cookies.get(SESSION_COOKIE)
+    if not token:
+        raise HTTPException(401, "Authentication required")
+    with engine.connect() as connection:
+        role = connection.scalar(select(users.c.role).where(
+            users.c.id == active_session(token_digest(token)).scalar_subquery(),
+        ))
+    if role is None:
+        raise HTTPException(401, "Authentication required")
+    if role != ADMIN_ROLE:
+        raise HTTPException(403, "Administrator access required")
+
+
 def clear_session_cookie(request: Request) -> Response:
     response = Response(status_code=204)
     response.delete_cookie(
@@ -200,6 +215,30 @@ def create_auth_router(engine: Engine) -> APIRouter:
     router = APIRouter(route_class=AuthRoute, tags=["auth"])
     settings = AuthSettings.from_env()
     dummy_salt = secrets.token_bytes(16)
+
+    def admin_access(request: Request) -> None:
+        require_admin(engine, request)
+
+    def student_access(request: Request) -> str:
+        token = request.cookies.get(SESSION_COOKIE)
+        if not token:
+            raise HTTPException(401, "Authentication required")
+        with engine.connect() as connection:
+            user = connection.execute(select(users.c.id, users.c.role).where(
+                users.c.id == active_session(token_digest(token)).scalar_subquery(),
+            )).one_or_none()
+        if user is None:
+            raise HTTPException(401, "Authentication required")
+        if user.role != STUDENT_ROLE:
+            raise HTTPException(403, "Student access required")
+        return user.id
+
+    def inquiry_author(request: Request) -> str:
+        user_id = student_access(request)
+        consume_login_attempt(engine, f"inquiry:{user_id}", int(time.time()), settings)
+        return user_id
+
+    register_member_routes(router, engine, admin_access, student_access, inquiry_author)
 
     @router.post("/auth/signup", status_code=201, response_model=UserID)
     def signup(payload: SignupRequest) -> UserID:
@@ -264,6 +303,11 @@ def create_auth_router(engine: Engine) -> APIRouter:
                 connection.execute(delete(auth_sessions).where(auth_sessions.c.token_hash == token_digest(token)))
 
         return clear_session_cookie(request)
+
+    @router.get("/admin/session", status_code=204, response_class=Response)
+    def admin_session(request: Request) -> Response:
+        admin_access(request)
+        return Response(status_code=204)
 
     @router.get("/me", response_model=Profile)
     def me(request: Request) -> Profile:
