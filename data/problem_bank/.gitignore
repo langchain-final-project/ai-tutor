@@ -1,0 +1,2 @@
+# 완성된 공유용 DB 하나만 Git에 포함한다. 개인 작업 DB/저널은 기존 규칙으로 제외한다.
+!problem_bank.seed.sqlite3
