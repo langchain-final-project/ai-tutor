@@ -10,6 +10,7 @@ services:
       - --database
       - /var/lib/didgo-solution/solution-flow.sqlite3
       - --create-empty
+      - --with-auth
     volumes:
       - solution_data:/var/lib/didgo-solution
     restart: "no"
@@ -17,7 +18,7 @@ services:
   api:
     command:
       - uvicorn
-      - app.submission_api:app
+      - app.student_api:app
       - --host
       - 0.0.0.0
       - --port
@@ -26,8 +27,6 @@ services:
       - "1"
     environment:
       DIDGO_DATABASE: /var/lib/didgo-solution/solution-flow.sqlite3
-      DIDGO_API_TOKEN: ${DIDGO_API_TOKEN:?개발용 DIDGO_API_TOKEN을 설정해 주세요}
-      DIDGO_DEV_USER_ID: ${DIDGO_DEV_USER_ID:-local-student}
     volumes:
       - solution_data:/var/lib/didgo-solution
     depends_on:

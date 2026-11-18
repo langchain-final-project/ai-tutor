@@ -3,12 +3,12 @@
 import sqlite3
 
 from sqlalchemy import create_engine, event
-from sqlalchemy.engine import Engine, make_url
+from sqlalchemy.engine import Engine, URL, make_url
 
 # 데이터베이스 엔진을 구성하는 함수
 # database_url: 데이터베이스 연결 URL
 # 반환값: 구성된 SQLAlchemy 엔진
-def build_engine(database_url: str) -> Engine:
+def build_engine(database_url: str | URL) -> Engine:
     url = make_url(database_url)
     if url.get_backend_name() != "sqlite":
         return create_engine(url, connect_args={"connect_timeout": 3})

@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path
 import sqlite3
+import sys
 import tempfile
 
 
@@ -168,9 +169,26 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--database", type=Path, default=DATABASE)
     parser.add_argument("--create-empty", action="store_true", help="파일이 없을 때만 빈 개발 DB 생성")
+    parser.add_argument("--with-auth", action="store_true", help="같은 개발 DB에 회원·세션 테이블도 준비")
     args = parser.parse_args()
     try:
-        print(json.dumps(prepare(args.database, create_empty=args.create_empty), ensure_ascii=False, indent=2))
+        result = prepare(args.database, create_empty=args.create_empty)
+        if args.with_auth:
+            sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+            from app.db.auth import metadata
+            from app.db.connection import build_engine
+            from sqlalchemy.engine import URL
+            from sqlalchemy.exc import SQLAlchemyError
+
+            engine = build_engine(URL.create("sqlite", database=result["database"]))
+            try:
+                metadata.create_all(engine)
+            except SQLAlchemyError as error:
+                raise ValueError("회원·세션 테이블을 준비하지 못했습니다.") from error
+            finally:
+                engine.dispose()
+            result["auth_schema"] = "prepared"
+        print(json.dumps(result, ensure_ascii=False, indent=2))
     except (OSError, ValueError, sqlite3.Error) as error:
         parser.exit(1, f"DB 준비 실패: {error}\n")
 

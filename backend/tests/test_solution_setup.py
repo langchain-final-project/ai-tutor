@@ -4,6 +4,8 @@ from contextlib import closing
 import importlib.util
 from pathlib import Path
 import sqlite3
+import subprocess
+import sys
 
 import pytest
 
@@ -47,6 +49,28 @@ def test_create_and_repeat_keeps_data(tmp_path):
     with closing(sqlite3.connect(target)) as connection:
         assert connection.execute("SELECT owner_id FROM problem_submissions").fetchall() == [("student_A",)]
         assert connection.execute("SELECT COUNT(*) FROM questions").fetchone()[0] == 0
+        assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
+
+
+def test_with_auth_cli_repeat_preserves_accounts_sessions_and_questions(tmp_path):
+    target = tmp_path / "student.sqlite3"
+    command = [sys.executable, str(SCRIPT), "--database", str(target),
+               "--create-empty", "--with-auth"]
+    subprocess.run(command, check=True, capture_output=True, text=True)
+    with closing(sqlite3.connect(target)) as connection:
+        connection.execute("PRAGMA foreign_keys=ON")
+        connection.execute("""INSERT INTO users(id,name,email,password_hash,created_at)
+            VALUES ('student_A','학생','student@example.com','test-hash',CURRENT_TIMESTAMP)""")
+        connection.execute("""INSERT INTO auth_sessions(token_hash,user_id,expires_at)
+            VALUES ('test-token-hash','student_A',2147483647)""")
+        connection.execute("INSERT INTO problem_submissions(owner_id,input_kind) VALUES ('student_A','text')")
+        connection.commit()
+    subprocess.run(command, check=True, capture_output=True, text=True)
+    with closing(sqlite3.connect(target)) as connection:
+        assert connection.execute("SELECT id FROM users").fetchall() == [("student_A",)]
+        assert connection.execute("SELECT token_hash,user_id FROM auth_sessions").fetchall() == [
+            ("test-token-hash", "student_A")]
+        assert connection.execute("SELECT owner_id FROM problem_submissions").fetchall() == [("student_A",)]
         assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
 
 

@@ -171,6 +171,28 @@ def active_session(token_hash: str):
     )
 
 
+def require_session_profile(engine: Engine, request: Request) -> Profile:
+    """로그인 쿠키의 유효한 세션과 실제 계정을 확인한다."""
+    token = request.cookies.get(SESSION_COOKIE)
+    if not token:
+        raise HTTPException(401, "Authentication required")
+
+    try:
+        with engine.connect() as connection:
+            user = connection.execute(
+                select(users.c.id, users.c.name, users.c.email)
+                .select_from(auth_sessions.join(users))
+                .where(auth_sessions.c.token_hash == token_digest(token),
+                       auth_sessions.c.expires_at > int(time.time()))
+            ).one_or_none()
+    except SQLAlchemyError as error:
+        raise HTTPException(503, "Database unavailable") from error
+
+    if user is None:
+        raise HTTPException(401, "Authentication required")
+    return Profile(user_id=user.id, name=user.name, email=user.email)
+
+
 def clear_session_cookie(request: Request) -> Response:
     response = Response(status_code=204)
     response.delete_cookie(
@@ -267,18 +289,7 @@ def create_auth_router(engine: Engine) -> APIRouter:
 
     @router.get("/me", response_model=Profile)
     def me(request: Request) -> Profile:
-        token = request.cookies.get(SESSION_COOKIE)
-        if token:
-            with engine.connect() as connection:
-                user = connection.execute(
-                    select(users.c.id, users.c.name, users.c.email)
-                    .select_from(auth_sessions.join(users))
-                    .where(auth_sessions.c.token_hash == token_digest(token),
-                           auth_sessions.c.expires_at > int(time.time()))
-                ).one_or_none()
-            if user is not None:
-                return Profile(user_id=user.id, name=user.name, email=user.email)
-        raise HTTPException(401, "Authentication required")
+        return require_session_profile(engine, request)
 
     def confirm_account_password(request: Request, password: str) -> tuple[str, str, str]:
         token = request.cookies.get(SESSION_COOKIE)

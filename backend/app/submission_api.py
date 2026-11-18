@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import secrets
 import sqlite3
-from typing import Annotated
+from typing import Annotated, Callable
 from urllib.parse import quote
 import warnings
 
@@ -122,6 +122,7 @@ def create_submission_app(
     *,
     dev_token: str | None = None,
     owner_id: str | None = None,
+    owner_dependency: Callable[..., str] | None = None,
     pipeline_factory=build_qwen_pipeline,
 ) -> FastAPI:
     database = Path(database) if database is not None else Path(
@@ -175,6 +176,9 @@ def create_submission_app(
             )
 
         return owner
+
+    if owner_dependency is not None:
+        current_owner = owner_dependency
 
     @app.exception_handler(LookupError)
     async def missing_submission(_request, _error):
