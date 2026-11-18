@@ -85,6 +85,17 @@ def test_reading_order_uses_position_not_detector_score():
     assert report["raw_detections"]["boxes"][0]["score"] == 0.99
 
 
+def test_slight_vertical_offset_does_not_reverse_same_row_choices():
+    layout, _ = convert_detections({"boxes": [
+        box("formula", [60, 10, 100, 30]),
+        box("formula", [10, 11, 50, 31]),
+        box("formula", [10, 60, 50, 80]),
+    ]}, (120, 100))
+    formulas = [region for region in layout.regions if region.kind == "formula"]
+    assert [region.bbox[0] for region in formulas] == [10, 60, 10]
+    assert [region.reading_order for region in formulas] == [0, 1, 2]
+
+
 def test_unknown_labels_and_empty_detections_are_retained():
     unknown, report = convert_detections({"boxes": [
         box("unrecognized_label", [-0.5, -0.5, 100.4, 100.4]),

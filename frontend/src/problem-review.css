@@ -365,6 +365,13 @@
   cursor: wait;
 }
 
+.review-photo-actions .review-retake-primary {
+  order: -1;
+  border-color: var(--navy);
+  background: var(--navy);
+  color: white;
+}
+
 .review-editor.review-math-editor {
   width: min(100%, 480px);
   max-width: 480px;
@@ -448,6 +455,79 @@
 .review-quality-warning button:disabled {
   opacity: 0.5;
   cursor: wait;
+}
+
+.review-unreadable {
+  padding: 1px 3px;
+  border-radius: 3px;
+  background: #fff0b3;
+  color: #8a3100;
+}
+
+.review-candidate-text {
+  margin: 8px 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+}
+
+.review-type-match {
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.review-type-match button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--navy);
+  font: inherit;
+  cursor: pointer;
+}
+
+.review-type-match .review-type-search {
+  background: var(--navy);
+  color: white;
+}
+
+.review-type-match button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.review-type-candidates {
+  display: grid;
+  gap: 16px;
+  margin: 0;
+  padding-left: 24px;
+}
+
+.review-type-candidates li {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  line-height: 1.7;
+}
+
+.review-type-candidates h3 {
+  margin: 0 0 8px;
+  font-size: 16px;
+}
+
+.review-type-reference {
+  margin: 12px 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--subtle);
+  overflow-wrap: anywhere;
+}
+
+.review-type-selected {
+  padding: 12px;
+  border-radius: 8px;
+  background: var(--tint);
 }
 
 .review-region-selector,

@@ -15,6 +15,8 @@ type PhotoPickerProps = {
   disabled?: boolean
   photoContent?: ReactNode
   layout?: ProblemLayout | null
+  photoNotice?: ReactNode
+  retakeRequired?: boolean
 }
 
 export function PhotoPicker({
@@ -23,6 +25,8 @@ export function PhotoPicker({
   disabled = false,
   photoContent,
   layout = null,
+  photoNotice,
+  retakeRequired = false,
 }: PhotoPickerProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const cameraInputRef = useRef<HTMLInputElement>(null)
@@ -73,21 +77,24 @@ export function PhotoPicker({
         </div>
       )}
 
+      {photoNotice}
+
       <div className="review-photo-actions">
         <button
           type="button"
           disabled={disabled}
           onClick={() => fileInputRef.current?.click()}
         >
-          {imageUrl ? "사진 다시 선택" : "사진 선택"}
+          {retakeRequired ? "다른 사진 올리기" : imageUrl ? "사진 다시 선택" : "사진 선택"}
         </button>
 
         <button
           type="button"
           disabled={disabled}
+          className={retakeRequired ? "review-retake-primary" : undefined}
           onClick={() => cameraInputRef.current?.click()}
         >
-          {imageUrl ? "재촬영" : "사진 촬영"}
+          {retakeRequired ? "사진 다시 촬영" : imageUrl ? "재촬영" : "사진 촬영"}
         </button>
       </div>
 

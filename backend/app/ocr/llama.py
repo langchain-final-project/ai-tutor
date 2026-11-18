@@ -21,6 +21,10 @@ from urllib.request import Request, urlopen
 class OCRError(RuntimeError):
     """모델 연결 또는 응답 오류."""
 
+    def __init__(self, message, *, retryable=True):
+        super().__init__(message)
+        self.retryable = retryable
+
 
 def _repeating(text: str) -> bool:
     paragraphs = Counter(p.strip() for p in re.split(r"\n\s*\n", text) if len(p.strip()) >= 20)
@@ -95,8 +99,20 @@ class LlamaClient:
                     if len(text) > 24000 or time.monotonic() - started > self.timeout:
                         finish = "limit"
                         break
-        except (HTTPError, URLError, OSError, ValueError) as error:
+        except HTTPError as error:
+            raise OCRError(
+                "OCR 서버의 응답을 확인해 주세요.",
+                retryable=error.code in {408, 429, 500, 502, 503, 504},
+            ) from error
+        except URLError as error:
+            raise OCRError(
+                "OCR 서버 연결을 확인해 주세요.",
+                retryable=not isinstance(error.reason, ConnectionRefusedError),
+            ) from error
+        except OSError as error:
             raise OCRError("OCR 서버 연결 또는 스트림을 확인해 주세요.") from error
+        except ValueError as error:
+            raise OCRError("OCR 서버 스트림 형식을 확인해 주세요.", retryable=False) from error
         yield {"type": "complete", "text": text, "finish_reason": finish,
                "usage": usage, "seconds": round(time.monotonic() - started, 3)}
 

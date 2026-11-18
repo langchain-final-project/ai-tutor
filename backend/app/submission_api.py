@@ -31,10 +31,9 @@ from app.ocr_api import create_ocr_router
 from app.ocr_jobs import OCRJobManager, build_qwen_pipeline
 from app.ocr.images import open_image
 from app.ocr.selection import crop_photo_region
-from app.ocr.quality import (
-    inspect_photo_quality,
-    evaluate_photo_quality,
-)
+from app.ocr.quality import check_photo_quality, requires_photo_retake
+from app.db.type_matches import ensure_type_match_schema, load_type_match, save_type_match
+from app.tutor.unit_type_matcher import DEFAULT_BANK, VERSION as TYPE_MATCH_VERSION, get_unit_matcher
 
 ROOT = Path(__file__).resolve().parents[2]
 MAX_IMAGE_BYTES = 30 * 1024 * 1024
@@ -48,6 +47,15 @@ class InputBody(BaseModel):
         min_length=1, max_length=24000, strict=True
     )
     expected_version_number: int = Field(ge=1, strict=True)
+
+
+class TypeMatchBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    expected_version_number: int = Field(ge=1, strict=True)
+
+
+class TypeChoiceBody(TypeMatchBody):
+    source_topic_code: str = Field(pattern=r"^[0-9]{7}$", strict=True)
 
 
 def validate_photo(content: bytes) -> str:
@@ -120,6 +128,7 @@ def create_submission_app(
     dev_token: str | None = None,
     owner_id: str | None = None,
     pipeline_factory=build_qwen_pipeline,
+    type_bank_database: str | Path | None = None,
 ) -> FastAPI:
     database = Path(database) if database is not None else (
         ROOT / "data/problem_bank/didgo.sqlite3"
@@ -137,9 +146,12 @@ def create_submission_app(
     )
 
     manager = OCRJobManager(database, pipeline_factory=pipeline_factory)
+    type_bank = Path(type_bank_database or os.getenv("DIDGO_TYPE_BANK_DATABASE", str(DEFAULT_BANK)))
 
     @asynccontextmanager
     async def lifespan(_app):
+        with submission_connection(database) as connection:
+            ensure_type_match_schema(connection)
         # DB 복구와 모델 작업의 종료 대기는 별도 스레드에서 처리한다.
         await run_in_threadpool(manager.start)
         try:
@@ -257,12 +269,16 @@ def create_submission_app(
             if not filename.strip() or len(filename) > 255:
                 raise HTTPException(422, "파일명을 확인해 주세요.")
 
-            quality_metrics = inspect_photo_quality(content)
+            photo_quality = check_photo_quality(content)
+            photo_quality["retake_required"] = requires_photo_retake(photo_quality)
 
-            photo_quality = {
-                **evaluate_photo_quality(quality_metrics),
-                "metrics": quality_metrics,
-            }
+            # 재촬영 대상은 제출 ID를 발급하지 않아 OCR을 시작할 수 없다.
+            if photo_quality["retake_required"]:
+                raise HTTPException(422, detail={
+                    "code": "photo_retake_required",
+                    "message": "문제 전체가 선명하게 보이도록 사진을 다시 촬영해 주세요.",
+                    "photo_quality": photo_quality,
+                })
 
             with submission_connection(database) as connection:
                 ids = create_photo_submission(
@@ -425,6 +441,56 @@ def create_submission_app(
                 submission_id=submission_id,
                 owner_id=student_id,
             )
+
+    def confirmed_type_input(connection, submission_id, student_id, expected):
+        current = get_submission(connection, submission_id=submission_id, owner_id=student_id)
+        latest = current["latest_input"]
+        if not latest or latest["version_number"] != expected:
+            raise HTTPException(409, "문제 내용이 변경되었습니다. 최신 내용을 불러와 주세요.")
+        if not latest["confirmed_at"]:
+            raise HTTPException(409, "본문과 수식을 확인하고 문제 내용 확인 완료를 먼저 눌러주세요.")
+        return current, latest
+
+    def type_matcher():
+        try:
+            return get_unit_matcher(type_bank)
+        except (OSError, sqlite3.Error, ValueError) as error:
+            raise HTTPException(503, "문제은행을 불러오지 못했습니다. 문자와 식 문항이 있는 DB를 확인해 주세요.") from error
+
+    @app.post("/submissions/{submission_id}/type-match")
+    def match_type(submission_id: int, body: TypeMatchBody, student_id: Annotated[str, Depends(current_owner)]):
+        with submission_connection(database) as connection:
+            current, latest = confirmed_type_input(connection, submission_id, student_id, body.expected_version_number)
+            cached = load_type_match(connection, latest["id"])
+        matcher = type_matcher()
+        reusable = cached and cached.get("data_version") == matcher.data_version and cached.get("classifier_version") == TYPE_MATCH_VERSION
+        if reusable:
+            result = cached
+        else:
+            layout = (current.get("layout_detection") or {}).get("layout") or {}
+            has_visuals = any(region["kind"] in {"figure", "graph", "table"} for region in layout.get("regions", []))
+            result = matcher.predict(latest["content_text"], has_visuals=has_visuals)
+        with submission_connection(database, immediate=True) as connection:
+            _, latest = confirmed_type_input(connection, submission_id, student_id, body.expected_version_number)
+            existing = load_type_match(connection, latest["id"])
+            if existing and existing.get("data_version") == matcher.data_version and existing.get("classifier_version") == TYPE_MATCH_VERSION:
+                return existing
+            return save_type_match(connection, latest, result)
+
+    @app.post("/submissions/{submission_id}/type-match/confirm")
+    def choose_type(submission_id: int, body: TypeChoiceBody, student_id: Annotated[str, Depends(current_owner)]):
+        with submission_connection(database, immediate=True) as connection:
+            _, latest = confirmed_type_input(connection, submission_id, student_id, body.expected_version_number)
+            result = load_type_match(connection, latest["id"])
+            if not result or result["status"] not in {"classified", "candidates"}:
+                raise HTTPException(409, "유형 후보를 먼저 찾아주세요.")
+            candidate = next((item for item in result["candidates"] if item["source_topic_code"] == body.source_topic_code), None)
+            if candidate is None:
+                raise HTTPException(422, "현재 문제의 문자와 식 유형 후보 중에서 선택해 주세요.")
+            result = {**result, "status": "classified", "method": "manual", "matched_question_id": None,
+                      "selected_type": {key: candidate[key] for key in ("source_topic_code", "source_topic_name")},
+                      "reasons": ["확인된 문제 내용의 유형 후보 중 사용자가 선택했습니다."]}
+            return save_type_match(connection, latest, result)
 
     app.include_router(create_ocr_router(manager, current_owner))
 

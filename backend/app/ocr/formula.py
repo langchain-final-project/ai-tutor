@@ -1,7 +1,10 @@
 """PP-FormulaNet_plus-M 수식 인식 연결."""
 
 from contextlib import contextmanager
+from functools import lru_cache
 import json
+import os
+from pathlib import Path
 from threading import Lock
 from time import perf_counter
 
@@ -25,11 +28,19 @@ class FormulaBackend:
                 started = perf_counter()
 
                 try:
+                    if self.model_dir is not None and any(
+                        not (Path(self.model_dir) / name).is_file()
+                        for name in ("inference.json", "inference.yml", "inference.pdiparams")
+                    ):
+                        raise FileNotFoundError("setup_formula_model.py로 수식 모델을 먼저 준비해 주세요.")
+                    os.environ.setdefault("PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK", "True")
                     from paddleocr import FormulaRecognition
 
                     options = {
                         "model_name": self.model_name,
                         "device": self.device,
+                        "enable_mkldnn": False,
+                        "cpu_threads": 2,
                     }
 
                     if self.model_dir is not None:
@@ -39,7 +50,7 @@ class FormulaBackend:
 
                 except Exception as error:
                     raise OCRError(
-                        "수식 모델을 불러오지 못했습니다: " + str(error)
+                        "수식 모델을 불러오지 못했습니다: " + str(error), retryable=False,
                     ) from error
 
                 self.load_seconds = round(
@@ -105,3 +116,12 @@ class FormulaBackend:
             "finish_reason": "stop",
             "seconds": round(perf_counter() - started, 3),
         }
+
+
+@lru_cache(maxsize=1)
+def get_formula_backend():
+    root = Path(__file__).resolve().parents[3]
+    return FormulaBackend(model_dir=os.getenv(
+        "DIDGO_FORMULA_MODEL_DIR",
+        str(root / ".venv/formula-model-cache/official_models/PP-FormulaNet_plus-M"),
+    ))

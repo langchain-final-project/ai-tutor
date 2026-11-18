@@ -197,8 +197,8 @@ def test_failed_ocr_is_recorded_and_can_be_retried(database, mode):
         history = client.get(
             f"/submissions/{submission_id}/ocr/history", headers=HEADERS
         ).json()
-        assert len(history) == 1
-        assert history[0]["status"] == "failed"
+        assert len(history) == (1 if mode == "exception" else 2)
+        assert all(item["status"] == "failed" for item in history)
 
         app.state.ocr_jobs.pipeline_factory = FixturePipeline
         retry = client.post(

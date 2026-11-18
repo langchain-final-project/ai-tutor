@@ -249,7 +249,7 @@ def create_initial_input_version(connection: sqlite3.Connection, *, submission_i
     return input_version_id
 
 @contextmanager
-def submission_connection(database: str | Path | None = None):
+def submission_connection(database: str | Path | None = None, *, immediate: bool = False):
     """개인 DB를 열고, 성공 시 확정하고 오류 시 되돌린 뒤 닫는다."""
     path = (
         Path(database)
@@ -262,7 +262,7 @@ def submission_connection(database: str | Path | None = None):
     with closing(sqlite3.connect(uri, uri=True)) as connection:
         connection.execute("PRAGMA foreign_keys = ON")
         with connection:
-            connection.execute("BEGIN")
+            connection.execute("BEGIN IMMEDIATE" if immediate else "BEGIN")
             yield connection
 
 
@@ -359,6 +359,8 @@ def get_submission(
     latest = _latest_input(connection, submission_id, owner_id)
 
     result["latest_input"] = latest
+    from .type_matches import load_type_match
+    result["type_match"] = load_type_match(connection, latest["id"]) if latest and latest["confirmed_at"] else None
     result["review_status"] = (
         "awaiting_input" if latest is None
         else "confirmed" if latest["confirmed_at"] is not None
@@ -370,6 +372,8 @@ def get_submission(
     result["image_orientation"] = None
     result["selected_region"] = None
     result["layout_detection"] = None
+    result["ocr_review"] = None
+    result["region_assembly"] = None
     result["condition_extraction"] = {
         "schema_version": "conditions-v1",
         "status": "not_run",
@@ -392,6 +396,10 @@ def get_submission(
                 result["selected_region"] = raw["selected_region"]
             if isinstance(raw.get("layout_detection"), dict):
                 result["layout_detection"] = raw["layout_detection"]
+            if isinstance(raw.get("retry_summary"), dict):
+                result["ocr_review"] = raw["retry_summary"]
+            if isinstance(raw.get("region_assembly"), dict):
+                result["region_assembly"] = raw["region_assembly"]
             if "condition_extraction" in raw:
                 from app.ocr.conditions import ConditionExtraction
 

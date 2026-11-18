@@ -168,7 +168,18 @@ def convert_detections(raw: dict, image_size: tuple[int, int]) -> tuple[ProblemL
             node.kind = "group"
 
     for siblings in children.values():
-        siblings.sort(key=lambda i: (candidates[i].bbox[1], candidates[i].bbox[0], i))
+        rows = []
+        for index in sorted(siblings, key=lambda i: (candidates[i].bbox[1], candidates[i].bbox[0], i)):
+            box = candidates[index].bbox
+            row = next((row for row in rows if (
+                min(row["bottom"], box[3]) - max(row["top"], box[1])
+            ) / min(row["bottom"] - row["top"], box[3] - box[1]) >= 0.5), None)
+            if row is None:
+                rows.append({"top": box[1], "bottom": box[3], "members": [index]})
+            else:
+                row["members"].append(index)
+                row["top"], row["bottom"] = min(row["top"], box[1]), max(row["bottom"], box[3])
+        siblings[:] = [index for row in rows for index in sorted(row["members"], key=lambda i: (candidates[i].bbox[0], i))]
 
     regions = [LayoutRegion(
         id="image-root", kind="group", role="unknown",
@@ -191,7 +202,7 @@ def convert_detections(raw: dict, image_size: tuple[int, int]) -> tuple[ProblemL
     emit(None)
     layout = ProblemLayout(image_size=image_size, regions=regions)
     report = {
-        "rules_version": "layout-conversion-v1",
+        "rules_version": "layout-conversion-v2",
         "raw_count": len(boxes),
         "merged_count": merged_count,
         "region_count": len(regions),
@@ -201,7 +212,7 @@ def convert_detections(raw: dict, image_size: tuple[int, int]) -> tuple[ProblemL
         "notes": [
             "중복 병합과 부모 관계는 실험용 규칙입니다.",
             "부모 관계는 좌표상 포함 관계이며 의미상 소속이 확정된 것은 아닙니다.",
-            "읽기 순서는 위에서 아래, 왼쪽에서 오른쪽으로 임시 부여했습니다.",
+            "읽기 순서는 위에서 아래이며, 세로로 절반 이상 겹치는 같은 행에서는 왼쪽에서 오른쪽입니다.",
             "묶음 안에 자식 박스가 덮지 못한 본문이 있을 수 있어 원문 OCR을 유지해야 합니다.",
             "서로 다른 종류의 겹친 후보는 검토를 위해 보존했습니다.",
         ],

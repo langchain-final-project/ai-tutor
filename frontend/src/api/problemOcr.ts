@@ -17,15 +17,57 @@ export type OcrPhase =
 export type PhotoQuality = {
   policy_version: string
   status: "warning" | "no_warning"
+  retake_required: boolean
   warnings: {
     code: string
     message: string
   }[]
 }
 
+export function isPhotoQuality(value: unknown): value is PhotoQuality {
+  if (!value || typeof value !== "object") return false
+  const quality = value as Partial<PhotoQuality>
+  return typeof quality.policy_version === "string" &&
+    (quality.status === "warning" || quality.status === "no_warning") &&
+    typeof quality.retake_required === "boolean" &&
+    Array.isArray(quality.warnings) &&
+    quality.warnings.every((warning) =>
+      warning && typeof warning.code === "string" && typeof warning.message === "string"
+    )
+}
+
 export type Submission = {
   id: number
   photo_quality?: PhotoQuality
+  type_match?: UnitTypeMatch | null
+  ocr_review?: {
+    attempt_count: number
+    selected_attempt: number
+    selection_reason: string
+    review_warnings: {
+      code: string
+      message: string
+      first_text?: string
+      second_text?: string
+      first_label?: string
+      second_label?: string
+    }[]
+  } | null
+  region_assembly?: {
+    schema_version: "region-assembly-v1"
+    status: "assembled" | "fallback"
+    coordinate_space: "ocr_image"
+    image_size: [number, number]
+    blocks: {
+      region_id: string
+      kind: string
+      bbox: [number, number, number, number]
+      parent_id: string | null
+      reading_order: number
+      order: number
+      text: string
+    }[]
+  } | null
   selected_region?: PhotoRegion | null
   layout_detection?: LayoutDetection | null
   condition_extraction?: ConditionExtraction | null
@@ -44,8 +86,46 @@ export type Submission = {
   
 }
 
+export type UnitTypeMatch = {
+  status: "classified" | "candidates" | "needs_review" | "unsupported"
+  method: "exact_match" | "retrieval" | "hybrid" | "manual"
+  scope: { grade: number; semester: number; unit_code: string; unit_name: string }
+  bank_question_count: number
+  bank_type_count: number
+  input_version_number: number
+  selected_type: { source_topic_code: string; source_topic_name: string } | null
+  matched_question_id: string | null
+  reasons: string[]
+  candidates: {
+    source_topic_code: string
+    source_topic_name: string
+    score: number
+    score_name: string
+    reasons: string[]
+    reference_questions: { id: string; question_text: string }[]
+  }[]
+}
+
+export function matchUnitType(id: number, version: number, signal: AbortSignal) {
+  return request<UnitTypeMatch>(`/submissions/${id}/type-match`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ expected_version_number: version }), signal,
+  })
+}
+
+export function chooseUnitType(id: number, version: number, code: string, signal: AbortSignal) {
+  return request<UnitTypeMatch>(`/submissions/${id}/type-match/confirm`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ expected_version_number: version, source_topic_code: code }), signal,
+  })
+}
+
 export class ReviewApiError extends Error {
-  constructor(public status: number, message: string) {
+  constructor(
+    public status: number,
+    message: string,
+    public photoQuality: PhotoQuality | null = null,
+  ) {
     super(message)
     this.name = "ReviewApiError"
   }
@@ -66,11 +146,15 @@ async function request<T>(
   const payload = await response.json().catch(() => null)
 
   if (!response.ok) {
+    const detail = payload?.detail
     throw new ReviewApiError(
       response.status,
-      typeof payload?.detail === "string"
-        ? payload.detail
-        : `요청에 실패했습니다. (${response.status})`,
+      typeof detail === "string" ? detail
+        : typeof detail?.message === "string" ? detail.message
+          : `요청에 실패했습니다. (${response.status})`,
+      response.status === 422 && detail?.code === "photo_retake_required" &&
+        isPhotoQuality(detail.photo_quality) && detail.photo_quality.retake_required
+        ? detail.photo_quality : null,
     )
   }
 

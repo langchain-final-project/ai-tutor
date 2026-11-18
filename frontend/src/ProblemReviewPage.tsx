@@ -11,8 +11,9 @@ import {
   saveReview,
   serializeReviewContent,
   ReviewApiError,
+  isPhotoQuality,
 } from "./api/problemOcr"
-import type { OcrPhase, Submission } from "./api/problemOcr"
+import type { OcrPhase, PhotoQuality, Submission } from "./api/problemOcr"
 import { MathPad } from "./components/MathPad"
 import { PhotoPicker } from "./components/PhotoPicker"
 import { PhotoRegionSelector } from "./components/PhotoRegionSelector"
@@ -20,13 +21,22 @@ import type { PhotoRegion } from "./types/photoRegion"
 import { isFullPhotoRegion, createPhotoRegionPreviewUrl } from "./utils/photoRegion"
 import "./problem-review.css"
 import { ProblemConditions } from "./components/ProblemConditions"
+import { ProblemTypeMatch } from "./components/ProblemTypeMatch"
 
 function PartContent({ part }: { part: ContentPart }) {
   if (part.kind === "math") {
     return <MathFormula latex={part.latex} />
   }
 
-  return <>{part.text}</>
+  return <ReviewText text={part.text} />
+}
+
+function ReviewText({ text }: { text: string }) {
+  return <>{text.split(/(\[UNREADABLE\]|\[판독불가\])/gi).map((part, index) =>
+    /^(\[UNREADABLE\]|\[판독불가\])$/i.test(part)
+      ? <mark key={index} className="review-unreadable" title="원본 사진과 비교해 수정해 주세요">{part}</mark>
+      : part
+  )}</>
 }
 
 function createEmptyProblem(imageUrl: string | null = null): ProblemReview {
@@ -65,6 +75,7 @@ const [pendingPhoto, setPendingPhoto] = useState<{
   submission: Submission
   imageUrl: string
 } | null>(null)
+const [photoQuality, setPhotoQuality] = useState<PhotoQuality | null>(null)
 const [saving, setSaving] = useState<"save" | "confirm" | null>(null)
 const [photoRegion, setPhotoRegion] = useState<PhotoRegion | null>(null)
 const [saveNotice, setSaveNotice] = useState("")
@@ -77,6 +88,7 @@ const busy =
   phase === "restoring" || phase === "uploading" ||
   phase === "queued" || phase === "running"
 const locked = busy || saving !== null
+const retakeRequired = phase === "quality_review" && photoQuality?.retake_required === true
 
 const displayedPhotoRegion =
   submission?.selected_region ??
@@ -169,6 +181,7 @@ async function startPhotoRecognition(file: File, imageUrl: string) {
 
   setPhase("uploading")
   setPendingPhoto(null)
+  setPhotoQuality(null)
   setPhotoRegion(null)
   setOcrError("")
   setSelectedId(null)
@@ -188,21 +201,20 @@ async function startPhotoRecognition(file: File, imageUrl: string) {
     if (ocrControllerRef.current !== controller) return
 
     const quality = uploaded.photo_quality
-    if (
-      !quality ||
-      !["warning", "no_warning"].includes(quality.status) ||
-      !Array.isArray(quality.warnings) ||
-      !quality.warnings.every((warning) =>
-        warning && typeof warning.code === "string" && typeof warning.message === "string"
-      )
-    ) {
+    if (!isPhotoQuality(quality)) {
       throw new Error("사진 품질 검사 결과를 확인하지 못했습니다. API 서버를 확인해 주세요.")
     }
 
-    setPendingPhoto({ submission: uploaded, imageUrl })
-    setPhase(quality.status === "warning" ? "quality_review" : "region_review")
+    setPhotoQuality(quality)
+    setPendingPhoto(quality.retake_required ? null : { submission: uploaded, imageUrl })
+    setPhase(quality.retake_required || quality.status === "warning" ? "quality_review" : "region_review")
   } catch (error) {
     if (ocrControllerRef.current !== controller) return
+    if (error instanceof ReviewApiError && error.photoQuality?.retake_required) {
+      setPhotoQuality(error.photoQuality)
+      setPhase("quality_review")
+      return
+    }
     setPhase("failed")
     setOcrError(controller.signal.aborted
       ? "사진 업로드 시간이 초과됐습니다. 다시 시도해 주세요."
@@ -285,7 +297,7 @@ async function recognizeUploadedPhoto(
 
 function continuePhotoRecognition() {
   if (!pendingPhoto || phase !== "region_review" || !photoRegion ||
-    locked || ocrControllerRef.current) return
+    photoQuality?.retake_required || locked || ocrControllerRef.current) return
 
   const pending = pendingPhoto
   const controller = new AbortController()
@@ -365,11 +377,13 @@ function reloadLatest() {
 const phaseMessage: Record<OcrPhase, string> = {
   idle: "사진을 선택하면 인식한 내용이 여기에 표시됩니다.",
   restoring: "저장된 문제와 원본 사진을 불러오고 있어요.",
-  uploading: "사진을 업로드하고 있어요.",
-  quality_review: "사진 상태를 확인하고 인식을 계속할지 선택해 주세요.",
+  uploading: "사진을 업로드하고 흔들림·가림·잘림을 확인하고 있어요.",
+  quality_review: retakeRequired
+    ? "문제를 읽기 어려운 사진이에요. 다시 촬영하거나 다른 사진을 올려주세요."
+    : "사진 상태를 직접 확인한 뒤 인식을 계속할지 선택해 주세요.",
   region_review: "인식할 문제의 범위를 확인해 주세요.",
   queued: "문제 인식 순서를 기다리고 있어요.",
-  running: "문제 사진을 읽고 있어요. 잠시 기다려 주세요.",
+  running: "문제 사진을 읽고 결과를 확인하고 있어요. 필요하면 한 번 더 인식합니다.",
   completed: "인식이 완료됐어요. 원본과 비교해 주세요.",
   failed: "문제 인식을 완료하지 못했어요.",
 }
@@ -463,7 +477,7 @@ function applyMathEdit(latex: string) {
         <span className="review-brand">딛고</span>
         <span className="review-badge">
           {phase === "region_review" ? "범위 확인"
-            : phase === "quality_review" ? "사진 확인"
+            : phase === "quality_review" ? (retakeRequired ? "재촬영 필요" : "사진 확인")
             : phase === "restoring" ? "불러오는 중" : busy ? "인식 중"
             : confirmed ? "확인 완료" : hasEdits ? "수정 중"
               : phase === "completed" ? "확인 대기" : "문제 등록"}
@@ -490,6 +504,7 @@ function applyMathEdit(latex: string) {
             onSelect={choosePhoto}
             imageUrl={problem.imageUrl}
             disabled={locked}
+            retakeRequired={retakeRequired}
             layout={
               phase === "completed" &&
               submission?.layout_detection?.status === "detected"
@@ -503,24 +518,29 @@ function applyMathEdit(latex: string) {
                 onChange={setPhotoRegion}
               />
             ) : undefined}
+            photoNotice={phase === "quality_review" && photoQuality ? (
+              <div className="review-quality-warning" role="region" aria-labelledby="review-quality-title">
+                <h3 id="review-quality-title">
+                  {retakeRequired ? "문제 사진을 다시 촬영해 주세요" : "사진을 한 번 확인해 주세요"}
+                </h3>
+                <ul>
+                  {photoQuality.warnings.map((warning) => (
+                    <li key={warning.code}>{warning.message}</li>
+                  ))}
+                </ul>
+                <p>
+                  {retakeRequired
+                    ? "새 사진을 올린 뒤 품질 검사를 통과하면 문제 인식을 진행할 수 있어요."
+                    : "문제 전체가 선명하게 보이는지 확인해 주세요. 사진을 바꾸거나 이 사진으로 계속할 수 있어요."}
+                </p>
+                {!retakeRequired && pendingPhoto && (
+                  <button type="button" disabled={locked} onClick={() => setPhase("region_review")}>
+                    사진 확인했어요 · 범위 선택
+                  </button>
+                )}
+              </div>
+            ) : undefined}
           />
-          {phase === "quality_review" && pendingPhoto && (
-            <div className="review-quality-warning" role="region" aria-labelledby="review-quality-title">
-              <h3 id="review-quality-title">사진을 한 번 확인해 주세요</h3>
-              <ul>
-                {pendingPhoto.submission.photo_quality?.warnings.map((warning) => (
-                  <li key={warning.code}>{warning.message}</li>
-                ))}
-              </ul>
-              <p>
-                위의 사진 선택·재촬영 버튼으로 사진을 바꾸거나,
-                이 사진으로 인식을 계속할 수 있어요.
-              </p>
-              <button type="button" disabled={locked} onClick={() => setPhase("region_review")}>
-                이 사진으로 범위 선택
-              </button>
-            </div>
-          )}
           {phase === "region_review" && pendingPhoto && (
             <div className="review-region-actions">
               <p className="review-help">
@@ -568,6 +588,28 @@ function applyMathEdit(latex: string) {
           </p>
           {ocrError && <p className="review-error" role="alert">{ocrError}</p>}
 
+          {phase === "completed" && !!submission?.ocr_review?.review_warnings.length && (
+            <div className="review-quality-warning" role="region" aria-labelledby="review-ocr-title">
+              <h3 id="review-ocr-title">원본과 비교해서 확인할 부분이 있어요</h3>
+              <ul>
+                {submission.ocr_review.review_warnings.map((warning, index) => (
+                  <li key={`${warning.code}-${index}`}>
+                    {warning.message}
+                    {warning.first_text && warning.second_text && (
+                      <details>
+                        <summary>두 인식 결과 비교</summary>
+                        <p>{warning.first_label ?? "첫 번째 인식"}</p>
+                        <pre className="review-candidate-text">{warning.first_text}</pre>
+                        <p>{warning.second_label ?? "두 번째 인식"}</p>
+                        <pre className="review-candidate-text">{warning.second_text}</pre>
+                      </details>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="review-content" aria-busy={busy}>
             {problem.draft.length === 0 && (
               <p className="review-help">
@@ -595,7 +637,7 @@ function applyMathEdit(latex: string) {
                         }
                       }}
                     >
-                      {part.text}
+                      <ReviewText text={part.text} />
                     </span>
                   ) : (
                     <button
@@ -617,6 +659,12 @@ function applyMathEdit(latex: string) {
         {phase === "completed" && (
           <ProblemConditions
             extraction={submission?.condition_extraction}
+          />
+        )}
+        {phase === "completed" && submission?.latest_input && (
+          <ProblemTypeMatch
+            key={`${submission.id}:${submission.latest_input.version_number}:${!!submission.latest_input.confirmed_at}:${hasEdits}`}
+            submission={submission} hasEdits={hasEdits} disabled={locked}
           />
         )}
         <section

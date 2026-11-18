@@ -2,11 +2,13 @@
 
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import closing, contextmanager
+from copy import copy
+from dataclasses import replace
 import json
 import logging
 import os
 from pathlib import Path
-from time import monotonic
+from time import monotonic, sleep
 from uuid import uuid4
 from app.ocr.condition_extractor import ConditionExtractor
 
@@ -18,9 +20,14 @@ from app.db.submissions import (
     submission_connection,
 )
 from app.ocr import Backend, OCRPipeline
+from app.ocr.llama import OCRError
 from app.ocr.orientation import get_orientation_detector
 from app.ocr.layout_detector import get_layout_detector
+from app.ocr.formula import get_formula_backend
 from app.ocr.selection import crop_photo_region, validate_photo_region
+from app.ocr.retry import (
+    MAX_ATTEMPTS, OCR_BUDGET_SECONDS, assess_result, critical_signature, select_result,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -46,6 +53,7 @@ def build_qwen_pipeline():
 
     return OCRPipeline(
         backend,
+        formula=get_formula_backend(),
         primary_engine="qwen",
         orientation_detector=get_orientation_detector(),
         layout_detector=get_layout_detector(),
@@ -61,7 +69,7 @@ class OCRJobManager:
         pipeline_factory=build_qwen_pipeline,
         model_name="Qwen3-VL-4B-Instruct",
         model_version=None,
-        pipeline_version="qwen-api-v5-conditions",
+        pipeline_version="qwen-api-v7-region-assembly",
     ):
         self.database = Path(database)
         self.pipeline_factory = pipeline_factory
@@ -347,7 +355,17 @@ class OCRJobManager:
                     event,
                 )
 
-    def _finish(self, job_id, result):
+    def _record_attempt(self, job_id, result):
+        with self.connection() as connection:
+            job = self._job(connection, job_id)
+            return record_ocr_attempt(
+                connection, submission_id=job["submission_id"], owner_id=job["owner_id"],
+                model_name=self.model_name, model_version=self.model_version,
+                pipeline_version=self.pipeline_version,
+                result={**result, "selected_region": job["selected_region"]},
+            )
+
+    def _finish(self, job_id, result, ocr_id=None):
         with self.connection() as connection:
             job = self._job(connection, job_id)
 
@@ -355,15 +373,18 @@ class OCRJobManager:
                 return
 
             result = {**result, "selected_region": job["selected_region"]}
-            ocr_id = record_ocr_attempt(
-                connection,
-                submission_id=job["submission_id"],
-                owner_id=job["owner_id"],
-                model_name=self.model_name,
-                model_version=self.model_version,
-                pipeline_version=self.pipeline_version,
-                result=result,
-            )
+            if ocr_id is None:
+                ocr_id = record_ocr_attempt(
+                    connection, submission_id=job["submission_id"], owner_id=job["owner_id"],
+                    model_name=self.model_name, model_version=self.model_version,
+                    pipeline_version=self.pipeline_version, result=result,
+                )
+            else:
+                # 저장한 전사 원문은 보존하고 최종 선택·검토 정보만 함께 기록한다.
+                connection.execute(
+                    "UPDATE problem_ocr_results SET raw_response_json = ? WHERE id = ?",
+                    (json.dumps(result, ensure_ascii=False, allow_nan=False), ocr_id),
+                )
 
             succeeded = result["status"] == "needs_review"
             version_id = None
@@ -379,9 +400,11 @@ class OCRJobManager:
             status = "completed" if succeeded else "failed"
 
             error_message = None if succeeded else (
-                "일부 영역을 인식하지 못했습니다."
-                if result["status"] == "incomplete"
-                else "OCR 인식에 실패했습니다. OCR 이력을 확인해 주세요."
+                "인식 서버의 연결·설정을 확인한 뒤 다시 시도해 주세요."
+                if result.get("retryable_error") is False or any(
+                    region.get("retryable_error") is False for region in result.get("regions", [])
+                )
+                else "문제를 끝까지 읽지 못했어요. 사진을 다시 촬영하거나 다른 사진을 올려주세요."
             )
 
             connection.execute(
@@ -441,6 +464,34 @@ class OCRJobManager:
                 },
             )
 
+    def _read_attempt(self, job_id, image, pipeline, attempt):
+        pending = []
+        last_flush = monotonic()
+        result = None
+        try:
+            with closing(pipeline.stream(image)) as stream:
+                for event in stream:
+                    if event["type"] == "result":
+                        result = event["result"]
+                        break
+                    pending.append({**event, "attempt": attempt})
+                    if event["type"] != "delta" or len(pending) >= 20 or monotonic() - last_flush >= 0.1:
+                        self._publish(job_id, pending)
+                        pending = []
+                        last_flush = monotonic()
+        except Exception as error:
+            logger.exception("OCR 시도 실패: %s / %s", job_id, attempt)
+            result = {
+                "status": "failed", "text": "", "issues": [str(error)],
+                "error_kind": "transport" if isinstance(error, OCRError) else "configuration",
+                "retryable_error": isinstance(error, OCRError) and getattr(error, "retryable", True),
+            }
+        self._publish(job_id, pending)
+        return result if result is not None else {
+            "status": "failed", "text": "", "issues": ["OCR 최종 결과를 받지 못했습니다."],
+            "error_kind": "missing_result",
+        }
+
     def _run(self, job_id):
         try:
             job_input = self._begin(job_id)
@@ -453,37 +504,93 @@ class OCRJobManager:
                 # 먼저 원본 좌표로 정확히 자른 뒤, 선택된 문제에 방향 보정·OCR을 적용한다.
                 image = crop_photo_region(image, selected_region)
 
-            result = None
-            pending = []
-            last_flush = monotonic()
+            results, result_ids = [], []
+            deadline = monotonic() + OCR_BUDGET_SECONDS
+            condition_pipeline = None
+            skipped = None
+            for number in range(1, MAX_ATTEMPTS + 1):
+                remaining = deadline - monotonic()
+                if number > 1 and remaining <= 1:
+                    skipped = "time_budget"
+                    break
+                pipeline = copy(self.pipeline_factory())
+                reasons = results[-1]["assessment"]["retry_reasons"] if results else []
+                variant = "original"
+                tokens = 2048 if number > 1 and "output_truncated" in reasons else 1024
+                if isinstance(pipeline, OCRPipeline):
+                    if condition_pipeline is None:
+                        condition_pipeline = copy(pipeline)
+                    # 부가 조건은 선택된 본문에 대해서만 한 번 추출한다.
+                    pipeline.condition_extractor = None
+                    pipeline.max_tokens = tokens
+                    pipeline.deadline = deadline
+                    pipeline.retry_preprocess = number > 1 and not (
+                        "output_truncated" in reasons or "transport_error" in reasons
+                    )
+                    variant = "contrast_1.3" if pipeline.retry_preprocess else "original"
+                    if isinstance(pipeline.paddle, Backend):
+                        pipeline.paddle = replace(
+                            pipeline.paddle, timeout=max(1, min(pipeline.paddle.timeout, 120, remaining))
+                        )
+                if number > 1:
+                    self._publish(job_id, [{"type": "stage", "stage": "retry", "attempt": number, "reasons": reasons}])
+                    if "transport_error" in reasons:
+                        sleep(1)
+                started = monotonic()
+                result = self._read_attempt(job_id, image, pipeline, number)
+                assessment = assess_result(result)
+                if not assessment["usable"]:
+                    result = {**result, "raw_text": result.get("text", ""), "text": "", "status": "failed"}
+                result.update({
+                    "attempt_number": number, "assessment": assessment,
+                    "input_variant": variant, "max_tokens": tokens,
+                    "seconds": round(monotonic() - started, 3),
+                })
+                result_id = self._record_attempt(job_id, result)
+                results.append(result)
+                result_ids.append(result_id)
+                self._publish(job_id, [{
+                    "type": "attempt_complete", "attempt": number, "ocr_result_id": result_id,
+                    "retry_reasons": assessment["retry_reasons"],
+                }])
+                if not assessment["retry_reasons"]:
+                    break
 
-            pipeline = self.pipeline_factory()
-
-            with closing(pipeline.stream(image)) as stream:
-                for event in stream:
-                    if event["type"] == "result":
-                        result = event["result"]
-                        break
-
-                    pending.append(event)
-
-                    if (
-                        event["type"] != "delta"
-                        or len(pending) >= 20
-                        or monotonic() - last_flush >= 0.1
-                    ):
-                        self._publish(job_id, pending)
-                        pending = []
-                        last_flush = monotonic()
-
-            self._publish(job_id, pending)
-
-            if result is None:
-                raise ValueError(
-                    "OCR 최종 결과를 받지 못했습니다."
-                )
-
-            self._finish(job_id, result)
+            verified = None
+            verification = "not_needed"
+            if len(results) == 2 and all(assess_result(item)["usable"] for item in results) and (
+                critical_signature(results[0]["text"]) != critical_signature(results[1]["text"])
+            ):
+                verification = "uncertain"
+                if condition_pipeline is not None and condition_pipeline.primary_engine == "qwen" and deadline - monotonic() > 1:
+                    verifier = copy(condition_pipeline)
+                    if isinstance(verifier.paddle, Backend):
+                        verifier.paddle = replace(verifier.paddle, timeout=min(15, deadline - monotonic()))
+                    self._publish(job_id, [{"type": "stage", "stage": "verification"}])
+                    try:
+                        verified = verifier.verify_candidates(image, results)
+                        if verified is not None:
+                            verification = "checked"
+                    except Exception:
+                        logger.exception("원본 대조를 완료하지 못했습니다: %s", job_id)
+                        verification = "unavailable"
+            selected, summary = select_result(results, verified)
+            summary.update({
+                "verification": verification, "retry_skipped": skipped,
+                "attempts": [{
+                    "attempt": index + 1, "ocr_result_id": result_ids[index],
+                    "retry_reasons": item["assessment"]["retry_reasons"],
+                    "input_variant": item["input_variant"], "max_tokens": item["max_tokens"],
+                    "seconds": item["seconds"],
+                } for index, item in enumerate(results)],
+            })
+            result = {**results[selected], "retry_summary": summary, "issues": list(results[selected].get("issues", []))}
+            result["issues"].extend(warning["message"] for warning in summary["review_warnings"])
+            if result["status"] == "needs_review" and condition_pipeline is not None and condition_pipeline.condition_extractor is not None:
+                with closing(condition_pipeline.complete_conditions(image, result)) as events:
+                    for event in events:
+                        self._publish(job_id, [event])
+            self._finish(job_id, result, result_ids[selected])
 
         except Exception as error:
             logger.exception("OCR 작업 실패: %s", job_id)
