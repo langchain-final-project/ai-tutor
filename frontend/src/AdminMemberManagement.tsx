@@ -109,7 +109,7 @@ export function AdminInquiries() {
               <tbody>
                 {!list.data.items.length && <tr><td colSpan={4}>문의가 없습니다.</td></tr>}
                 {list.data.items.map((inquiry) => (
-                  <tr key={inquiry.inquiry_id}>
+                  <tr key={inquiry.inquiry_id} className={inquiry.status === "answered" ? "admin-inquiry-row--answered" : undefined}>
                     <th scope="row">{inquiry.title}</th>
                     <td>{inquiryCategories[inquiry.category] ?? inquiry.category}</td>
                     <td><span className="admin-member-status">{inquiryStatus[inquiry.status]}</span></td>

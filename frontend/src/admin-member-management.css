@@ -120,3 +120,8 @@
   .admin-record-layout { grid-template-columns: minmax(0, 1fr); }
   .admin-member-table th, .admin-member-table td { padding-inline: 8px; }
 }
+.admin-member-table tbody tr.admin-inquiry-row--answered { background: var(--tint); }
+.admin-inquiry-row--answered .admin-member-status {
+  background: var(--light-blue);
+  color: var(--navy);
+}
