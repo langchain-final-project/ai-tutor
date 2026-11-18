@@ -1,31 +1,31 @@
-import { useEffect, useState } from "react";
-import type { FormEvent, InputHTMLAttributes } from "react";
-import { createRoot } from "react-dom/client";
-import "@fontsource-variable/noto-sans-kr";
-import { ApiError, auth, authMessage } from "./auth";
-import { HomePage } from "./HomePage";
-import logo from "./assets/didgo.svg";
-import "./styles.css";
+import { useEffect, useState } from "react"
+import type { FormEvent, InputHTMLAttributes } from "react"
+import { createRoot } from "react-dom/client"
+import "@fontsource-variable/noto-sans-kr"
+import { ApiError, auth, authMessage } from "./auth"
+import { HomePage } from "./HomePage"
+import logo from "./assets/didgo.svg"
+import "./styles.css"
 
-import { ProblemReviewPage } from "./ProblemReviewPage";
+import { ProblemReviewPage } from "./ProblemReviewPage"
 
-const loginUrl = "/login";
-const signupUrl = "/signup";
-const homeUrl = "/home";
-const slogan = "한 걸음씩, 내 힘으로";
+const loginUrl = "/login"
+const signupUrl = "/signup"
+const homeUrl = "/home"
+const slogan = "한 걸음씩, 내 힘으로"
 const loginSteps = [
   ["문제에서 출발", "2x + 3 = 11", "궁금한 문제를 가져와요"],
   ["한 단계씩 이해", "2x = 8", "막힌 부분을 짚어봐요"],
   ["내 힘으로 해결", "x = 4", "스스로 답을 완성해요"],
-];
+]
 const signupSteps = [
   ["내 문제에서 시작", "", "사진이나 수식으로 궁금한 문제를 가져와요."],
   ["막힌 부분을 이해", "", "필요한 단계에서 힌트를 받아요."],
   ["나의 힘으로 마무리", "", "직접 해결한 경험을 기록해요."],
-];
+]
 
 function Introduction({ signup }: { signup: boolean }) {
-  const steps = signup ? signupSteps : loginSteps;
+  const steps = signup ? signupSteps : loginSteps
   return (
     <aside className="introduction" aria-labelledby="introduction-title">
       <div>
@@ -59,7 +59,7 @@ function Introduction({ signup }: { signup: boolean }) {
         </dl>
       )}
     </aside>
-  );
+  )
 }
 
 function Field({ label, ...props }: InputHTMLAttributes<HTMLInputElement> & { label: string }) {
@@ -68,57 +68,57 @@ function Field({ label, ...props }: InputHTMLAttributes<HTMLInputElement> & { la
       <span>{label}</span>
       <input required {...props} />
     </label>
-  );
+  )
 }
 
 function AuthPage({ signup }: { signup: boolean }) {
-  const [pending, setPending] = useState(false);
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
-  const registered = !signup && new URLSearchParams(location.search).get("registered") === "1";
-  const action = signup ? "회원가입" : "로그인";
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState("")
+  const [notice, setNotice] = useState("")
+  const registered = !signup && new URLSearchParams(location.search).get("registered") === "1"
+  const action = signup ? "회원가입" : "로그인"
 
   useEffect(() => {
-    if (signup) return;
-    const controller = new AbortController();
+    if (signup) return
+    const controller = new AbortController()
     auth.profile(controller.signal).then(() => {
-      if (!controller.signal.aborted) location.replace(homeUrl);
+      if (!controller.signal.aborted) location.replace(homeUrl)
     }).catch(() => {
       // The login form is available even when there is no active session.
-    });
-    return () => controller.abort();
-  }, [signup]);
+    })
+    return () => controller.abort()
+  }, [signup])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    if (pending) return;
-    const values = new FormData(event.currentTarget);
-    const email = String(values.get("email")).trim();
-    const password = String(values.get("password"));
-    setError("");
-    setNotice("");
-    const confirmation = String(values.get("password_confirmation") ?? "");
+    event.preventDefault()
+    if (pending) return
+    const values = new FormData(event.currentTarget)
+    const email = String(values.get("email")).trim()
+    const password = String(values.get("password"))
+    setError("")
+    setNotice("")
+    const confirmation = String(values.get("password_confirmation") ?? "")
     if (signup && password !== confirmation) {
-      setError("비밀번호와 비밀번호 확인이 일치하지 않아요.");
-      return;
+      setError("비밀번호와 비밀번호 확인이 일치하지 않아요.")
+      return
     }
 
-    setPending(true);
+    setPending(true)
     try {
       if (signup) {
-        await auth.signUp({ name: String(values.get("name")).trim(), email, password, password_confirmation: confirmation });
-        location.assign(`${loginUrl}?registered=1`);
-        return;
+        await auth.signUp({ name: String(values.get("name")).trim(), email, password, password_confirmation: confirmation })
+        location.assign(`${loginUrl}?registered=1`)
+        return
       }
-      await auth.login({ email, password, remember_me: values.has("remember_me") });
-      await auth.profile();
-      location.replace(homeUrl);
+      await auth.login({ email, password, remember_me: values.has("remember_me") })
+      await auth.profile()
+      location.replace(homeUrl)
     } catch (error) {
       setError(!signup && error instanceof ApiError && error.status === 401 && error.detail === "Authentication required"
         ? "로그인 상태를 확인할 수 없어요. 브라우저의 쿠키 설정을 확인해 주세요."
-        : authMessage(error));
+        : authMessage(error))
     } finally {
-      setPending(false);
+      setPending(false)
     }
   }
 
@@ -196,7 +196,7 @@ function AuthPage({ signup }: { signup: boolean }) {
         <span className="mobile-only">{slogan} · 딛고</span>
       </footer>
     </div>
-  );
+  )
 }
 
 // createRoot(document.getElementById("root")!).render(
@@ -207,7 +207,7 @@ function AuthPage({ signup }: { signup: boolean }) {
 
 const isReviewPreview =
   import.meta.env.DEV &&
-  location.pathname === "/review-preview";
+  location.pathname === "/review-preview"
 
 createRoot(document.getElementById("root")!).render(
   isReviewPreview
@@ -215,4 +215,4 @@ createRoot(document.getElementById("root")!).render(
     : location.pathname === homeUrl
       ? <HomePage loginUrl={loginUrl} />
       : <AuthPage signup={location.pathname === signupUrl} />,
-);
+)

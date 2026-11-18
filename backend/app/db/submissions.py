@@ -370,6 +370,11 @@ def get_submission(
     result["image_orientation"] = None
     result["selected_region"] = None
     result["layout_detection"] = None
+    result["condition_extraction"] = {
+        "schema_version": "conditions-v1",
+        "status": "not_run",
+        "conditions": [],
+    }
     if latest is not None and latest["source_ocr_result_id"] is not None:
         ocr = _fetch_one(
             connection,
@@ -387,6 +392,23 @@ def get_submission(
                 result["selected_region"] = raw["selected_region"]
             if isinstance(raw.get("layout_detection"), dict):
                 result["layout_detection"] = raw["layout_detection"]
+            if "condition_extraction" in raw:
+                from app.ocr.conditions import ConditionExtraction
+
+                try:
+                    extraction = ConditionExtraction.model_validate(
+                        raw["condition_extraction"]
+                    )
+                    result["condition_extraction"] = (
+                        extraction.model_dump(mode="json")
+                    )
+
+                except (ValueError, TypeError):
+                    result["condition_extraction"] = {
+                        "schema_version": "conditions-v1",
+                        "status": "failed",
+                        "conditions": [],
+                    }
 
     return result
 

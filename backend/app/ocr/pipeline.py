@@ -79,6 +79,7 @@ class OCRPipeline:
         rotation=0,
         orientation_detector=None,
         layout_detector=None,
+        condition_extractor=None,
     ):
         self.paddle, self.qwen = paddle, qwen
         self.formula = formula
@@ -90,6 +91,7 @@ class OCRPipeline:
         self.rotation = rotation
         self.orientation_detector = orientation_detector
         self.layout_detector = layout_detector
+        self.condition_extractor = condition_extractor
 
     def recognize(self, image: bytes, regions: list[Region] | None = None, *, check_text: bool = False) -> dict:
         """최종 결과만 반환한다. 증분 출력은 stream()을 사용한다."""
@@ -285,6 +287,60 @@ class OCRPipeline:
             except (OCRError, OSError) as error:
                 issues.append(str(error))
 
+        condition_extraction = {
+            "schema_version": "conditions-v1",
+            "status": "not_run",
+            "conditions": [],
+        }
+
+        # 웹에서는 선택한 범위를 먼저 자른 뒤 이 파이프라인을 호출합니다.
+        # 명시적인 영역 목록을 사용하는 CLI에서는 범위 밖을 읽지 않습니다.
+        if (
+            self.condition_extractor is not None
+            and regions is None
+            and text.strip()
+        ):
+            yield {
+                "type": "stage",
+                "stage": "conditions",
+            }
+
+            try:
+                from .conditions import ConditionExtraction
+
+                with source.copy() as condition_image:
+                    candidate = self.condition_extractor.extract(
+                        condition_image
+                    )
+
+                extraction = ConditionExtraction.model_validate(candidate)
+
+                if extraction.status == "not_run":
+                    raise ValueError("조건 추출 결과 상태가 올바르지 않습니다.")
+
+                condition_extraction = extraction.model_dump(mode="json")
+
+            except Exception:
+                logger.exception("조건 추출 결과를 처리하지 못했습니다.")
+
+                condition_extraction = {
+                    "schema_version": "conditions-v1",
+                    "status": "failed",
+                    "conditions": [],
+                }
+
+            if condition_extraction["status"] == "failed":
+                issues.append(
+                    "그림 조건을 읽지 못했습니다. "
+                    "원본 사진과 본문을 확인해 주세요."
+                )
+
+            yield {
+                "type": "conditions_complete",
+                "status": condition_extraction["status"],
+                "count": len(condition_extraction["conditions"]),
+            }
+
         usable = sum(r["usable"] for r in results.values())
         status = "failed" if not usable else "incomplete" if usable < len(results) else "needs_review"
         yield {"type": "result", "result": {"status": status, "text": text,
@@ -292,5 +348,6 @@ class OCRPipeline:
                "rotation_ccw": (self.rotation + (orientation or {}).get("rotation_ccw", 0)) % 360,
                "orientation": orientation,
                "layout_detection": layout_detection,
+               "condition_extraction": condition_extraction,
                "uncovered_dark_pixels": outside,
                "issues": issues, "regions": list(results.values())}}

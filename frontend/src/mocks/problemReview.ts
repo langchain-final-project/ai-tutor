@@ -1,4 +1,4 @@
-import type { ProblemReview, ReviewBlock } from "../types/problemReview";
+import type { ProblemReview, ReviewBlock } from "../types/problemReview"
 
 // 실제 OCR 결과가 아닌, 화면 개발용 예시 문제입니다.
 const formulaExample: ReviewBlock[] = [
@@ -23,7 +23,7 @@ const formulaExample: ReviewBlock[] = [
       },
     ],
   },
-];
+]
 
 export function createFormulaExample(): ProblemReview {
   return {
@@ -31,5 +31,5 @@ export function createFormulaExample(): ProblemReview {
     imageUrl: null,
     original: structuredClone(formulaExample),
     draft: structuredClone(formulaExample),
-  };
+  }
 }

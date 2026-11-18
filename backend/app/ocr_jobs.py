@@ -8,6 +8,7 @@ import os
 from pathlib import Path
 from time import monotonic
 from uuid import uuid4
+from app.ocr.condition_extractor import ConditionExtractor
 
 from app.db.submissions import (
     create_initial_input_version,
@@ -25,18 +26,30 @@ logger = logging.getLogger(__name__)
 
 
 def build_qwen_pipeline():
+    qwen_url = os.getenv(
+        "DIDGO_QWEN_URL",
+        "http://127.0.0.1:8081/v1",
+    )
+
     backend = Backend(
-        url=os.getenv(
-            "DIDGO_QWEN_URL",
-            "http://127.0.0.1:8081/v1",
-        ),
+        url=qwen_url,
         timeout=float(os.getenv("DIDGO_OCR_TIMEOUT", "120")),
         image_tokens=(256, 2048),
     )
+
+    condition_backend = Backend(
+        url=qwen_url,
+        timeout=float(
+            os.getenv("DIDGO_CONDITION_TIMEOUT", "180")
+        ),
+    )
+
     return OCRPipeline(
-        backend, primary_engine="qwen",
+        backend,
+        primary_engine="qwen",
         orientation_detector=get_orientation_detector(),
         layout_detector=get_layout_detector(),
+        condition_extractor=ConditionExtractor(condition_backend),
     )
 
 
@@ -48,7 +61,7 @@ class OCRJobManager:
         pipeline_factory=build_qwen_pipeline,
         model_name="Qwen3-VL-4B-Instruct",
         model_version=None,
-        pipeline_version="qwen-api-v4-layout",
+        pipeline_version="qwen-api-v5-conditions",
     ):
         self.database = Path(database)
         self.pipeline_factory = pipeline_factory

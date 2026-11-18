@@ -91,7 +91,7 @@
 
 .review-paragraph {
   margin: 0;
-  line-height: 2.5;
+  line-height: 0.7;
   overflow-wrap: anywhere;
 }
 
@@ -529,4 +529,36 @@
   width: auto;
   height: auto;
   margin-inline: auto;
+}
+
+
+.review-condition-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-condition-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.review-condition-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.review-condition-value {
+  min-width: 0;
+  overflow-x: auto;
+  overflow-wrap: anywhere;
+  font-size: 17px;
+  line-height: 1.8;
 }

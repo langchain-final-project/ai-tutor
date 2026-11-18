@@ -1,53 +1,56 @@
-import { useRef, useState } from "react";
-import type { ChangeEvent, ReactNode } from "react";
-import { PhotoViewer } from "./PhotoViewer";
+import { useRef, useState } from "react"
+import type { ChangeEvent, ReactNode } from "react"
+import { PhotoViewer } from "./PhotoViewer"
+import type { ProblemLayout } from "../types/problemLayout"
 
 const acceptedTypes = new Set([
   "image/jpeg",
   "image/png",
   "image/webp",
-]);
+])
 
 type PhotoPickerProps = {
-  onSelect: (file: File) => boolean;
-  imageUrl: string | null;
-  disabled?: boolean;
-  photoContent?: ReactNode;
-};
+  onSelect: (file: File) => boolean
+  imageUrl: string | null
+  disabled?: boolean
+  photoContent?: ReactNode
+  layout?: ProblemLayout | null
+}
 
 export function PhotoPicker({
   onSelect,
   imageUrl,
   disabled = false,
   photoContent,
+  layout = null,
 }: PhotoPickerProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null);
-  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null)
+  const cameraInputRef = useRef<HTMLInputElement>(null)
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState("")
 
   function selectPhoto(event: ChangeEvent<HTMLInputElement>) {
-    const nextFile = event.currentTarget.files?.[0];
+    const nextFile = event.currentTarget.files?.[0]
 
     // 같은 사진을 다시 골라도 change 이벤트가 발생하게 합니다.
-    event.currentTarget.value = "";
+    event.currentTarget.value = ""
 
     // 사진 선택이나 촬영을 취소하면 기존 사진을 유지합니다.
-    if (!nextFile || disabled) return;
+    if (!nextFile || disabled) return
 
     if (nextFile.size > 30 * 1024 * 1024) {
-      setError("사진은 30MB 이하로 선택해 주세요.");
-      return;
+      setError("사진은 30MB 이하로 선택해 주세요.")
+      return
     }
 
     if (nextFile.type && !acceptedTypes.has(nextFile.type)) {
-      setError("JPG, PNG, WebP 사진을 선택해 주세요.");
-      return;
+      setError("JPG, PNG, WebP 사진을 선택해 주세요.")
+      return
     }
 
-    if (!onSelect(nextFile)) return;
+    if (!onSelect(nextFile)) return
 
-    setError("");
+    setError("")
   }
 
   return (
@@ -56,10 +59,11 @@ export function PhotoPicker({
       photoContent ?? <PhotoViewer
         key={imageUrl}
         imageUrl={imageUrl}
+        layout={layout}
         onError={() => {
           setError(
             "사진을 표시할 수 없습니다. 다른 사진을 선택해 주세요.",
-          );
+          )
         }}
       />
       ) : (
@@ -111,10 +115,6 @@ export function PhotoPicker({
           {error}
         </p>
       )}
-
-      <p className="review-help">
-        사진을 선택하면 품질을 확인하고 문제 범위를 선택할 수 있어요.
-      </p>
     </div>
-  );
+  )
 }
