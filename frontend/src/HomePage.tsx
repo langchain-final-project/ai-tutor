@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { ApiError, auth } from "./auth";
 import type { Profile } from "./auth";
 import { AccountSettings } from "./AccountSettings";
+import { SolutionWorkspace } from "./SolutionWorkspace";
 import logo from "./assets/didgo.svg";
 import "./home.css";
+import "./solution-workspace.css";
 
 const icons = {
   home: <><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M9 21v-8h6v8" /></>,
@@ -48,9 +50,15 @@ function Icon({ name }: { name: keyof typeof icons }) {
 }
 
 function getSelection() {
-  const [categoryId, itemId] = location.hash.slice(1).split("/");
+  const [categoryId, itemId, submissionId] = location.hash.slice(1).split("/");
   const category = categories.find(({ id }) => id === categoryId) ?? categories[0];
-  return { category, item: category.children?.find(({ id }) => id === itemId) };
+  const item = category.children?.find(({ id }) => id === itemId);
+  return {
+    category,
+    item,
+    submissionId: category.id === "history" && (item?.id === "questions" || item?.id === "solutions")
+      ? submissionId ?? null : null,
+  };
 }
 
 export function HomePage({ loginUrl }: { loginUrl: string }) {
@@ -89,6 +97,8 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
   const title = item?.label ?? category.title ?? category.label;
   const inSettings = category.id === "settings";
   const profile = typeof session === "object" ? session : null;
+  const workspaceView = category.id === "home" ? "home"
+    : category.id === "history" && (item?.id === "questions" || item?.id === "solutions") ? item.id : null;
 
   return (
     <div className="student-page">
@@ -156,6 +166,14 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
                   <a key={child.id} href={`#${category.id}/${child.id}`}>{child.label}<Icon name="chevron" /></a>
                 ))}
               </nav>
+            )}
+            {workspaceView && (
+              <SolutionWorkspace
+                key={`${profile.user_id}:${workspaceView}:${selection.submissionId ?? "list"}`}
+                view={workspaceView}
+                submissionId={selection.submissionId}
+                loginUrl={loginUrl}
+              />
             )}
             {inSettings && <AccountSettings loginUrl={loginUrl} email={profile.email} />}
           </>
