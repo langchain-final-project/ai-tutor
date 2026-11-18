@@ -185,10 +185,132 @@ def test_other_account_cannot_access_photo_or_ocr_job(database, students):
     assert first.get(f"/submissions/{ident}/photo").status_code == 200
     assert first.get("/ocr-jobs/owner-job").status_code == 200
     for path in (f"/submissions/{ident}", f"/submissions/{ident}/photo",
+                 f"/submissions/{ident}/photo?selected=true&corrected=true",
                  f"/submissions/{ident}/ocr/history", "/ocr-jobs/owner-job",
                  "/ocr-jobs/owner-job/events"):
         assert second.get(path).status_code == 404, path
     assert second.post(f"/submissions/{ident}/ocr").status_code == 404
+
+
+PHOTO_OCR_TEXT = r"다음 방정식을 풀어 보세요. \(3(x-2)=12\)"
+
+
+class PhotoEquationPipeline:
+    def stream(self, image):
+        assert image
+        yield {"type": "result", "result": {
+            "status": "needs_review", "text": PHOTO_OCR_TEXT,
+            "rotation_ccw": 90,
+            "orientation": {"status": "corrected", "rotation_ccw": 90},
+            "layout_detection": {"status": "unavailable", "layout": None, "report": None},
+            "issues": [], "regions": [],
+        }}
+
+
+def photo_equation_source(app, client, *, recognize=True):
+    output = BytesIO()
+    Image.new("RGB", (8, 8), "white").save(output, format="PNG")
+    response = client.post("/submissions/photo", files={
+        "files": ("equation.png", output.getvalue(), "image/png"),
+    })
+    assert response.status_code == 201, response.text
+    assert "photo_quality" in response.json()
+    ident = response.json()["id"]
+    if recognize:
+        app.state.ocr_jobs.pipeline_factory = PhotoEquationPipeline
+        job = client.post(f"/submissions/{ident}/ocr")
+        assert job.status_code == 202, job.text
+        app.state.ocr_jobs.executor.submit(lambda: None).result(timeout=10)
+    return ident
+
+
+def test_confirmed_photo_equation_keeps_raw_ocr_and_restores_source(students):
+    app, first, second, owner_id, _ = students
+    photo_id = photo_equation_source(app, first)
+    photo = f"/submissions/{photo_id}"
+    confirmed = first.post(photo + "/confirm", json={
+        "content_text": PHOTO_OCR_TEXT, "expected_version_number": 1,
+    })
+    assert confirmed.status_code == 200, confirmed.text
+    original = confirmed.json()
+    assert original["latest_input"]["content_text"] == PHOTO_OCR_TEXT
+    assert original["latest_input"]["version_number"] == 1
+    response = first.post(photo + "/equation", json={
+        "content_text": "3(x-2)=12", "expected_version_number": 1,
+    })
+    assert response.status_code == 201, response.text
+    equation = response.json()
+    assert equation["id"] != photo_id
+    assert equation["input_kind"] == "text"
+    assert equation["owner_id"] == owner_id
+    assert equation["source_photo"] == {"submission_id": photo_id, "input_version_number": 1}
+    assert equation["latest_input"]["content_text"] == "3(x-2)=12"
+    assert equation["latest_input"]["confirmed_at"] is None
+    assert first.get(photo).json() == original
+    assert first.get(photo + "/ocr/history").json()[0]["ocr_text"] == PHOTO_OCR_TEXT
+    base = f"/submissions/{equation['id']}"
+    assert first.post(base + "/confirm", json={
+        "content_text": "3(x-2)=12", "expected_version_number": 1,
+    }).status_code == 200
+    result, viewed = verify_problem(first, equation["id"])
+    assert first.get(photo + "/work").status_code == 409
+    for suffix in ("", "/work", "/verification", "/feedback/history"):
+        assert second.get(base + suffix).status_code == 404, suffix
+    assert second.post(photo + "/equation", json={
+        "content_text": "x=6", "expected_version_number": 1,
+    }).status_code == 404
+    assert first.post("/auth/logout").status_code == 204
+    assert first.get(base).status_code == 401
+    assert first.post("/auth/login", json={"email": "first@example.com", "password": PASSWORD}).status_code == 200
+    assert first.get(base).json()["source_photo"] == equation["source_photo"]
+    assert first.get(base + "/verification").json() == result
+    assert first.get(base + "/feedback/history").json() == [viewed]
+    assert first.get(photo).json()["image_rotation_ccw"] == 90
+    assert first.get(photo).json()["layout_detection"] == original["layout_detection"]
+
+    revised = first.post(photo + "/confirm", json={
+        "content_text": PHOTO_OCR_TEXT + " (학생이 확인한 원문 수정)", "expected_version_number": 1,
+    })
+    assert revised.status_code == 200, revised.text
+    assert revised.json()["latest_input"]["version_number"] == 2
+    assert first.get(base).json()["source_photo"] == equation["source_photo"]
+    assert first.get(base + "/verification").json() == result
+    assert first.post(photo + "/equation", json={
+        "content_text": "x=6", "expected_version_number": 1,
+    }).status_code == 409
+
+
+def test_photo_equation_requires_confirmed_current_source_and_atomic_link(database, students):
+    app, first, _, _, _ = students
+    photo_id = photo_equation_source(app, first, recognize=False)
+    photo = f"/submissions/{photo_id}"
+    body = {"content_text": "3(x-2)=12", "expected_version_number": 1}
+    assert first.post(photo + "/equation", json=body).status_code == 409
+    app.state.ocr_jobs.pipeline_factory = PhotoEquationPipeline
+    assert first.post(photo + "/ocr").status_code == 202
+    app.state.ocr_jobs.executor.submit(lambda: None).result(timeout=10)
+    assert first.post(photo + "/equation", json=body).status_code == 409
+    assert first.post(photo + "/confirm", json={
+        "content_text": PHOTO_OCR_TEXT, "expected_version_number": 1,
+    }).status_code == 200
+    for change in ({"content_text": " "}, {"content_text": "x" * 513},
+                   {"owner_id": "forged-owner"}, {"expected_version_number": 0}):
+        assert first.post(photo + "/equation", json={**body, **change}).status_code == 422
+    assert first.post("/submissions/99999/equation", json=body).status_code == 404
+    text = create_problem(first)
+    assert first.post(f"/submissions/{text['id']}/equation", json=body).status_code == 409
+    with closing(sqlite3.connect(database)) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM photo_equation_sources").fetchone()[0] == 0
+        before = connection.execute("SELECT COUNT(*) FROM problem_submissions").fetchone()[0]
+        connection.executescript("""
+            CREATE TRIGGER reject_equation_source_fixture BEFORE INSERT ON photo_equation_sources
+            BEGIN SELECT RAISE(ABORT, 'fixture link failure'); END;
+        """)
+    assert first.post(photo + "/equation", json=body).status_code == 409
+    with closing(sqlite3.connect(database)) as connection:
+        assert connection.execute("SELECT COUNT(*) FROM problem_submissions").fetchone()[0] == before
+        assert connection.execute("SELECT COUNT(*) FROM photo_equation_sources").fetchone()[0] == 0
+    assert first.get(photo).json()["latest_input"]["content_text"] == PHOTO_OCR_TEXT
 
 
 def test_logout_revokes_a_cookie_even_when_it_is_replayed(students):

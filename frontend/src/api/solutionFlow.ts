@@ -16,6 +16,8 @@ export type Submission = {
   created_at: string;
   latest_input: ProblemInput | null;
   review_status: "awaiting_input" | "needs_review" | "confirmed";
+  original_filename?: string | null;
+  source_photo?: { submission_id: number; input_version_number: number } | null;
 };
 export type Work = {
   id: number;
@@ -84,6 +86,10 @@ export const solutionApi = {
   list: (signal?: AbortSignal) => request<Submission[]>("/submissions?limit=100", signal),
   create: (contentText: string, signal?: AbortSignal) =>
     request<Submission>("/submissions/text", signal, "POST", { content_text: contentText }),
+  createFromPhoto: (photoId: number, contentText: string, expectedVersion: number, signal?: AbortSignal) =>
+    request<Submission>(`${base(photoId)}/equation`, signal, "POST", {
+      content_text: contentText, expected_version_number: expectedVersion,
+    }),
   get: (id: number, signal?: AbortSignal) => request<Submission>(base(id), signal),
   confirmProblem: (id: number, contentText: string, expectedVersion: number, signal?: AbortSignal) =>
     request<Submission>(`${base(id)}/confirm`, signal, "POST", {

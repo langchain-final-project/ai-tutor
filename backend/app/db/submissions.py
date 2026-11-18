@@ -249,7 +249,7 @@ def create_initial_input_version(connection: sqlite3.Connection, *, submission_i
     return input_version_id
 
 @contextmanager
-def submission_connection(database: str | Path | None = None):
+def submission_connection(database: str | Path | None = None, *, write=False):
     """개인 DB를 열고, 성공 시 확정하고 오류 시 되돌린 뒤 닫는다."""
     path = (
         Path(database)
@@ -262,7 +262,7 @@ def submission_connection(database: str | Path | None = None):
     with closing(sqlite3.connect(uri, uri=True)) as connection:
         connection.execute("PRAGMA foreign_keys = ON")
         with connection:
-            connection.execute("BEGIN")
+            connection.execute("BEGIN IMMEDIATE" if write else "BEGIN")
             yield connection
 
 
@@ -359,11 +359,50 @@ def get_submission(
     latest = _latest_input(connection, submission_id, owner_id)
 
     result["latest_input"] = latest
+    result["source_photo"] = None
+    if connection.execute(
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'photo_equation_sources'"
+    ).fetchone() is not None:
+        result["source_photo"] = _fetch_one(
+            connection,
+            """
+            SELECT s.id AS submission_id, v.version_number AS input_version_number
+            FROM photo_equation_sources link
+            JOIN problem_submissions s ON s.id = link.source_submission_id
+            JOIN problem_input_versions v ON v.id = link.source_input_version_id
+                AND v.submission_id = s.id
+            WHERE link.submission_id = ? AND s.owner_id = ?
+            """,
+            (submission_id, owner_id),
+        )
     result["review_status"] = (
         "awaiting_input" if latest is None
         else "confirmed" if latest["confirmed_at"] is not None
         else "needs_review"
     )
+
+    # 학생 수정본도 최초 OCR 결과를 참조하므로 방향 정보가 함께 복원된다.
+    result["image_rotation_ccw"] = 0
+    result["image_orientation"] = None
+    result["selected_region"] = None
+    result["layout_detection"] = None
+    if latest is not None and latest["source_ocr_result_id"] is not None:
+        ocr = _fetch_one(
+            connection,
+            "SELECT raw_response_json FROM problem_ocr_results WHERE id = ?",
+            (latest["source_ocr_result_id"],),
+        )
+        if ocr and ocr["raw_response_json"]:
+            raw = json.loads(ocr["raw_response_json"])
+            rotation = raw.get("rotation_ccw", 0)
+            if type(rotation) is int and rotation in {0, 90, 180, 270}:
+                result["image_rotation_ccw"] = rotation
+            if isinstance(raw.get("orientation"), dict):
+                result["image_orientation"] = raw["orientation"]
+            if isinstance(raw.get("selected_region"), dict):
+                result["selected_region"] = raw["selected_region"]
+            if isinstance(raw.get("layout_detection"), dict):
+                result["layout_detection"] = raw["layout_detection"]
 
     return result
 
@@ -679,3 +718,28 @@ def create_text_submission(
             "submission_id": submission_id,
             "input_version_id": _inserted_id(cursor),
         }
+
+
+def create_equation_submission(
+    connection, *, source_submission_id: int, owner_id: str,
+    content_text: str, expected_version_number: int,
+) -> dict[str, int]:
+    """확인한 사진 원문은 그대로 두고 학생의 등식과 출처를 함께 저장한다."""
+    if not isinstance(content_text, str) or not content_text.strip() or len(content_text) > 512:
+        raise ValueError("등식을 512자 이내로 직접 입력해 주세요.")
+    with _submission_write(connection):
+        source = get_submission(connection, submission_id=source_submission_id, owner_id=owner_id)
+        latest = source["latest_input"]
+        if source["input_kind"] != "photo" or latest is None or latest["confirmed_at"] is None:
+            raise ValueError("사진의 인식 내용을 먼저 확인해 주세요.")
+        _check_expected_version(latest, expected_version_number)
+        ids = create_text_submission(connection, owner_id=owner_id, content_text=content_text)
+        connection.execute(
+            """
+            INSERT INTO photo_equation_sources
+                (submission_id, source_submission_id, source_input_version_id)
+            VALUES (?, ?, ?)
+            """,
+            (ids["submission_id"], source_submission_id, latest["id"]),
+        )
+        return ids

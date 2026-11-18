@@ -8,6 +8,7 @@ type Props = {
   view: "home" | "questions" | "solutions";
   submissionId: string | null;
   loginUrl: string;
+  sourcePhotoId?: string | null;
 };
 type Snapshot = {
   submission: Submission;
@@ -65,8 +66,9 @@ async function readSnapshot(id: number, signal?: AbortSignal): Promise<Snapshot>
   return { submission: after, work, result, history, views, inputs };
 }
 
-export function SolutionWorkspace({ view, submissionId, loginUrl }: Props) {
+export function SolutionWorkspace({ view, submissionId, loginUrl, sourcePhotoId = null }: Props) {
   const [questions, setQuestions] = useState<Submission[]>([]);
+  const [sourcePhoto, setSourcePhoto] = useState<Submission | null>(null);
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [newEquation, setNewEquation] = useState("");
   const [equation, setEquation] = useState("");
@@ -88,6 +90,8 @@ export function SolutionWorkspace({ view, submissionId, loginUrl }: Props) {
 
   const id = submissionId && /^[1-9]\d*$/.test(submissionId) && Number.isSafeInteger(Number(submissionId))
     ? Number(submissionId) : null;
+  const sourceId = sourcePhotoId && /^[1-9]\d*$/.test(sourcePhotoId) && Number.isSafeInteger(Number(sourcePhotoId))
+    ? Number(sourcePhotoId) : null;
   const input = snapshot?.submission.latest_input;
   const problemDirty = snapshot !== null && equation !== (input?.content_text ?? "");
   const workDirty = snapshot !== null && !sameSteps(writtenSteps(steps), snapshot.work?.steps ?? []);
@@ -99,11 +103,13 @@ export function SolutionWorkspace({ view, submissionId, loginUrl }: Props) {
     if (!alive.current || (reason instanceof Error && reason.name === "AbortError")) return;
     if (reason instanceof ApiError && reason.status === 401) {
       setSnapshot(null); setQuestions([]); setEquation(""); setSteps([]); setBackup(null);
+      setSourcePhoto(null);
       location.replace(loginUrl);
       return;
     }
     if (reason instanceof ApiError && reason.status === 404) {
       setSnapshot(null); setEquation(""); setSteps([]); setBackup(null);
+      setSourcePhoto(null);
     }
     if (reason instanceof ApiError && reason.status === 409) {
       setConflict(true);
@@ -125,8 +131,17 @@ export function SolutionWorkspace({ view, submissionId, loginUrl }: Props) {
     setLoading(true);
     try {
       if (submissionId === null) {
-        const list = await solutionApi.list(controller.current?.signal);
-        if (alive.current && number === readNumber.current) setQuestions(list);
+        if (sourcePhotoId !== null && !sourceId) throw new Error("사진 문제 주소를 확인해 주세요.");
+        const [list, source] = await Promise.all([
+          solutionApi.list(controller.current?.signal),
+          sourceId ? solutionApi.get(sourceId, controller.current?.signal) : Promise.resolve(null),
+        ]);
+        if (source && (source.input_kind !== "photo" || !source.latest_input?.confirmed_at)) {
+          throw new ApiError(409, "사진 문제 내용을 먼저 확인해 주세요.");
+        }
+        if (alive.current && number === readNumber.current) {
+          setQuestions(list); setSourcePhoto(source); setConflict(false);
+        }
       } else if (id === null) {
         throw new Error("문제 주소가 올바르지 않습니다. 질문 내역에서 다시 선택해 주세요.");
       } else {
@@ -145,7 +160,7 @@ export function SolutionWorkspace({ view, submissionId, loginUrl }: Props) {
     controller.current = new AbortController();
     void load();
     return () => { alive.current = false; controller.current?.abort(); };
-  }, [submissionId]);
+  }, [submissionId, sourcePhotoId]);
 
   useEffect(() => {
     if (!dirty) return;
@@ -197,8 +212,11 @@ export function SolutionWorkspace({ view, submissionId, loginUrl }: Props) {
   function create(event: FormEvent) {
     event.preventDefault();
     if (!newEquation.trim()) return;
+    if (sourcePhotoId !== null && !sourcePhoto?.latest_input?.confirmed_at) return;
     void perform("문제를 저장하고 있어요…", async () => {
-      const saved = await solutionApi.create(newEquation.trim(), controller.current?.signal);
+      const saved = sourcePhotoId !== null
+        ? await solutionApi.createFromPhoto(sourcePhoto!.id, newEquation.trim(), sourcePhoto!.latest_input!.version_number, controller.current?.signal)
+        : await solutionApi.create(newEquation.trim(), controller.current?.signal);
       if (alive.current) location.hash = `#history/solutions/${saved.id}`;
     });
   }
@@ -263,7 +281,6 @@ export function SolutionWorkspace({ view, submissionId, loginUrl }: Props) {
     void load();
   }
 
-  const textQuestions = questions.filter((question) => question.input_kind === "text");
   const summary = result ? resultSummary(result) : null;
   const verdict = result?.evaluation.verification;
 
@@ -283,20 +300,27 @@ export function SolutionWorkspace({ view, submissionId, loginUrl }: Props) {
       {!loading && submissionId === null && <>
         <section className="solution-intro">
           <p className="solution-eyebrow">한 줄씩, 내 힘으로</p>
-          <h2>{view === "home" ? "막힌 식부터 다시 시작해요" : "내 문제를 이어 풀어요"}</h2>
+          <h2>{sourcePhotoId !== null ? "사진에서 확인한 문제를 이어 풀어요" : view === "home" ? "막힌 식부터 다시 시작해요" : "내 문제를 이어 풀어요"}</h2>
           <p>문제를 직접 입력하고, 마지막으로 확인한 풀이에서 다음 한 걸음을 찾아보세요.</p>
         </section>
         <div className="solution-grid">
           <section className="solution-card" aria-labelledby="new-problem-title">
             <h2 id="new-problem-title">내 문제 풀기</h2>
+            {sourcePhotoId === null && <a className="solution-button is-secondary" href="/review">사진으로 문제 가져오기</a>}
+            {sourcePhoto && <div className="solution-notice">
+              <p>사진에서 확인한 원문은 그대로 보존돼요. 풀이에 사용할 일차등식 하나를 직접 입력해 주세요.</p>
+              <a className="solution-inline-link" href={`/review?submission=${sourcePhoto.id}`}>출처 사진과 확인한 내용 보기 →</a>
+            </div>}
             <p className="solution-help">미지수 하나인 일차방정식을 입력해 주세요. 괄호·소수·분수도 사용할 수 있어요.</p>
             <form className="solution-form" onSubmit={create}>
               <label className="solution-label" htmlFor="new-equation">문제의 식</label>
               <input id="new-equation" className="solution-input solution-equation" value={newEquation}
                 onChange={(event) => setNewEquation(event.target.value)} placeholder="예: 3(x-2)=12"
-                maxLength={512} required autoComplete="off" disabled={disabled} />
+                maxLength={512} required autoComplete="off" disabled={disabled || conflict || (sourcePhotoId !== null && !sourcePhoto)} />
               <p className="solution-help">분수 계수는 (1/2)*x처럼 괄호와 곱셈 기호를 써 주세요.</p>
-              <button className="solution-button" disabled={disabled || !newEquation.trim()}>문제 등록하기</button>
+              <button className="solution-button" disabled={disabled || conflict || !newEquation.trim() || (sourcePhotoId !== null && !sourcePhoto)}>
+                {sourcePhotoId !== null ? "이 식으로 풀이 등록하기" : "문제 등록하기"}
+              </button>
             </form>
           </section>
           <section className="solution-card" aria-labelledby="my-questions-title">
@@ -304,14 +328,14 @@ export function SolutionWorkspace({ view, submissionId, loginUrl }: Props) {
               <h2 id="my-questions-title">{view === "solutions" ? "이어서 풀 문제" : "내 질문 내역"}</h2>
               <button className="solution-button is-quiet" type="button" onClick={reread} disabled={disabled}>새로고침</button>
             </div>
-            <p className="solution-help">최근 등록한 100개 중 직접 입력한 문제를 보여드려요.</p>
-            {!textQuestions.length && !error && <p className="solution-empty">아직 직접 입력한 문제가 없어요. 첫 문제를 등록해 보세요.</p>}
+            <p className="solution-help">사진과 식으로 등록한 최근 문제 100개를 보여드려요.</p>
+            {!questions.length && !error && <p className="solution-empty">아직 등록한 문제가 없어요. 첫 문제를 등록해 보세요.</p>}
             <ul className="solution-list">
-              {textQuestions.map((question) => <li key={question.id}>
-                <a className="solution-list-item" href={`#history/solutions/${question.id}`}>
-                  <span className="solution-equation">{question.latest_input?.content_text ?? "입력 확인 필요"}</span>
-                  <span className="solution-meta">{dateLabel(question.created_at)} · {question.review_status === "confirmed" ? "문제 확인됨" : "문제 확인 대기"}</span>
-                  <span className="solution-inline-link">풀이 열기 →</span>
+              {questions.map((question) => <li key={question.id}>
+                <a className="solution-list-item" href={question.input_kind === "photo" ? `/review?submission=${question.id}` : `#history/solutions/${question.id}`}>
+                  <span className="solution-equation">{question.latest_input?.content_text ?? question.original_filename ?? "사진 인식 대기"}</span>
+                  <span className="solution-meta">{dateLabel(question.created_at)} · {question.input_kind === "photo" ? "사진" : "직접 입력"} · {question.review_status === "confirmed" ? "문제 확인됨" : "문제 확인 대기"}</span>
+                  <span className="solution-inline-link">{question.input_kind === "photo" ? "사진 확인 열기" : "풀이 열기"} →</span>
                 </a>
               </li>)}
             </ul>
@@ -320,11 +344,15 @@ export function SolutionWorkspace({ view, submissionId, loginUrl }: Props) {
       </>}
 
       {!loading && snapshot && snapshot.submission.input_kind !== "text" && <div className="solution-card">
-        <p>사진으로 등록한 문제예요. 이 화면에서는 직접 입력한 식을 이어 풀 수 있어요.</p>
-        <a className="solution-inline-link" href="#history/questions">내 질문 내역으로</a>
+        <p>사진으로 등록한 문제예요. 원본과 인식한 내용은 문제 확인 화면에서 이어 볼 수 있어요.</p>
+        <a className="solution-inline-link" href={`/review?submission=${snapshot.submission.id}`}>사진과 문제 내용 확인하기 →</a>
       </div>}
 
       {!loading && snapshot?.submission.input_kind === "text" && <>
+        {snapshot.submission.source_photo && <p className="solution-notice">
+          <a href={`/review?submission=${snapshot.submission.source_photo.submission_id}`}>이 풀이의 출처 사진 확인하기 →</a>
+          <span className="solution-help">연결한 사진 입력 버전: {snapshot.submission.source_photo.input_version_number}</span>
+        </p>}
         <div className="solution-section-header">
           <a className="solution-inline-link" href="#history/questions">← 내 질문 내역</a>
           <button className="solution-button is-quiet" type="button" onClick={reread} disabled={disabled}>저장된 내용 불러오기</button>

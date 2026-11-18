@@ -12,6 +12,7 @@
 $env:DIDGO_API_TOKEN = 'local-test-token'
 $env:DIDGO_DEV_USER_ID = 'local-student'
 $env:DIDGO_QWEN_URL = 'http://127.0.0.1:8081/v1'
+$env:DIDGO_OCR_TIMEOUT = '300'
 
 .\.venv\api312\Scripts\python.exe -B -m uvicorn app.submission_api:app --app-dir backend --host 127.0.0.1 --port 8001 --workers 1
 ```
@@ -21,7 +22,104 @@ $env:DIDGO_QWEN_URL = 'http://127.0.0.1:8081/v1'
 모델 서버를 실행하는 명령은 모델 파일 경로와 실행 환경에 따라 다릅니다.
 모델 서버가 없으면 OCR 작업은 `failed`가 되고 실패 이력을 남깁니다.
 
+### 사진 방향 자동 보정
+
+사진 API는 EXIF 보정 후 `PP-LCNet_x1_0_doc_ori`로 90도 단위 방향을 판별하고,
+보정한 사진을 Qwen에 전달합니다. 실행 환경을 처음 준비할 때 설치합니다.
+
+```powershell
+.\.venv\api312\Scripts\python.exe -m pip install -r backend/requirements-orientation.txt
+.\.venv\api312\Scripts\python.exe -B backend/scripts/setup_orientation_model.py
+```
+
+모델은 `.venv/ocr-models/PP-LCNet_x1_0_doc_ori`에 저장하며, 공식 리비전과
+파일 해시를 검사합니다. API 프로세스에서 한 번 로딩한 모델을 재사용합니다.
+요청 처리 중에 모델을 자동 다운로드하지 않습니다. 설치 후 API를 재시작합니다.
+
+네 방향의 분류 결과를 원래 좌표로 환산해 모두 일치하고, 평균 점수 0.8 이상,
+차순위와의 점수 차이 0.25 이상일 때만 자동 회전합니다. 이는 초기 운용 규칙이며
+실제 촬영 문제에 대한 정확도 확률로 해석하면 안 됩니다. 작은 수식 조각·저대비 사진,
+불확실한 결과·모델 미설치에는 자동 회전을 적용하지 않고 확인 필요 정보를 남깁니다.
+미세한 기울기, 원근 왜곡, 도형·표 영역 분리는 이 기능의 대상이 아닙니다.
+
+`GET /submissions/{id}`의 `image_rotation_ccw`, `image_orientation`으로 결과를
+확인합니다. OCR 실행 이력에도 판별 근거와 적용 각도가 남습니다.
+학생 수정·확인 후에도 최초 OCR 결과의 방향 정보를 유지합니다.
+
+- `GET /submissions/{id}/photo`: 업로드한 원본 바이트
+- `GET /submissions/{id}/photo?corrected=true`: EXIF와 OCR 회전을 적용한 PNG 표시본
+
+원본 파일은 덮어쓰지 않습니다. 수동 회전이나 명시적인 영역 좌표가 지정된
+`OCRPipeline` 호출에서는 자동 방향 판별을 생략해 좌표가 바뀌는 것을 방지합니다.
+
 `004`, `005` 마이그레이션을 적용한 개인 작업용 DB를 사용합니다.
+부분 영역 OCR을 사용할 때는 `006`도 적용합니다. 화면 테스트 서버
+`backend/scripts/run_review_api.py`는 시작 시 기존 기록을 유지하면서 자동 적용합니다.
+다른 작업용 DB는 다음 명령으로 준비합니다.
+
+```powershell
+.\.venv\api312\Scripts\python.exe -B backend/scripts/setup_problem_ocr_regions.py
+```
+
+### 선택 영역 OCR과 저장
+
+`POST /submissions/{id}/ocr`에 다음 본문을 전달하면 선택 영역만 인식합니다.
+본문을 생략한 기존 호출은 사진 전체를 인식합니다.
+
+```json
+{
+  "region": {
+    "coordinate_space": "exif_transposed",
+    "image_size": [3000, 4000],
+    "bbox": [300, 800, 1800, 2400]
+  }
+}
+```
+
+`bbox`는 EXIF 방향을 반영한 원본 사진의 `[왼쪽, 위, 오른쪽, 아래]` 정수
+픽셀 좌표이며 오른쪽·아래 경계는 포함하지 않습니다. 사진 크기 불일치,
+경계 밖 좌표, 빈 영역은 작업 생성 전에 `422`로 거절합니다.
+
+선택 영역은 작업 생성과 함께 `problem_ocr_jobs.selected_region_json`에 저장하고
+변경을 금지합니다. 같은 영역의 중복 요청은 실행 중인 작업을 반환하고,
+다른 영역의 요청은 `409`로 거절합니다. 대기 작업도 서버 재시작 후 같은 범위로
+재개합니다. 영역을 먼저 자른 뒤 해당 문제에 자동 방향 보정과 OCR을 적용하므로
+영역 밖의 다른 문제가 모델 입력에 포함되지 않습니다.
+
+최종 OCR 원문·결과에는 서버가 검증한 `selected_region`이 함께 저장됩니다.
+`GET /submissions/{id}`에서 수정·확인 이후에도 같은 좌표를 조회할 수 있습니다.
+
+- `GET /submissions/{id}/photo`: 원본 업로드 바이트
+- `GET /submissions/{id}/photo?selected=true`: 선택한 범위의 PNG
+- `GET /submissions/{id}/photo?selected=true&corrected=true`: 선택한 범위에 OCR 회전을 반영한 PNG
+
+프런트엔드는 마지막 표시본을 사용해 완료 직후와 새로고침 후 같은 사진 범위를
+복원합니다. 원본 사진은 덮어쓰지 않으며, 영역은 원문 OCR 결과를 통해 입력
+수정 버전과 연결됩니다. 학생 검토가 시작된 제출의 OCR 범위는 변경할 수 없습니다.
+
+### 영역 검출 결과 저장·조회
+
+API의 `qwen-api-v4-layout` 파이프라인은 선택 범위를 자르고 방향을 보정한 뒤
+`PP-DocLayout_plus-L`로 영역 후보를 검출합니다. 검출기와 모델은 API 프로세스에서
+재사용하며, 기본 모델 경로는 `.venv/layout-model-cache/official_models/PP-DocLayout_plus-L`입니다.
+`DIDGO_LAYOUT_MODEL_DIR`로 별도 설치 경로를 지정할 수 있습니다. 모델은 사전에
+준비해야 하며 요청 처리 중 자동 다운로드하지 않습니다.
+
+검출 결과는 `layout_detection`으로 OCR 원문의 `raw_response_json`에 함께 저장됩니다.
+`GET /submissions/{id}`와 OCR 실행 이력에서 조회할 수 있고, 학생 수정·확인 뒤에도
+원래 OCR 결과를 참조해 같은 분석 결과를 복원합니다. 기존 저장 구조를 사용하므로
+영역 분석용 추가 DB 마이그레이션은 필요하지 않습니다. 이전 OCR 기록은
+`layout_detection: null`로 조회됩니다.
+
+- `status`: `detected`, `not_detected`, `unavailable`
+- `layout`: `ProblemLayout`. 좌표는 선택 영역 자르기·방향 보정 후 이미지 기준입니다.
+- `report`: 원본 검출 후보, 병합 이력, 처리 규칙의 한계
+
+분석 실패·잘못된 좌표·저장할 수 없는 부가 데이터가 있으면 `unavailable`로 기록하고
+기존 Qwen OCR은 계속 진행합니다. 검출 후보는 아직 주 OCR 입력을 나누거나 본문을
+대체하는 데 사용하지 않습니다. `stage: layout`과 `layout_complete` 이벤트로
+부가 분석의 진행 상태를 확인할 수 있습니다. 화면의 영역 박스 표시는 별도 연결 단계입니다.
+
 서버 시작 시 작업 관리자가 시작되고, 종료 시 진행 중인 작업을 기다린 뒤 정리합니다.
 재시작하면 대기 중이던 작업은 재개하고 중단됐던 실행 작업은 실패로 기록합니다.
 같은 DB를 사용하는 이 API는 `--workers 1`로 실행합니다.

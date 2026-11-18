@@ -9,10 +9,11 @@ from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Path, Query, Request
 from fastapi.responses import StreamingResponse
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, Field
 from starlette.concurrency import run_in_threadpool
 
 from app.ocr_jobs import OCRJobManager
+from app.ocr.selection import InvalidPhotoRegion
 
 logger = logging.getLogger(__name__)
 MAX_EVENT_ID = 2**63 - 1
@@ -72,6 +73,22 @@ async def _stream_events(request, manager, job_id, owner_id, after_id):
         await asyncio.sleep(SSE_POLL_SECONDS)
 
 
+PositivePixel = Annotated[int, Field(strict=True, gt=0)]
+Pixel = Annotated[int, Field(strict=True, ge=0)]
+
+
+class PhotoRegionInput(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    coordinate_space: Literal["exif_transposed"]
+    image_size: tuple[PositivePixel, PositivePixel]
+    bbox: tuple[Pixel, Pixel, Pixel, Pixel]
+
+
+class OCRJobBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    region: PhotoRegionInput | None = None
+
+
 class OCRJobResponse(BaseModel):
     id: str
     submission_id: int
@@ -81,6 +98,7 @@ class OCRJobResponse(BaseModel):
     created_at: str
     started_at: str | None
     finished_at: str | None
+    selected_region: PhotoRegionInput | None = None
 
 
 def create_ocr_router(manager: OCRJobManager, current_owner) -> APIRouter:
@@ -95,12 +113,16 @@ def create_ocr_router(manager: OCRJobManager, current_owner) -> APIRouter:
     def start_ocr(
         submission_id: Annotated[int, Path(ge=1)],
         student_id: Annotated[str, Depends(current_owner)],
+        body: OCRJobBody | None = None,
     ):
         try:
             return manager.submit(
                 submission_id=submission_id,
                 owner_id=student_id,
+                selected_region=body.region.model_dump(mode="json") if body and body.region else None,
             )
+        except InvalidPhotoRegion as error:
+            raise HTTPException(422, str(error)) from error
         except ValueError as error:
             raise HTTPException(409, str(error)) from error
         except RuntimeError as error:

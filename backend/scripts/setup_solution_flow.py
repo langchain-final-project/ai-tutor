@@ -25,6 +25,10 @@ BASE = (
 )
 SCHEMA_FILE = "006_solution_verification.sqlite.sql"
 MIGRATION_ID = "solution-verification-v1"
+REGION_SCHEMA_FILE = "006_problem_ocr_regions.sqlite.sql"
+REGION_TRIGGER = "trg_ocr_job_region_immutable"
+SOURCE_SCHEMA_FILE = "007_photo_equation_sources.sqlite.sql"
+SOURCE_MIGRATION_ID = "photo-equation-sources-v1"
 
 
 def _schema(name):
@@ -41,12 +45,16 @@ def _objects(connection):
     ))
 
 
-def _reference():
+def _reference(*, with_regions=False, with_sources=False):
     with closing(sqlite3.connect(":memory:")) as reference:
         for name, _ in BASE:
             reference.executescript(_schema(name))
         base = _objects(reference)
         reference.executescript(_schema(SCHEMA_FILE))
+        if with_regions:
+            reference.executescript(_schema(REGION_SCHEMA_FILE))
+        if with_sources:
+            reference.executescript(_schema(SOURCE_SCHEMA_FILE))
         full = _objects(reference)
         columns = {
             name: list(reference.execute(f'PRAGMA table_info("{name}")'))
@@ -85,14 +93,35 @@ def _verify_history(connection):
             raise ValueError(f"먼저 기존 마이그레이션을 확인해 주세요: {migration_id}")
 
 
+def _has_region_schema(connection):
+    columns = {row[1] for row in connection.execute("PRAGMA table_info(problem_ocr_jobs)")}
+    trigger = connection.execute(
+        "SELECT sql FROM sqlite_master WHERE type='trigger' AND name=?", (REGION_TRIGGER,),
+    ).fetchone()
+    has_column = "selected_region_json" in columns
+    if has_column != (trigger is not None):
+        raise ValueError("OCR 영역 스키마가 일부만 존재합니다. 마이그레이션 상태를 확인해 주세요.")
+    if trigger is not None:
+        expected = "CREATE TRIGGER" + _schema(REGION_SCHEMA_FILE).split("CREATE TRIGGER", 1)[1]
+        if trigger[0].strip().rstrip(";") != expected.strip().rstrip(";"):
+            raise ValueError("OCR 영역 불변 트리거의 내용이 변경되었습니다.")
+    return has_column
+
+
 def apply_migration(connection):
-    """기존 데이터는 유지하고 006을 원자적으로 적용한다."""
+    """풀이·OCR 영역·사진 출처 스키마를 원자적으로 적용한다."""
     if connection.in_transaction:
         raise ValueError("진행 중인 저장 작업을 마친 뒤 마이그레이션해 주세요.")
     if connection.execute("PRAGMA foreign_keys").fetchone()[0] != 1:
         raise ValueError("외래키 검사를 활성화해 주세요.")
     base, full, columns = _reference()
-    _verify_objects(connection, base, columns)
+    has_regions = _has_region_schema(connection)
+    _, extended, extended_columns = _reference(with_regions=True, with_sources=True)
+    _, sources, _ = _reference(with_sources=True)
+    current_columns = dict(extended_columns)
+    if not has_regions:
+        current_columns["problem_ocr_jobs"] = columns["problem_ocr_jobs"]
+    _verify_objects(connection, base, current_columns)
     _verify_history(connection)
     _verify_integrity(connection)
     schema = _schema(SCHEMA_FILE)
@@ -101,26 +130,52 @@ def apply_migration(connection):
         "SELECT schema_sha256 FROM problem_schema_migrations WHERE id = ?",
         (MIGRATION_ID,),
     ).fetchone()
+    source_schema = _schema(SOURCE_SCHEMA_FILE)
+    source_digest = _digest(source_schema)
+    source_row = connection.execute(
+        "SELECT schema_sha256 FROM problem_schema_migrations WHERE id = ?",
+        (SOURCE_MIGRATION_ID,),
+    ).fetchone()
     if row is not None:
         if row != (digest,):
             raise ValueError("이미 적용된 006 SQL의 내용이 변경되었습니다.")
-        _verify_objects(connection, full, columns)
-        return "이미 적용됨: 저장 구조 검증 완료"
-    if set(full).difference(base).intersection(_objects(connection)):
+        _verify_objects(connection, full, current_columns)
+    elif set(full).difference(base).intersection(_objects(connection)):
         raise ValueError("006 객체가 일부 존재합니다. 자동으로 덮어쓰지 않습니다.")
+    if source_row is not None:
+        if row is None or source_row != (source_digest,):
+            raise ValueError("이미 적용된 007 SQL의 내용 또는 적용 이력이 변경되었습니다.")
+        _verify_objects(connection, sources, current_columns)
+    elif set(sources).difference(full).intersection(_objects(connection)):
+        raise ValueError("007 객체가 일부 존재합니다. 자동으로 덮어쓰지 않습니다.")
+    if row is not None and source_row is not None and has_regions:
+        _verify_objects(connection, extended, extended_columns)
+        return "이미 적용됨: 풀이·OCR 영역·사진 출처 저장 구조 검증 완료"
+    pending_schema = "" if row is not None else schema
+    if not has_regions:
+        pending_schema += "\n" + _schema(REGION_SCHEMA_FILE)
+    if source_row is None:
+        pending_schema += "\n" + source_schema
     try:
-        connection.executescript("BEGIN IMMEDIATE;\n" + schema)
-        _verify_objects(connection, full, columns)
+        connection.executescript("BEGIN IMMEDIATE;\n" + pending_schema)
+        _verify_objects(connection, extended, extended_columns)
+        _has_region_schema(connection)
         _verify_integrity(connection)
-        connection.execute(
-            "INSERT INTO problem_schema_migrations(id, schema_sha256) VALUES (?, ?)",
-            (MIGRATION_ID, digest),
-        )
+        if row is None:
+            connection.execute(
+                "INSERT INTO problem_schema_migrations(id, schema_sha256) VALUES (?, ?)",
+                (MIGRATION_ID, digest),
+            )
+        if source_row is None:
+            connection.execute(
+                "INSERT INTO problem_schema_migrations(id, schema_sha256) VALUES (?, ?)",
+                (SOURCE_MIGRATION_ID, source_digest),
+            )
         connection.commit()
     except BaseException:
         connection.rollback()
         raise
-    return "006 적용 완료"
+    return "풀이·OCR 영역·사진 출처 저장 구조 적용 완료"
 
 
 def _build_empty(path):
@@ -138,7 +193,7 @@ def _build_empty(path):
 
 
 def prepare(database, *, create_empty=False):
-    """새 파일은 완성 후 등록하고, 기존 DB에는 006만 적용한다."""
+    """새 파일은 완성 후 등록하고, 기존 DB의 풀이·OCR 영역·사진 출처 구조를 준비한다."""
     database = Path(database).resolve()
     if database.exists():
         if not database.is_file():

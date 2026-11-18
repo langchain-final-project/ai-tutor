@@ -17,6 +17,9 @@ from app.db.submissions import (
     submission_connection,
 )
 from app.ocr import Backend, OCRPipeline
+from app.ocr.orientation import get_orientation_detector
+from app.ocr.layout_detector import get_layout_detector
+from app.ocr.selection import crop_photo_region, validate_photo_region
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +33,11 @@ def build_qwen_pipeline():
         timeout=float(os.getenv("DIDGO_OCR_TIMEOUT", "120")),
         image_tokens=(256, 2048),
     )
-    return OCRPipeline(backend, primary_engine="qwen")
+    return OCRPipeline(
+        backend, primary_engine="qwen",
+        orientation_detector=get_orientation_detector(),
+        layout_detector=get_layout_detector(),
+    )
 
 
 class OCRJobManager:
@@ -39,9 +46,9 @@ class OCRJobManager:
         database: str | Path,
         *,
         pipeline_factory=build_qwen_pipeline,
-        model_name="Qwen3-VL-2B",
+        model_name="Qwen3-VL-4B-Instruct",
         model_version=None,
-        pipeline_version="qwen-api-v1",
+        pipeline_version="qwen-api-v4-layout",
     ):
         self.database = Path(database)
         self.pipeline_factory = pipeline_factory
@@ -78,7 +85,10 @@ class OCRJobManager:
                 "OCR 작업이 없거나 접근 권한이 없습니다."
             )
 
-        return dict(row)
+        job = dict(row)
+        raw_region = job.pop("selected_region_json", None)
+        job["selected_region"] = json.loads(raw_region) if raw_region is not None else None
+        return job
 
     def _event(self, connection, job_id, event_type, payload):
         connection.execute(
@@ -182,11 +192,17 @@ class OCRJobManager:
             )
             self.executor = None
 
-    def submit(self, *, submission_id, owner_id):
+    def submit(self, *, submission_id, owner_id, selected_region=None):
         if self.executor is None:
             raise RuntimeError(
                 "OCR 작업 관리자가 시작되지 않았습니다."
             )
+
+        if selected_region is not None:
+            with self.connection() as connection:
+                photo = get_uploaded_photo(connection, submission_id=submission_id, owner_id=owner_id)
+            # 큰 사진의 디코딩은 DB 트랜잭션 밖에서 수행한다.
+            selected_region = validate_photo_region(photo["image_content"], selected_region)
 
         with self.connection() as connection:
             submission = get_submission(
@@ -215,29 +231,33 @@ class OCRJobManager:
             ).fetchone()
 
             if active is not None:
-                return self._job(
+                active_job = self._job(
                     connection,
                     active["id"],
                     owner_id,
                 )
+                if active_job["selected_region"] != selected_region:
+                    raise ValueError("이미 다른 범위의 OCR이 진행 중입니다. 완료 후 확인해 주세요.")
+                return active_job
 
             job_id = str(uuid4())
 
-            connection.execute(
-                """
-                INSERT INTO problem_ocr_jobs (
-                    id, submission_id
+            if selected_region is None:
+                connection.execute(
+                    "INSERT INTO problem_ocr_jobs (id, submission_id) VALUES (?, ?)",
+                    (job_id, submission_id),
                 )
-                VALUES (?, ?)
-                """,
-                (job_id, submission_id),
-            )
+            else:
+                connection.execute(
+                    "INSERT INTO problem_ocr_jobs (id, submission_id, selected_region_json) VALUES (?, ?, ?)",
+                    (job_id, submission_id, json.dumps(selected_region, allow_nan=False)),
+                )
 
             self._event(
                 connection,
                 job_id,
                 "queued",
-                {"job_id": job_id, "status": "queued"},
+                {"job_id": job_id, "status": "queued", "selected_region": selected_region},
             )
 
         try:
@@ -294,7 +314,7 @@ class OCRJobManager:
                 {"job_id": job_id, "status": "running"},
             )
 
-            return photo["image_content"]
+            return photo["image_content"], job["selected_region"]
 
     def _publish(self, job_id, events):
         if not events:
@@ -321,6 +341,7 @@ class OCRJobManager:
             if job["status"] not in {"queued", "running"}:
                 return
 
+            result = {**result, "selected_region": job["selected_region"]}
             ocr_id = record_ocr_attempt(
                 connection,
                 submission_id=job["submission_id"],
@@ -409,10 +430,15 @@ class OCRJobManager:
 
     def _run(self, job_id):
         try:
-            image = self._begin(job_id)
+            job_input = self._begin(job_id)
 
-            if image is None:
+            if job_input is None:
                 return
+
+            image, selected_region = job_input
+            if selected_region is not None:
+                # 먼저 원본 좌표로 정확히 자른 뒤, 선택된 문제에 방향 보정·OCR을 적용한다.
+                image = crop_photo_region(image, selected_region)
 
             result = None
             pending = []

@@ -18,6 +18,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from starlette.concurrency import run_in_threadpool
 
 from app.db.submissions import (
+    create_equation_submission,
     create_photo_submission,
     create_text_submission,
     get_input_version_history,
@@ -31,6 +32,12 @@ from app.db.submissions import (
 from app.ocr_api import create_ocr_router
 from app.ocr_jobs import OCRJobManager, build_qwen_pipeline
 from app.solution_api import create_solution_router
+from app.ocr.images import open_image
+from app.ocr.selection import crop_photo_region
+from app.ocr.quality import (
+    inspect_photo_quality,
+    evaluate_photo_quality,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 MAX_IMAGE_BYTES = 30 * 1024 * 1024
@@ -51,6 +58,12 @@ class TextSubmissionBody(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
     content_text: str = Field(min_length=1, max_length=10000, strict=True)
+
+
+class EquationSubmissionBody(InputBody):
+    """확인한 사진에서 학생이 직접 옮긴 평문 등식 한 개를 별도로 저장한다."""
+
+    content_text: str = Field(min_length=1, max_length=512, strict=True)
 
 
 def validate_photo(content: bytes) -> str:
@@ -259,7 +272,9 @@ def create_submission_app(
     def upload_photo(
         files: Annotated[
             list[UploadFile],
-            File(min_length=1, max_length=1),
+            File(min_length=1, max_length=1, json_schema_extra={"items": {
+                "type":"string", "format":"binary",
+            }}),
         ],
         student_id: Annotated[str, Depends(current_owner)],
     ):
@@ -276,6 +291,13 @@ def create_submission_app(
             if not filename.strip() or len(filename) > 255:
                 raise HTTPException(422, "파일명을 확인해 주세요.")
 
+            quality_metrics = inspect_photo_quality(content)
+
+            photo_quality = {
+                **evaluate_photo_quality(quality_metrics),
+                "metrics": quality_metrics,
+            }
+
             with submission_connection(database) as connection:
                 ids = create_photo_submission(
                     connection,
@@ -285,14 +307,41 @@ def create_submission_app(
                     image_content=content,
                 )
 
-                return get_submission(
+                submission = get_submission(
                     connection,
                     submission_id=ids["submission_id"],
                     owner_id=student_id,
                 )
 
+            submission["photo_quality"] = photo_quality
+            return submission
+
         finally:
             upload.file.close()
+
+    @app.post("/submissions/{submission_id}/equation", status_code=201)
+    def submit_photo_equation(
+        submission_id: int,
+        body: EquationSubmissionBody,
+        student_id: Annotated[str, Depends(current_owner)],
+    ):
+        # 원문 확인·버전 검사와 파생 문제 생성을 같은 쓰기 잠금 안에서 처리한다.
+        with submission_connection(database, write=True) as connection:
+            source = get_submission(
+                connection, submission_id=submission_id, owner_id=student_id,
+            )
+            latest = source["latest_input"]
+            if source["input_kind"] != "photo" or latest is None or latest["confirmed_at"] is None:
+                raise HTTPException(409, "사진의 인식 내용을 먼저 확인해 주세요.")
+            if latest["version_number"] != body.expected_version_number:
+                raise HTTPException(409, "사진의 인식 내용이 변경되었습니다. 다시 조회해 주세요.")
+            ids = create_equation_submission(
+                connection, source_submission_id=submission_id, owner_id=student_id,
+                content_text=body.content_text, expected_version_number=body.expected_version_number,
+            )
+            return get_submission(
+                connection, submission_id=ids["submission_id"], owner_id=student_id,
+            )
 
     @app.get("/submissions/{submission_id}")
     def read_submission(
@@ -310,12 +359,39 @@ def create_submission_app(
     def read_photo(
         submission_id: int,
         student_id: Annotated[str, Depends(current_owner)],
+        corrected: bool = False,
+        selected: bool = False,
     ):
         with submission_connection(database) as connection:
             photo = get_uploaded_photo(
                 connection,
                 submission_id=submission_id,
                 owner_id=student_id,
+            )
+
+            rotation = 0
+            region = None
+            if corrected or selected:
+                current = get_submission(
+                    connection, submission_id=submission_id, owner_id=student_id,
+                )
+                if corrected:
+                    rotation = current["image_rotation_ccw"]
+                if selected:
+                    region = current["selected_region"]
+
+        if corrected or selected:
+            content = crop_photo_region(photo["image_content"], region) if region else photo["image_content"]
+            with open_image(content) as image:
+                with image.rotate(rotation, expand=True) as upright:
+                    output = BytesIO()
+                    upright.save(output, format="PNG")
+            suffix = "-selected" if region else ""
+            filename = Path(photo["original_filename"]).stem + suffix + "-upright.png"
+            return Response(
+                content=output.getvalue(),
+                media_type="image/png",
+                headers={"Content-Disposition": "inline; filename*=UTF-8''" + quote(filename)},
             )
 
         return Response(

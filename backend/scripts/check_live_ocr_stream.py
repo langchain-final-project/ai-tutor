@@ -98,6 +98,7 @@ def main():
                 "002_problem_classification.sqlite.sql",
                 "004_problem_submissions.sqlite.sql",
                 "005_problem_ocr_jobs.sqlite.sql",
+                "006_problem_ocr_regions.sqlite.sql",
             ):
                 connection.executescript(
                     (ROOT / "backend/migrations" / name).read_text(encoding="utf-8")

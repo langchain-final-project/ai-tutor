@@ -50,14 +50,13 @@ function Icon({ name }: { name: keyof typeof icons }) {
 }
 
 function getSelection() {
-  const [categoryId, itemId, submissionId] = location.hash.slice(1).split("/");
+  const [categoryId, itemId, submissionId, sourceId] = location.hash.slice(1).split("/");
   const category = categories.find(({ id }) => id === categoryId) ?? categories[0];
   const item = category.children?.find(({ id }) => id === itemId);
-  return {
-    category,
-    item,
-    submissionId: category.id === "history" && (item?.id === "questions" || item?.id === "solutions")
-      ? submissionId ?? null : null,
+  const inHistory = category.id === "history" && (item?.id === "questions" || item?.id === "solutions");
+  return { category, item,
+    submissionId: inHistory && submissionId !== "from-photo" ? submissionId ?? null : null,
+    sourcePhotoId: inHistory && submissionId === "from-photo" ? sourceId ?? "" : null,
   };
 }
 
@@ -95,7 +94,6 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
 
   const { category, item } = selection;
   const title = item?.label ?? category.title ?? category.label;
-  const inSettings = category.id === "settings";
   const profile = typeof session === "object" ? session : null;
   const workspaceView = category.id === "home" ? "home"
     : category.id === "history" && (item?.id === "questions" || item?.id === "solutions") ? item.id : null;
@@ -104,6 +102,7 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
     <div className="student-page">
       <header className="student-header">
         <a className="student-brand" href="#home" aria-label="딛고 학습 홈"><img src={logo} alt="" /></a>
+        <span className="student-header-title">{categories[0].title}</span>
         <span className="subject">중학 수학</span>
       </header>
 
@@ -149,7 +148,7 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
         </>
       )}
 
-      <main className={inSettings ? "student-content student-content--settings" : "student-content"} aria-labelledby="student-title">
+      <main className="student-content" aria-labelledby="student-title">
         <h1 id="student-title">{title}</h1>
         {session === "checking" && <p role="status">로그인 상태를 확인하고 있어요.</p>}
         {session === "unavailable" && (
@@ -167,15 +166,12 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
                 ))}
               </nav>
             )}
-            {workspaceView && (
-              <SolutionWorkspace
-                key={`${profile.user_id}:${workspaceView}:${selection.submissionId ?? "list"}`}
-                view={workspaceView}
-                submissionId={selection.submissionId}
-                loginUrl={loginUrl}
-              />
-            )}
-            {inSettings && <AccountSettings loginUrl={loginUrl} email={profile.email} />}
+            {workspaceView && <SolutionWorkspace
+              key={`${profile.user_id}:${workspaceView}:${selection.submissionId ?? "list"}:${selection.sourcePhotoId ?? ""}`}
+              view={workspaceView} submissionId={selection.submissionId} loginUrl={loginUrl}
+              sourcePhotoId={selection.sourcePhotoId}
+            />}
+            {category.id === "settings" && <AccountSettings loginUrl={loginUrl} email={profile.email} />}
           </>
         )}
       </main>

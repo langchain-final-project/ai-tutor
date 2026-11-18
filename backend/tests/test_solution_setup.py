@@ -83,6 +83,160 @@ def test_upgrade_existing_base_preserves_question(tmp_path):
         assert connection.execute("SELECT id FROM problem_schema_migrations WHERE id=?", (setup.MIGRATION_ID,)).fetchone()
 
 
+def test_upgrade_previous_solution_schema_preserves_checksum_and_records(tmp_path):
+    target = tmp_path / "previous-solution.sqlite3"
+    create_base(target)
+    original_digest = setup._digest(setup._schema(setup.SCHEMA_FILE))
+    with closing(sqlite3.connect(target)) as connection:
+        connection.executescript(setup._schema(setup.SCHEMA_FILE))
+        connection.execute(
+            "INSERT INTO problem_schema_migrations(id,schema_sha256) VALUES (?,?)",
+            (setup.MIGRATION_ID, original_digest),
+        )
+        connection.execute("""INSERT INTO student_work_versions
+            (submission_id,problem_input_version_id,version_number,steps_json)
+            VALUES (1,1,1,'[]')""")
+        connection.commit()
+    setup.prepare(target)
+    setup.prepare(target)
+    with closing(sqlite3.connect(target)) as connection:
+        assert connection.execute("SELECT content_text FROM problem_input_versions").fetchall() == [("x=2",)]
+        assert connection.execute("SELECT version_number,steps_json FROM student_work_versions").fetchall() == [(1, "[]")]
+        assert connection.execute("SELECT schema_sha256 FROM problem_schema_migrations WHERE id=?",
+                                  (setup.MIGRATION_ID,)).fetchone() == (original_digest,)
+        assert "selected_region_json" in {row[1] for row in connection.execute("PRAGMA table_info(problem_ocr_jobs)")}
+        assert connection.execute("SELECT schema_sha256 FROM problem_schema_migrations WHERE id=?",
+                                  (setup.SOURCE_MIGRATION_ID,)).fetchone() == (setup._digest(setup._schema(setup.SOURCE_SCHEMA_FILE)),)
+
+
+def test_upgrade_team_region_schema_preserves_existing_job_and_repeats(tmp_path):
+    target = tmp_path / "team-regions.sqlite3"
+    create_base(target)
+    with closing(sqlite3.connect(target)) as connection:
+        connection.executescript(setup._schema(setup.REGION_SCHEMA_FILE))
+        connection.execute("""INSERT INTO uploaded_problems
+            (original_filename,mime_type,image_sha256,image_content)
+            VALUES ('photo.png','image/png',?,?)""", ("a" * 64, b"photo"))
+        photo_id = connection.execute("SELECT last_insert_rowid()").fetchone()[0]
+        connection.execute("INSERT INTO problem_submissions(owner_id,input_kind,uploaded_problem_id) VALUES ('student_A','photo',?)", (photo_id,))
+        submission_id = connection.execute("SELECT last_insert_rowid()").fetchone()[0]
+        connection.execute("INSERT INTO problem_ocr_jobs(id,submission_id,selected_region_json) VALUES ('team-job',?,'{}')", (submission_id,))
+        connection.commit()
+    setup.prepare(target)
+    setup.prepare(target)
+    with closing(sqlite3.connect(target)) as connection:
+        assert connection.execute("SELECT id,selected_region_json FROM problem_ocr_jobs").fetchall() == [("team-job", "{}")]
+        with pytest.raises(sqlite3.IntegrityError, match="immutable"):
+            connection.execute("UPDATE problem_ocr_jobs SET selected_region_json=NULL")
+        assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
+
+
+def test_partial_region_schema_is_rejected_without_adding_solution_objects(tmp_path):
+    target = tmp_path / "partial-region.sqlite3"
+    create_base(target)
+    with closing(sqlite3.connect(target)) as connection:
+        connection.execute("ALTER TABLE problem_ocr_jobs ADD COLUMN selected_region_json TEXT")
+    with pytest.raises(ValueError, match="OCR 영역 스키마가 일부"):
+        setup.prepare(target)
+    with closing(sqlite3.connect(target)) as connection:
+        assert connection.execute("SELECT name FROM sqlite_master WHERE name='student_work_versions'").fetchone() is None
+
+
+def test_changed_region_trigger_is_rejected(tmp_path):
+    target = tmp_path / "changed-region.sqlite3"
+    setup.prepare(target, create_empty=True)
+    with closing(sqlite3.connect(target)) as connection:
+        connection.execute("DROP TRIGGER trg_ocr_job_region_immutable")
+        connection.executescript("""CREATE TRIGGER trg_ocr_job_region_immutable
+            BEFORE UPDATE OF selected_region_json ON problem_ocr_jobs BEGIN SELECT 1; END;""")
+    with pytest.raises(ValueError, match="불변 트리거"):
+        setup.prepare(target)
+
+
+def test_new_migration_checksum_mismatch_is_rejected(tmp_path):
+    target = tmp_path / "changed-source.sqlite3"
+    setup.prepare(target, create_empty=True)
+    with closing(sqlite3.connect(target)) as connection:
+        connection.execute("UPDATE problem_schema_migrations SET schema_sha256=? WHERE id=?",
+                           ("0" * 64, setup.SOURCE_MIGRATION_ID))
+        connection.commit()
+    with pytest.raises(ValueError, match="007 SQL"):
+        setup.prepare(target)
+
+
+@pytest.mark.parametrize("existing_solution", [False, True])
+def test_failed_extension_rolls_back_region_and_source_schema(tmp_path, monkeypatch, existing_solution):
+    target = tmp_path / "extension-rollback.sqlite3"
+    create_base(target)
+    if existing_solution:
+        with closing(sqlite3.connect(target)) as connection:
+            connection.executescript(setup._schema(setup.SCHEMA_FILE))
+            connection.execute("INSERT INTO problem_schema_migrations(id,schema_sha256) VALUES (?,?)",
+                               (setup.MIGRATION_ID, setup._digest(setup._schema(setup.SCHEMA_FILE))))
+            connection.commit()
+    original = setup._verify_objects
+
+    def fail_after_extensions(connection, expected, columns):
+        original(connection, expected, columns)
+        if "photo_equation_sources" in expected:
+            raise ValueError("합성 사진 출처 적용 실패")
+
+    monkeypatch.setattr(setup, "_verify_objects", fail_after_extensions)
+    with pytest.raises(ValueError, match="합성 사진 출처"):
+        setup.prepare(target)
+    with closing(sqlite3.connect(target)) as connection:
+        assert "selected_region_json" not in {row[1] for row in connection.execute("PRAGMA table_info(problem_ocr_jobs)")}
+        assert connection.execute("SELECT name FROM sqlite_master WHERE name='photo_equation_sources'").fetchone() is None
+        assert (connection.execute("SELECT name FROM sqlite_master WHERE name='student_work_versions'").fetchone() is not None) == existing_solution
+        assert connection.execute("SELECT content_text FROM problem_input_versions").fetchall() == [("x=2",)]
+        assert connection.execute("SELECT id FROM problem_schema_migrations WHERE id=?",
+                                  (setup.SOURCE_MIGRATION_ID,)).fetchone() is None
+        assert (connection.execute("SELECT id FROM problem_schema_migrations WHERE id=?",
+                                   (setup.MIGRATION_ID,)).fetchone() is not None) == existing_solution
+
+
+def test_photo_equation_source_enforces_confirmed_photo_owner_and_immutability(tmp_path):
+    target = tmp_path / "source-constraints.sqlite3"
+    create_base(target)
+    setup.prepare(target)
+    with closing(sqlite3.connect(target)) as connection:
+        connection.execute("PRAGMA foreign_keys=ON")
+
+        def photo(owner, confirmed):
+            image_id = connection.execute("""INSERT INTO uploaded_problems
+                (original_filename,mime_type,image_sha256,image_content)
+                VALUES ('photo.png','image/png',?,?)""", (setup._digest(owner + str(confirmed)), b"photo")).lastrowid
+            submission_id = connection.execute("""INSERT INTO problem_submissions
+                (owner_id,input_kind,uploaded_problem_id) VALUES (?,'photo',?)""", (owner, image_id)).lastrowid
+            input_id = connection.execute("""INSERT INTO problem_input_versions
+                (submission_id,version_number,origin,content_text) VALUES (?,1,'student','원문')""", (submission_id,)).lastrowid
+            if confirmed:
+                connection.execute("UPDATE problem_input_versions SET confirmed_at=CURRENT_TIMESTAMP WHERE id=?", (input_id,))
+            return submission_id, input_id
+
+        source, source_input = photo("student_A", True)
+        other, other_input = photo("student_B", True)
+        unconfirmed, unconfirmed_input = photo("student_A", False)
+        other_target = connection.execute("INSERT INTO problem_submissions(owner_id,input_kind) VALUES ('student_B','text')").lastrowid
+        invalid = [
+            (other_target, source, source_input),
+            (source, source, source_input),
+            (1, 1, 1),
+            (1, unconfirmed, unconfirmed_input),
+            (1, source, other_input),
+        ]
+        for values in invalid:
+            with pytest.raises(sqlite3.IntegrityError, match="confirmed photo"):
+                connection.execute("""INSERT INTO photo_equation_sources
+                    (submission_id,source_submission_id,source_input_version_id) VALUES (?,?,?)""", values)
+        connection.execute("""INSERT INTO photo_equation_sources
+            (submission_id,source_submission_id,source_input_version_id) VALUES (?,?,?)""", (1, source, source_input))
+        assert connection.execute("SELECT source_submission_id,source_input_version_id FROM photo_equation_sources").fetchone() == (source, source_input)
+        with pytest.raises(sqlite3.IntegrityError, match="immutable"):
+            connection.execute("UPDATE photo_equation_sources SET source_submission_id=?", (other,))
+        assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
+
+
 def test_existing_unknown_file_is_not_overwritten(tmp_path):
     target = tmp_path / "unknown.sqlite3"
     target.write_bytes(b"not a sqlite database")
