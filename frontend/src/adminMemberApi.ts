@@ -4,8 +4,8 @@ export const inquiriesPath = "/admin/inquiries";
 export const membersPath = "/admin/members";
 
 export type Page<T> = { items: T[]; next_cursor: string | null };
-export type Inquiry = { inquiry_id: string; title: string; status: "pending" | "answered" };
-export type InquiryDetail = Inquiry & {
+export type Inquiry = { inquiry_id: string; title: string; status: "pending" | "answered"; category: string };
+export type InquiryDetail = Omit<Inquiry, "category"> & {
   body: string;
   replies: { reply_id: string; body: string }[];
 };

@@ -46,7 +46,9 @@ def test_inquiry_reply_retries_and_status_filter(sessions):
     assert first.status_code == second.status_code == 201
 
     page = manager.get(path, params={"status": "pending"}).json()
-    assert page["items"] == [{"inquiry_id": second.json()["inquiry_id"], "title": "Second", "status": "pending"}]
+    assert page["items"] == [{
+        "inquiry_id": second.json()["inquiry_id"], "title": "Second", "status": "pending", "category": "account",
+    }]
     next_page = manager.get(path, params={"status": "pending", "cursor": page["next_cursor"]}).json()
     assert next_page["items"][0]["inquiry_id"] == first.json()["inquiry_id"]
     assert next_page["next_cursor"] is None

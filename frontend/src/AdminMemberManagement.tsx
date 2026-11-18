@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import type { FormEvent, ReactNode } from "react";
+import type { FormEvent } from "react";
 import { ApiError } from "./auth";
 import {
   adminError, adminRequest, inquiriesPath, membersPath, saveMemberName, sendInquiryReply,
@@ -52,123 +52,168 @@ function LoadState({ loading, error, retry }: { loading: boolean; error?: string
   return <p role="alert">{error} <button type="button" onClick={retry}>다시 시도</button></p>;
 }
 
-function ListPage({ hasPrevious, hasNext, previous, next, children }: {
-  hasPrevious: boolean;
-  hasNext: boolean;
-  previous: () => void;
-  next: () => void;
-  children: ReactNode;
-}) {
+const inquiryStatus = { pending: "답변 대기", answered: "답변 완료" };
+const inquiryCategories: Record<string, string> = { learning: "학습", account: "계정", other: "기타" };
+
+export function AdminInquiries() {
+  const [status, setStatus] = useState("");
+  const [category, setCategory] = useState("");
+  const [sort, setSort] = useState("newest");
+  const [notice, setNotice] = useState("");
+  const filters: Record<string, string> = { sort };
+  if (status) filters.status = status;
+  if (category) filters.category = category;
+  const list = useAdminList<Inquiry>(inquiriesPath, filters);
+
+  function finishReply() {
+    list.select(null);
+    setNotice("답변을 등록했습니다.");
+    list.reload();
+  }
+
   return (
     <>
-      <ul className="admin-records">{children}</ul>
-      {(hasPrevious || hasNext) && (
-        <nav className="admin-record-pagination" aria-label="목록 페이지">
-          <button type="button" onClick={previous} disabled={!hasPrevious}>이전</button>
-          <button type="button" onClick={next} disabled={!hasNext}>다음</button>
+      <section className="admin-record-panel admin-member-list" aria-labelledby="admin-inquiry-list">
+        <div className="admin-member-list-header admin-inquiry-list-header">
+          <h2 id="admin-inquiry-list">문의 목록</h2>
+          <div className="admin-inquiry-filters">
+          <label className="admin-record-field">
+            <span>답변 상태</span>
+            <select value={status} onChange={(event) => { setStatus(event.target.value); list.reset(); setNotice(""); }}>
+              <option value="">전체</option>
+              {Object.entries(inquiryStatus).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </label>
+          <label className="admin-record-field">
+            <span>문의 유형</span>
+            <select value={category} onChange={(event) => { setCategory(event.target.value); list.reset(); setNotice(""); }}>
+              <option value="">전체</option>
+              {Object.entries(inquiryCategories).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </label>
+          <label className="admin-record-field">
+            <span>정렬</span>
+            <select value={sort} onChange={(event) => { setSort(event.target.value); list.reset(); setNotice(""); }}>
+              <option value="newest">최신순</option>
+              <option value="oldest">오래된순</option>
+            </select>
+          </label>
+          </div>
+        </div>
+        {notice && <p role="status">{notice}</p>}
+        <LoadState {...list} retry={list.reload} />
+        {list.data && (
+          <div className="admin-member-table-frame">
+            <table className="admin-member-table" aria-labelledby="admin-inquiry-list">
+              <thead><tr><th scope="col">문의 제목</th><th scope="col">문의 유형</th><th scope="col">답변 상태</th><th scope="col">작업</th></tr></thead>
+              <tbody>
+                {!list.data.items.length && <tr><td colSpan={4}>문의가 없습니다.</td></tr>}
+                {list.data.items.map((inquiry) => (
+                  <tr key={inquiry.inquiry_id}>
+                    <th scope="row">{inquiry.title}</th>
+                    <td>{inquiryCategories[inquiry.category] ?? inquiry.category}</td>
+                    <td><span className="admin-member-status">{inquiryStatus[inquiry.status]}</span></td>
+                    <td><button type="button" aria-haspopup="dialog"
+                      aria-label={`${inquiry.title} ${inquiry.status === "pending" ? "답변 등록" : "답변 보기"}`}
+                      onClick={() => { setNotice(""); list.select(inquiry.inquiry_id); }}>
+                      {inquiry.status === "pending" ? "답변 등록" : "답변 보기"}
+                    </button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        <nav className="admin-record-pagination admin-member-pagination" aria-label="문의 목록 페이지">
+          <button type="button" onClick={list.previous} disabled={!list.hasPrevious}>이전</button>
+          <span aria-live="polite">{list.pageNumber} 페이지</span>
+          <button type="button" onClick={list.next} disabled={!list.data?.next_cursor}>다음</button>
         </nav>
-      )}
+      </section>
+      {list.selected && <InquiryPanel key={list.selected} id={list.selected}
+        onReply={finishReply} onConflict={list.reload} onClose={() => list.select(null)} />}
     </>
   );
 }
 
-const inquiryStatus = { pending: "답변 대기", answered: "답변 완료" };
-
-export function AdminInquiries() {
-  const [status, setStatus] = useState("");
-  const list = useAdminList<Inquiry>(inquiriesPath, status ? { status } : {});
-
-  return (
-    <div className="admin-record-layout">
-      <section className="admin-record-panel" aria-labelledby="admin-inquiry-list">
-        <h2 id="admin-inquiry-list">문의 목록</h2>
-        <label className="admin-record-field">
-          <span>답변 상태</span>
-          <select value={status} onChange={(event) => { setStatus(event.target.value); list.reset(); }}>
-            <option value="">전체</option>
-            {Object.entries(inquiryStatus).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
-          </select>
-        </label>
-        <LoadState {...list} retry={list.reload} />
-        {list.data && (
-          <ListPage {...list} hasNext={!!list.data.next_cursor}>
-            {!list.data.items.length && <li>문의가 없습니다.</li>}
-            {list.data.items.map((inquiry) => (
-              <li key={inquiry.inquiry_id}>
-                <button type="button" className="admin-record-select" aria-pressed={list.selected === inquiry.inquiry_id}
-                  onClick={() => list.select(inquiry.inquiry_id)}>
-                  <span>{inquiry.title}</span><small>{inquiryStatus[inquiry.status]}</small>
-                </button>
-              </li>
-            ))}
-          </ListPage>
-        )}
-      </section>
-      {list.selected && <InquiryPanel key={list.selected} id={list.selected} onReply={list.reload} />}
-    </div>
-  );
-}
-
-function InquiryPanel({ id, onReply }: { id: string; onReply: () => void }) {
+function InquiryPanel({ id, onReply, onConflict, onClose }: {
+  id: string; onReply: () => void; onConflict: () => void; onClose: () => void;
+}) {
   const path = `${inquiriesPath}/${encodeURIComponent(id)}`;
   const inquiry = useAdminData<InquiryDetail>(path);
   const request = useRef<{ body: string; id: string } | null>(null);
+  const dialog = useRef<HTMLDialogElement>(null);
   const [body, setBody] = useState("");
   const [saving, setSaving] = useState(false);
-  const [notice, setNotice] = useState("");
+  const submitting = useRef(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const element = dialog.current;
+    element?.showModal();
+    return () => element?.close();
+  }, []);
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const answer = body.trim();
-    if (saving || !answer) return;
+    if (submitting.current || !answer) return;
+    submitting.current = true;
     setError("");
     setSaving(true);
     try {
       if (request.current?.body !== answer) request.current = { body: answer, id: crypto.randomUUID() };
       await sendInquiryReply(path, answer, request.current.id);
-      setNotice("답변을 등록했습니다.");
-      inquiry.reload();
       onReply();
     } catch (error) {
       if (error instanceof ApiError && error.status === 409) {
         setError("이미 답변이 등록되었습니다. 현재 답변을 불러왔어요.");
         inquiry.reload();
-        onReply();
+        onConflict();
       } else {
         setError(adminError(error, "답변을 등록하지 못했어요. 다시 시도해 주세요."));
       }
     } finally {
+      submitting.current = false;
       setSaving(false);
     }
   }
 
   return (
-    <section className="admin-record-panel" aria-label="문의 상세">
-      <LoadState {...inquiry} retry={inquiry.reload} />
-      {notice && <p role="status">{notice}</p>}
-      {error && <p role="alert">{error}</p>}
-      {inquiry.data && (
-        <>
-          <h2>{inquiry.data.title}</h2>
-          <p className="admin-record-message">{inquiry.data.body}</p>
-          {inquiry.data.replies.map((reply) => (
-            <div key={reply.reply_id}><h3>등록된 답변</h3><p className="admin-record-message">{reply.body}</p></div>
-          ))}
-          {inquiry.data.status === "pending" && (
-            <form onSubmit={submit}>
-              <label className="admin-record-field">
-                <span>답변</span>
-                <textarea required rows={5} value={body} onChange={(event) => setBody(event.target.value)} />
-              </label>
-              <button className="admin-record-primary" type="submit" disabled={saving || !body.trim()}>
-                {saving ? "등록 중…" : "답변 등록"}
-              </button>
-            </form>
-          )}
-        </>
-      )}
-    </section>
+    <dialog ref={dialog} className="admin-inquiry-dialog" aria-labelledby="inquiry-dialog-title"
+      onCancel={(event) => { event.preventDefault(); if (!submitting.current) onClose(); }}>
+      <section className="admin-record-panel" aria-busy={saving}>
+        <div className="admin-member-list-header">
+          <h2 id="inquiry-dialog-title">{inquiry.data?.status === "answered" ? "답변 보기" : "문의 답변"}</h2>
+          <button type="button" onClick={onClose} disabled={saving} autoFocus>닫기</button>
+        </div>
+        <LoadState {...inquiry} retry={inquiry.reload} />
+        {error && <p role="alert">{error}</p>}
+        {inquiry.data && (
+          <>
+            <h3>{inquiry.data.title}</h3>
+            <p className="admin-record-message">{inquiry.data.body}</p>
+            {inquiry.data.replies.map((reply) => (
+              <div key={reply.reply_id}><h3>등록된 답변</h3><p className="admin-record-message">{reply.body}</p></div>
+            ))}
+            {inquiry.data.status === "pending" && (
+              <form onSubmit={submit}>
+                <label className="admin-record-field">
+                  <span>답변</span>
+                  <textarea required rows={6} value={body} disabled={saving} onChange={(event) => setBody(event.target.value)} />
+                </label>
+                <div className="admin-inquiry-actions">
+                  <button type="button" onClick={onClose} disabled={saving}>취소</button>
+                  <button className="admin-record-primary" type="submit" disabled={saving || !body.trim()}>
+                    {saving ? "등록 중…" : "답변 등록"}
+                  </button>
+                </div>
+              </form>
+            )}
+          </>
+        )}
+      </section>
+    </dialog>
   );
 }
 

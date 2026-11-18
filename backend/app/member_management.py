@@ -42,6 +42,10 @@ class InquirySummary(InquiryCreated):
     title: str
 
 
+class AdminInquirySummary(InquirySummary):
+    category: str
+
+
 class StudentInquirySummary(InquirySummary):
     created_at: datetime
 
@@ -152,14 +156,24 @@ def register_member_routes(
         )
 
     @router.get("/admin/inquiries", dependencies=[admin])
-    def list_inquiries(status: InquiryStatus | None = None, cursor: str | None = None) -> Page[InquirySummary]:
-        statement = select(inquiries.c.id, inquiries.c.title, inquiries.c.status)
+    def list_inquiries(
+        status: InquiryStatus | None = None, cursor: str | None = None,
+        category: Literal["learning", "account", "other"] | None = None,
+        sort: Literal["newest", "oldest"] = "newest",
+    ) -> Page[AdminInquirySummary]:
+        statement = select(inquiries.c.id, inquiries.c.title, inquiries.c.status, inquiries.c.category)
         if status is not None:
             statement = statement.where(inquiries.c.status == status)
+        if category is not None:
+            statement = statement.where(inquiries.c.category == category)
         with engine.connect() as connection:
-            rows, next_cursor = read_page(connection, inquiries, statement, cursor, page_size)
-        return Page[InquirySummary](
-            items=[InquirySummary(inquiry_id=row["id"], title=row["title"], status=row["status"]) for row in rows],
+            rows, next_cursor = read_page(
+                connection, inquiries, statement, cursor, page_size, oldest_first=sort == "oldest",
+            )
+        return Page[AdminInquirySummary](
+            items=[AdminInquirySummary(
+                inquiry_id=row["id"], title=row["title"], status=row["status"], category=row["category"],
+            ) for row in rows],
             next_cursor=next_cursor,
         )
 

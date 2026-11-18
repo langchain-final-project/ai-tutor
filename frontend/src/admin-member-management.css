@@ -37,7 +37,6 @@
 
 .admin-record-field textarea { resize: vertical; }
 .admin-record-field input[readonly] { background: var(--subtle); }
-.admin-records { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
 .admin-record-pagination { display: flex; justify-content: flex-end; gap: 6px; }
 
 .admin-record-panel button {
@@ -52,17 +51,6 @@
 
 .admin-record-panel button:disabled { opacity: .6; cursor: default; }
 .admin-record-panel button:enabled:hover { border-color: var(--blue); }
-.admin-record-panel .admin-record-select {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px;
-  width: 100%;
-  text-align: left;
-  overflow-wrap: anywhere;
-}
-.admin-record-select small { flex: none; color: var(--muted); }
-.admin-record-select[aria-pressed="true"] { background: var(--tint); border-color: var(--light-blue); }
 .admin-record-panel .admin-record-primary {
   justify-self: start;
   margin-top: 4px;
@@ -107,6 +95,26 @@
   font-weight: 700;
 }
 .admin-member-pagination { align-items: center; gap: 12px; font-size: 13px; }
+.admin-inquiry-list-header { flex-wrap: wrap; align-items: end; }
+.admin-inquiry-filters { display: flex; flex-wrap: wrap; gap: 12px; }
+.admin-inquiry-filters .admin-record-field { min-width: 120px; }
+
+.admin-inquiry-dialog {
+  width: min(680px, calc(100% - 32px));
+  max-height: calc(100dvh - 48px);
+  padding: 0;
+  border: 0;
+  border-radius: 14px;
+  background: var(--paper);
+  color: var(--navy);
+  overflow-y: auto;
+}
+
+.admin-inquiry-dialog::backdrop { background: rgb(18 37 76 / 50%); }
+.admin-inquiry-dialog .admin-record-panel { border: 0; }
+.admin-inquiry-dialog .admin-record-message { max-height: 240px; overflow-y: auto; }
+.admin-inquiry-actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; }
+.admin-inquiry-actions .admin-record-primary { margin-top: 0; }
 
 @media (max-width: 840px) {
   .admin-record-layout { grid-template-columns: minmax(0, 1fr); }
