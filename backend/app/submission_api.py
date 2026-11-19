@@ -2,6 +2,7 @@
 
 from contextlib import asynccontextmanager
 from io import BytesIO
+import logging
 import os
 from pathlib import Path
 import secrets
@@ -33,11 +34,19 @@ from app.ocr.images import open_image
 from app.ocr.selection import crop_photo_region
 from app.ocr.quality import check_photo_quality, requires_photo_retake
 from app.db.type_matches import ensure_type_match_schema, load_type_match, save_type_match
-from app.tutor.unit_type_matcher import DEFAULT_BANK, VERSION as TYPE_MATCH_VERSION, get_unit_matcher
+from app.tutor.unit_type_matcher import (
+    AUTOMATIC_POLICY_VERSION,
+    DEFAULT_BANK,
+    SCOPE,
+    VERSION as TYPE_MATCH_VERSION,
+    classify_for_tutoring,
+    get_unit_matcher,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 MAX_IMAGE_BYTES = 30 * 1024 * 1024
 bearer = HTTPBearer(auto_error=False)
+logger = logging.getLogger(__name__)
 
 
 class InputBody(BaseModel):
@@ -52,10 +61,6 @@ class InputBody(BaseModel):
 class TypeMatchBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
     expected_version_number: int = Field(ge=1, strict=True)
-
-
-class TypeChoiceBody(TypeMatchBody):
-    source_topic_code: str = Field(pattern=r"^[0-9]{7}$", strict=True)
 
 
 def validate_photo(content: bytes) -> str:
@@ -427,7 +432,6 @@ def create_submission_app(
                 student_id,
                 body.expected_version_number,
             )
-
             save_and_confirm_input(
                 connection,
                 submission_id=submission_id,
@@ -435,62 +439,110 @@ def create_submission_app(
                 content_text=body.content_text,
                 expected_version_number=body.expected_version_number,
             )
-
-            return get_submission(
+            saved = get_submission(
                 connection,
                 submission_id=submission_id,
                 owner_id=student_id,
             )
 
+        version = saved["latest_input"]["version_number"]
+        classify_confirmed_input(submission_id, student_id, version)
+
+        with submission_connection(database) as connection:
+            current, _ = confirmed_type_input(
+                connection, submission_id, student_id, version,
+            )
+            return current
+
     def confirmed_type_input(connection, submission_id, student_id, expected):
-        current = get_submission(connection, submission_id=submission_id, owner_id=student_id)
+        current = get_submission(
+            connection, submission_id=submission_id, owner_id=student_id,
+        )
         latest = current["latest_input"]
         if not latest or latest["version_number"] != expected:
             raise HTTPException(409, "문제 내용이 변경되었습니다. 최신 내용을 불러와 주세요.")
         if not latest["confirmed_at"]:
-            raise HTTPException(409, "본문과 수식을 확인하고 문제 내용 확인 완료를 먼저 눌러주세요.")
+            raise HTTPException(409, "문제 내용 확인 완료가 필요합니다.")
         return current, latest
 
-    def type_matcher():
-        try:
-            return get_unit_matcher(type_bank)
-        except (OSError, sqlite3.Error, ValueError) as error:
-            raise HTTPException(503, "문제은행을 불러오지 못했습니다. 문자와 식 문항이 있는 DB를 확인해 주세요.") from error
-
-    @app.post("/submissions/{submission_id}/type-match")
-    def match_type(submission_id: int, body: TypeMatchBody, student_id: Annotated[str, Depends(current_owner)]):
+    def classify_confirmed_input(submission_id, student_id, expected):
         with submission_connection(database) as connection:
-            current, latest = confirmed_type_input(connection, submission_id, student_id, body.expected_version_number)
+            current, latest = confirmed_type_input(
+                connection, submission_id, student_id, expected,
+            )
             cached = load_type_match(connection, latest["id"])
-        matcher = type_matcher()
-        reusable = cached and cached.get("data_version") == matcher.data_version and cached.get("classifier_version") == TYPE_MATCH_VERSION
-        if reusable:
-            result = cached
-        else:
-            layout = (current.get("layout_detection") or {}).get("layout") or {}
-            has_visuals = any(region["kind"] in {"figure", "graph", "table"} for region in layout.get("regions", []))
-            result = matcher.predict(latest["content_text"], has_visuals=has_visuals)
+
+        try:
+            matcher = get_unit_matcher(type_bank)
+
+            def reusable(value):
+                return (
+                    value
+                    and value.get("data_version") == matcher.data_version
+                    and value.get("classifier_version") == TYPE_MATCH_VERSION
+                    and value.get("selection_policy_version") == AUTOMATIC_POLICY_VERSION
+                    and value.get("method") != "manual"
+                )
+
+            if reusable(cached):
+                result = cached
+            else:
+                layout = (current.get("layout_detection") or {}).get("layout") or {}
+                has_visuals = any(
+                    region["kind"] in {"figure", "graph", "table"}
+                    for region in layout.get("regions", [])
+                )
+                result = classify_for_tutoring(
+                    matcher, latest["content_text"], has_visuals=has_visuals,
+                )
+        except Exception:
+            logger.exception("내부 유형 분류 실패: submission_id=%s", submission_id)
+            result = {
+                "classifier_version": TYPE_MATCH_VERSION,
+                "data_version": None,
+                "selection_policy_version": AUTOMATIC_POLICY_VERSION,
+                "purpose": "tutoring_reference",
+                "status": "needs_review",
+                "method": "retrieval",
+                "scope": dict(SCOPE),
+                "bank_question_count": 0,
+                "bank_type_count": 0,
+                "selected_type": None,
+                "matched_question_id": None,
+                "is_provisional": False,
+                "candidates": [],
+                "reasons": ["내부 유형 분류를 완료하지 못했습니다."],
+                "error_code": "internal_type_classification_failed",
+            }
+
         with submission_connection(database, immediate=True) as connection:
-            _, latest = confirmed_type_input(connection, submission_id, student_id, body.expected_version_number)
+            _, latest = confirmed_type_input(
+                connection, submission_id, student_id, expected,
+            )
             existing = load_type_match(connection, latest["id"])
-            if existing and existing.get("data_version") == matcher.data_version and existing.get("classifier_version") == TYPE_MATCH_VERSION:
+            if (
+                existing
+                and existing.get("selection_policy_version") == AUTOMATIC_POLICY_VERSION
+                and existing.get("classifier_version") == TYPE_MATCH_VERSION
+                and existing.get("data_version") is not None
+                and existing.get("method") != "manual"
+                and (
+                    result["data_version"] is None
+                    or existing["data_version"] == result["data_version"]
+                )
+            ):
                 return existing
             return save_type_match(connection, latest, result)
 
-    @app.post("/submissions/{submission_id}/type-match/confirm")
-    def choose_type(submission_id: int, body: TypeChoiceBody, student_id: Annotated[str, Depends(current_owner)]):
-        with submission_connection(database, immediate=True) as connection:
-            _, latest = confirmed_type_input(connection, submission_id, student_id, body.expected_version_number)
-            result = load_type_match(connection, latest["id"])
-            if not result or result["status"] not in {"classified", "candidates"}:
-                raise HTTPException(409, "유형 후보를 먼저 찾아주세요.")
-            candidate = next((item for item in result["candidates"] if item["source_topic_code"] == body.source_topic_code), None)
-            if candidate is None:
-                raise HTTPException(422, "현재 문제의 문자와 식 유형 후보 중에서 선택해 주세요.")
-            result = {**result, "status": "classified", "method": "manual", "matched_question_id": None,
-                      "selected_type": {key: candidate[key] for key in ("source_topic_code", "source_topic_name")},
-                      "reasons": ["확인된 문제 내용의 유형 후보 중 사용자가 선택했습니다."]}
-            return save_type_match(connection, latest, result)
+    @app.post("/submissions/{submission_id}/type-match")
+    def match_type(
+        submission_id: int,
+        body: TypeMatchBody,
+        student_id: Annotated[str, Depends(current_owner)],
+    ):
+        return classify_confirmed_input(
+            submission_id, student_id, body.expected_version_number,
+        )
 
     app.include_router(create_ocr_router(manager, current_owner))
 

@@ -132,7 +132,14 @@ class UnitTypeMatcher:
             )]
         return cls(rows)
 
-    def predict(self, text: str, *, has_visuals=False, excluded_templates=frozenset()) -> dict:
+    def predict(
+        self,
+        text: str,
+        *,
+        has_visuals=False,
+        excluded_templates=frozenset(),
+        minimum_similarity=MIN_SIMILARITY,
+    ) -> dict:
         result = {
             "classifier_version": VERSION, "data_version": self.data_version,
             "scope": dict(SCOPE), "bank_question_count": len(self.rows), "bank_type_count": len(self.catalog),
@@ -175,7 +182,7 @@ class UnitTypeMatcher:
             score = 0.8 * references[0][0] + 0.2 * sum(member[0] for member in references) / len(references)
             ranked.append((code, score, references))
         ranked.sort(key=lambda item: (-(not matches and item[0] == focus), -item[1], item[0]))
-        if not ranked or (not matches and ranked[0][1] < MIN_SIMILARITY and ranked[0][0] != focus):
+        if not ranked or (not matches and ranked[0][1] < minimum_similarity and ranked[0][0] != focus):
             result["reasons"] = ["범위 안에서 충분히 비슷한 문항을 찾지 못했습니다. 본문과 단원을 확인해 주세요."]
             return result
         for code, score, references in ranked[:3]:
@@ -197,6 +204,42 @@ class UnitTypeMatcher:
                           selected_type={"source_topic_code": first["source_topic_code"], "source_topic_name": first["source_topic_name"]},
                           reasons=["형식과 공백을 정리한 본문이 같은 문제은행 문항이며 유형이 일치합니다."])
         return result
+
+
+AUTOMATIC_POLICY_VERSION = "tutoring-top1-v1"
+
+
+def classify_for_tutoring(matcher, text: str, *, has_visuals=False) -> dict:
+    result = matcher.predict(
+        text,
+        has_visuals=has_visuals,
+        minimum_similarity=0.0,
+    )
+    result = {
+        **result,
+        "selection_policy_version": AUTOMATIC_POLICY_VERSION,
+        "purpose": "tutoring_reference",
+        "is_provisional": False,
+    }
+    if result["status"] == "classified":
+        return result
+    if not result["candidates"]:
+        return result
+
+    best = result["candidates"][0]
+    return {
+        **result,
+        "status": "classified",
+        "selected_type": {
+            "source_topic_code": best["source_topic_code"],
+            "source_topic_name": best["source_topic_name"],
+        },
+        "matched_question_id": None,
+        "is_provisional": True,
+        "reasons": [
+            "확인된 본문·수식으로 찾은 1순위 유형을 단계별 안내의 참고 유형으로 선택했습니다."
+        ],
+    }
 
 
 @lru_cache(maxsize=4)

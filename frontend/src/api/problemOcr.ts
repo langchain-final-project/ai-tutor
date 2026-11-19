@@ -2,6 +2,10 @@ import type {ContentPart, ProblemReview, ReviewBlock, } from "../types/problemRe
 import type { PhotoRegion } from "../types/photoRegion"
 import type { LayoutDetection } from "../types/problemLayout"
 import type { ConditionExtraction } from "../types/problemCondition"
+import { splitLooseLatex } from "../utils/reviewLatex"
+import { connectOcrStream, OcrStreamHttpError } from "./ocrStream"
+import { initialOcrProgress, updateOcrProgress } from "../utils/ocrProgress"
+import type { OcrProgress } from "../utils/ocrProgress"
 
 export type OcrPhase =
   | "idle"
@@ -87,6 +91,10 @@ export type Submission = {
 }
 
 export type UnitTypeMatch = {
+  selection_policy_version?: string
+  purpose?: "tutoring_reference"
+  is_provisional?: boolean
+  error_code?: string
   status: "classified" | "candidates" | "needs_review" | "unsupported"
   method: "exact_match" | "retrieval" | "hybrid" | "manual"
   scope: { grade: number; semester: number; unit_code: string; unit_name: string }
@@ -104,20 +112,6 @@ export type UnitTypeMatch = {
     reasons: string[]
     reference_questions: { id: string; question_text: string }[]
   }[]
-}
-
-export function matchUnitType(id: number, version: number, signal: AbortSignal) {
-  return request<UnitTypeMatch>(`/submissions/${id}/type-match`, {
-    method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ expected_version_number: version }), signal,
-  })
-}
-
-export function chooseUnitType(id: number, version: number, code: string, signal: AbortSignal) {
-  return request<UnitTypeMatch>(`/submissions/${id}/type-match/confirm`, {
-    method: "POST", headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ expected_version_number: version, source_topic_code: code }), signal,
-  })
 }
 
 export class ReviewApiError extends Error {
@@ -256,8 +250,11 @@ export async function recognizeSubmission(
   signal: AbortSignal,
   onStatus: (phase: OcrPhase) => void,
   region: PhotoRegion,
+  onProgress: (progress: OcrProgress) => void = () => {},
 ): Promise<Submission> {
   onStatus("queued")
+  let progress = initialOcrProgress()
+  onProgress(progress)
 
   let job = await request<OcrJob>(`/submissions/${submission.id}/ocr`, {
     method: "POST",
@@ -271,6 +268,15 @@ export async function recognizeSubmission(
     accepted.image_size.some((value, index) => value !== region.image_size[index]) ||
     accepted.bbox.some((value, index) => value !== region.bbox[index])) {
     throw new Error("선택한 문제 범위를 서버에서 확인하지 못했습니다. API 서버를 다시 시작해 주세요.")
+  }
+
+  let afterId = "0"
+  let streamFailures = 0
+  let pollFailures = 0
+
+  function terminalConnectionError(error: unknown) {
+    return (error instanceof ReviewApiError || error instanceof OcrStreamHttpError) &&
+      [400, 401, 403, 404].includes(error.status)
   }
 
   while (true) {
@@ -298,8 +304,62 @@ export async function recognizeSubmission(
     }
 
     onStatus(job.status)
+
+    if (streamFailures < 3) {
+      try {
+        await connectOcrStream(job.id, afterId, signal, (event) => {
+          if (event.event === "stream_error") throw new Error("진행 이벤트를 다시 연결해야 합니다.")
+          if (!event.id || !/^\d+$/.test(event.id)) {
+            throw new Error("진행 이벤트 번호가 올바르지 않습니다.")
+          }
+          if (BigInt(event.id) <= BigInt(afterId)) return
+          const payload: unknown = JSON.parse(event.data)
+          if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+            throw new Error("진행 이벤트 형식이 올바르지 않습니다.")
+          }
+          const data = payload as Record<string, unknown>
+          afterId = event.id
+          progress = updateOcrProgress(progress, event.event, data)
+          onProgress(progress)
+
+          if (event.event === "queued" || event.event === "running") {
+            job = { ...job, status: event.event }
+            onStatus(event.event)
+          }
+          if (event.event === "completed" || event.event === "failed") {
+            job = {
+              ...job,
+              status: event.event,
+              error_message: typeof data.error_message === "string" ? data.error_message : null,
+            }
+            return false
+          }
+        }, () => {
+          progress = { ...progress, connection: "live" }
+          onProgress(progress)
+        })
+        if (["completed", "failed"].includes(job.status)) continue
+      } catch (error) {
+        signal.throwIfAborted()
+        if (terminalConnectionError(error)) throw error
+      }
+      streamFailures++
+      progress = {
+        ...progress,
+        connection: streamFailures < 3 ? "reconnecting" : "polling",
+      }
+      onProgress(progress)
+    }
+
+    // 완료 이벤트를 받지 못한 경우에도 서버에 저장된 상태를 조회합니다.
     await waitForPoll(signal)
-    job = await request<OcrJob>(`/ocr-jobs/${job.id}`, { signal })
+    try {
+      job = await request<OcrJob>(`/ocr-jobs/${job.id}`, { signal })
+      pollFailures = 0
+    } catch (error) {
+      signal.throwIfAborted()
+      if (terminalConnectionError(error) || ++pollFailures >= 3) throw error
+    }
   }
 }
 
@@ -311,8 +371,27 @@ function parseReviewContent(text: string): ReviewBlock[] {
   let cursor = 0
 
   function addText(value: string) {
-    if (!value) return
-    parts.push({ id: `part-${parts.length}`, kind: "text", text: value })
+    for (const piece of splitLooseLatex(value)) {
+      const id = `part-${parts.length}`
+
+      if (piece.kind === "text") {
+        parts.push({
+          id,
+          kind: "text",
+          text: piece.text,
+        })
+      } else {
+        parts.push({
+          id,
+          kind: "math",
+          latex: piece.latex,
+          source: {
+            latex: piece.latex,
+            raw: piece.raw,
+          },
+        })
+      }
+    }
   }
 
   for (const match of text.matchAll(mathPattern)) {

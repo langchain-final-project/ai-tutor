@@ -1,0 +1,230 @@
+{
+  "1": {},
+  "10": {
+    "text_status": "needs_correction",
+    "note": "Malformed underline command (unbalanced brace) and subscript/text formatting require correction from original."
+  },
+  "19": {
+    "text_status": "needs_correction",
+    "note": "Extraneous leading Korean consonant and a square bracket replacing opening parenthesis in subquestion (2)."
+  },
+  "23": {
+    "text_status": "needs_correction",
+    "note": "Choice (d) in original is a/c=b/c; imported transcription duplicates ac=bc and loses denominators."
+  },
+  "28": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Operation-flow arrows -5, times 3, +2 are visible only in diagram; text-only input omits required operations."
+  },
+  "47": {
+    "note": "Diagram present, but base lengths and height are all explicitly given in text; no diagram reconstruction needed."
+  },
+  "49": {
+    "text_status": "needs_correction",
+    "note": "Superscript markers lost in choices 1 and 2: a^2 and x^2 y in source image."
+  },
+  "52": {
+    "note": "Diagram present, but base and perpendicular height are explicitly given in text."
+  },
+  "81": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Shaded rectangle dimensions 9 m, 3 m, 2 m and geometry only in image; body omits all dimensions except x."
+  },
+  "98": {
+    "exclude_reason": "structured_table_input_not_supported",
+    "note": "Magic-square table is serialized as HTML; row/column structure needs a separate agreed input format before text-only scoring."
+  },
+  "105": {
+    "label_status": "ambiguous",
+    "note": "Original contains both denominator 3 and decimal 0.7, while source label is fraction-only. Could be mixed-coefficient type 7103051; quarantine pending taxonomy adjudication."
+  },
+  "106": {
+    "label_status": "ambiguous",
+    "note": "Two subquestions combine a decimal equation and a fraction equation; source fraction-only label does not uniquely represent both."
+  },
+  "108": {
+    "note": "Detailed original check confirms (na)=(da)-18; original transcription retained."
+  },
+  "129": {
+    "text_status": "needs_correction",
+    "note": "Escaped dollar signs/backslash linebreak artifacts prevent worked equations from being represented faithfully."
+  },
+  "136": {
+    "text_status": "needs_correction",
+    "note": "Remove duplicate (1) numbering; all underlined terms match source and are preserved."
+  },
+  "141": {
+    "text_status": "needs_correction",
+    "note": "Angle 157 degrees is transcribed as an apostrophe; preserve degree symbol."
+  },
+  "143": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Crossing walkway arrangement is specified by diagram; text alone does not determine overlap geometry."
+  },
+  "162": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Race separation distances are only in diagrams."
+  },
+  "163": {
+    "note": "Detailed text check confirms all plus signs in printed incorrect choices; no mathematical correction made."
+  },
+  "164": {
+    "text_status": "needs_correction",
+    "note": "Choice 3 constant -1/3 has been flattened to -13."
+  },
+  "166": {
+    "text_status": "needs_correction",
+    "note": "Given worked equation sequence 3x-5=7 -> 3x=12 -> x=4, with step labels, is omitted from imported body."
+  },
+  "167": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Polygon dimensions 2a,3a,3,4 and shaded geometry appear only in diagram."
+  },
+  "169": {
+    "label_status": "ambiguous",
+    "note": "Source label is division, but choices test sign distribution, multiplication and division; operation-specific taxonomy needs adjudication."
+  },
+  "191": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Shaded frame dimensions and inner rectangle conditions appear only in diagram."
+  },
+  "196": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Which cuboid faces are glued is determined by diagram, not text."
+  },
+  "202": {
+    "text_status": "needs_correction",
+    "note": "Choice 5 is a/b in original, but imported text duplicates b/a from choice 4."
+  },
+  "216": {
+    "label_status": "ambiguous",
+    "note": "Given expression is multiplication by -4/3, whereas source type is division; taxonomy overlap with multiplication type 7103024 needs adjudication."
+  },
+  "221": {
+    "text_status": "needs_correction",
+    "note": "RHS blank after 10- is omitted; restore blank from original worked equation."
+  },
+  "222": {
+    "text_status": "needs_correction",
+    "note": "Choice 1 equation is duplicated in imported body."
+  },
+  "226": {
+    "text_status": "needs_correction",
+    "note": "Custom angle-bracket operator should be represented as math \\langle a,b\\rangle; current '<'/'>' serialization loses grouping."
+  },
+  "228": {
+    "text_status": "needs_correction",
+    "note": "Original detail checked; restore the five given equation lines, blanks and operation labels (ga) and (na), without filling any blank."
+  },
+  "230": {
+    "note": "Raw LaTeX array preserves equation order correctly; retained original transcription despite compact sheet layout."
+  },
+  "258": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Magic-square entries and positions are absent from imported body."
+  },
+  "269": {
+    "exclude_reason": "structured_table_input_not_supported",
+    "note": "Magic-square row/column layout stored as HTML; keep outside initial body/formula-only scoring."
+  },
+  "274": {
+    "label_status": "ambiguous",
+    "note": "Question asks parameter conditions for infinitely many solutions, but source label is simple linear-equation solving."
+  },
+  "277": {
+    "text_status": "needs_correction",
+    "note": "HTML wrapper is merely a one-cell box around two equations; flatten wrapper while preserving equation order."
+  },
+  "280": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Balance-scale counts and colored shape symbols are missing from body."
+  },
+  "291": {
+    "exclude_reason": "structured_table_input_not_supported",
+    "note": "Equation-generation table requires row/column associations; excluded from initial text/formula-only scoring."
+  },
+  "292": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Calendar T-shape arrangement is only shown in image."
+  },
+  "293": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Number-pyramid reference rule and expression locations omitted from body."
+  },
+  "305": {
+    "text_status": "needs_correction",
+    "note": "Original and import both say 30 cc; typo 'fire' in Korean replaced with 'water'. No numeric change."
+  },
+  "308": {
+    "label_status": "ambiguous",
+    "note": "A multi-part item mixes one-variable and multi-variable expression evaluation, source label is simple one-variable value; needs taxonomy adjudication."
+  },
+  "311": {
+    "text_status": "needs_correction",
+    "note": "Answer-box x labels run into equation RHS; separate each given equation and its answer placeholder."
+  },
+  "315": {
+    "text_status": "needs_correction",
+    "note": "Extraneous 'x=' before blanks in both subquestions; original blanks have no x= prefix. Unit cm^2 flattened."
+  },
+  "320": {
+    "text_status": "needs_correction",
+    "note": "Answer-box x= labels concatenate with equation RHS; separate each equation from its answer placeholder."
+  },
+  "326": {
+    "label_status": "ambiguous",
+    "note": "Source multiplication label conflicts with a task evaluating a linear expression from its coefficient and constant."
+  },
+  "327": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Trapezoid dimensions a cm,5 cm,4 cm are only shown in diagram."
+  },
+  "329": {
+    "text_status": "needs_correction",
+    "note": "Choice 4 average (a+b)/2 is flattened to a+b2; original fraction must be preserved."
+  },
+  "330": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Trapezoid base lengths x,y and height h are only in diagram."
+  },
+  "335": {
+    "label_status": "ambiguous",
+    "note": "Question checks term counts, coefficients, constant and degree together; source degree/linear-expression label overlaps polynomial-terms type 7103022."
+  },
+  "337": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Triangle height 20 cm, base x cm and removed central base 8 cm appear only in image."
+  },
+  "346": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Circle arrangement, shaded arcs and diameters a,2a appear only in diagram."
+  },
+  "348": {
+    "exclude_reason": "structured_table_input_not_supported",
+    "note": "Magic-square layout serialized as HTML; needs structured table input policy."
+  },
+  "352": {
+    "text_status": "needs_correction",
+    "note": "Escaped math delimiters and omitted step labels corrupt worked-equation display; restore source steps and choices."
+  },
+  "378": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "Calendar grouping and date layout only in image; keep separate from body-only benchmark."
+  },
+  "395": {
+    "exclude_reason": "visual_condition_missing_from_text",
+    "note": "How matchstick triangles share sides is defined only by diagram sequence."
+  },
+  "407": {
+    "text_status": "needs_correction",
+    "note": "Entire equation-solving sequence and labelled steps omitted from body."
+  },
+  "409": {
+    "label_status": "ambiguous",
+    "note": "Question mixes identity/equation definitions and transposition; source transposition label is not uniquely supported by the tested distinction."
+  },
+  "426": {
+    "exclude_reason": "structured_table_input_not_supported",
+    "note": "Mass/concentration table rows and blanks omitted from body serialization; do not invent missing structure."
+  }
+}

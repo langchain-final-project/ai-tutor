@@ -1,0 +1,25 @@
+{
+  "dataset_version": "unit03-review-v1",
+  "dataset_manifest_sha256": "e5376486ece50829265f7af34249864adb7d66b300a9cc191b6b86a51bb51f2e",
+  "purpose": "development_evaluation_not_independent_final_test",
+  "classifier_version": "middle1-1-03-retrieval-v1",
+  "classifier_data_version": "da7f14098843ed29c222a0cf5ed405fee6d4220f85f774c9bc6e71309d1e741c",
+  "search_count": 1598,
+  "evaluation_count": 404,
+  "types": 78,
+  "top1_correct": 294,
+  "top3_correct": 365,
+  "top1_percent": 72.77,
+  "top3_percent": 90.35,
+  "macro_top1_percent": 67.23,
+  "statuses": {
+    "candidates": 404
+  },
+  "seconds": 29.73,
+  "notes": [
+    "Single-agent AI visual first pass; no human expert sign-off.",
+    "Development evaluation, not a blind external final test.",
+    "Quarantine and missing-only types excluded; coverage 78/81 source types.",
+    "Compare future runs against this exact dataset and search pool, not the earlier 435-question pilot."
+  ]
+}

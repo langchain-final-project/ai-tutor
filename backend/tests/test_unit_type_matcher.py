@@ -8,9 +8,16 @@ from fastapi.testclient import TestClient
 import pytest
 
 from app.db.submissions import create_text_submission, save_student_input_version, submission_connection
+from app.db.type_matches import save_type_match
 from app import submission_api
 from app.submission_api import create_submission_app
-from app.tutor.unit_type_matcher import UnitTypeMatcher, canonical, equation_focus
+from app.tutor.unit_type_matcher import (
+    AUTOMATIC_POLICY_VERSION,
+    UnitTypeMatcher,
+    canonical,
+    classify_for_tutoring,
+    equation_focus,
+)
 
 
 def rows():
@@ -93,6 +100,42 @@ def test_duplicate_body_with_different_labels_and_visuals_stays_candidates(match
     assert len(result["candidates"]) == 2
 
 
+def test_internal_selection_handles_unseen_question_without_changing_ranking(matcher):
+    text = "일차방정식 0.3(x-5)-0.7(x-2)=0을 풀면?"
+    candidates = matcher.predict(text)
+    selected = classify_for_tutoring(matcher, text)
+    assert candidates["status"] == "candidates"
+    assert selected["candidates"] == candidates["candidates"]
+    assert selected["status"] == "classified"
+    assert selected["selected_type"]["source_topic_code"] == "7103049"
+    assert selected["matched_question_id"] is None
+    assert selected["is_provisional"] is True
+    assert selected["purpose"] == "tutoring_reference"
+
+
+def test_internal_selection_distinguishes_exact_match_and_visual_reference(matcher):
+    text = rows()[0]["question_text"]
+    exact = classify_for_tutoring(matcher, text)
+    assert exact["method"] == "exact_match"
+    assert exact["is_provisional"] is False
+    assert exact["matched_question_id"] == rows()[0]["id"]
+    visual = classify_for_tutoring(matcher, text, has_visuals=True)
+    assert visual["status"] == "classified"
+    assert visual["is_provisional"] is True
+    assert visual["matched_question_id"] is None
+
+
+@pytest.mark.parametrize("text,status", [
+    ("[UNREADABLE]", "needs_review"),
+    ("다음 중 옳은 것은?", "needs_review"),
+    ("이차방정식 x^2=9를 풀어라.", "unsupported"),
+])
+def test_internal_selection_does_not_fabricate_a_type(matcher, text, status):
+    result = classify_for_tutoring(matcher, text)
+    assert result["status"] == status
+    assert result["selected_type"] is None
+
+
 @pytest.fixture
 def database(tmp_path):
     path = tmp_path / "types.sqlite3"
@@ -171,21 +214,26 @@ def test_classification_requires_confirmation_and_current_version(database, bank
         assert client.post(endpoint, headers=HEADERS, json={"expected_version_number": 1}).status_code == 404
 
 
-def test_type_selection_restores_and_becomes_stale_after_edit(database, bank):
+def test_automatic_type_restores_and_becomes_stale_after_edit(database, bank):
     sid = create_input(database)
     with TestClient(make_app(database, bank)) as client:
-        confirm(client, sid)
+        saved = confirm(client, sid)
         endpoint = f"/submissions/{sid}/type-match"
-        found = client.post(endpoint, headers=HEADERS, json={"expected_version_number": 1}).json()
-        code = found["candidates"][0]["source_topic_code"]
+        found = saved["type_match"]
+        assert found["status"] == "classified"
+        assert found["purpose"] == "tutoring_reference"
+        assert found["selection_policy_version"] == AUTOMATIC_POLICY_VERSION
+        assert found["is_provisional"] is True
+        assert found["matched_question_id"] is None
+        assert found["method"] != "manual"
+        code = found["selected_type"]["source_topic_code"]
+        assert code == "7103047"
         assert client.post(endpoint + "/confirm", headers=HEADERS,
-                           json={"expected_version_number": 1, "source_topic_code": "8101001"}).status_code == 422
-        chosen = client.post(endpoint + "/confirm", headers=HEADERS,
-                             json={"expected_version_number": 1, "source_topic_code": code})
-        assert chosen.status_code == 200
-        assert chosen.json()["status"] == "classified"
-        assert chosen.json()["method"] == "manual"
-        assert client.post(endpoint, headers=HEADERS, json={"expected_version_number": 1}).json()["method"] == "manual"
+                           json={"expected_version_number": 1, "source_topic_code": code}).status_code == 404
+        assert confirm(client, sid)["type_match"] == found
+        assert client.post(endpoint, headers=HEADERS, json={"expected_version_number": 1}).json() == found
+        with closing(sqlite3.connect(database)) as connection:
+            assert connection.execute("SELECT count(*) FROM problem_input_type_matches").fetchone()[0] == 1
     with TestClient(make_app(database, bank)) as client:
         restored = client.get(f"/submissions/{sid}", headers=HEADERS).json()
         assert restored["type_match"]["selected_type"]["source_topic_code"] == code
@@ -194,9 +242,10 @@ def test_type_selection_restores_and_becomes_stale_after_edit(database, bank):
         assert edited.status_code == 200
         assert edited.json()["type_match"] is None
         assert client.post(endpoint, headers=HEADERS, json={"expected_version_number": 1}).status_code == 409
-        confirm(client, sid, "일차방정식 0.3x=9를 풀어라.", 2)
-        new = client.post(endpoint, headers=HEADERS, json={"expected_version_number": 2}).json()
-        assert new["candidates"][0]["source_topic_code"] == "7103049"
+        updated = confirm(client, sid, "일차방정식 0.3x=9를 풀어라.", 2)
+        new = updated["type_match"]
+        assert new["input_version_number"] == 2
+        assert new["selected_type"]["source_topic_code"] == "7103049"
         with closing(sqlite3.connect(database)) as connection:
             assert connection.execute("SELECT count(DISTINCT input_version_id) FROM problem_input_type_matches").fetchone()[0] == 2
 
@@ -204,10 +253,15 @@ def test_type_selection_restores_and_becomes_stale_after_edit(database, bank):
 def test_missing_bank_is_reported_after_input_confirmation(database, tmp_path):
     sid = create_input(database)
     with TestClient(make_app(database, tmp_path / "missing.sqlite3")) as client:
-        confirm(client, sid)
+        saved = confirm(client, sid)
+        assert saved["review_status"] == "confirmed"
+        assert saved["latest_input"]["content_text"] == "일차방정식 7x-2=19를 풀어라."
+        assert saved["type_match"]["error_code"] == "internal_type_classification_failed"
+        assert saved["type_match"]["selected_type"] is None
         response = client.post(f"/submissions/{sid}/type-match", headers=HEADERS,
                                json={"expected_version_number": 1})
-        assert response.status_code == 503
+        assert response.status_code == 200
+        assert response.json()["status"] == "needs_review"
         assert not (tmp_path / "missing.sqlite3").exists()
 
 
@@ -226,10 +280,71 @@ def test_edit_during_matching_cannot_save_stale_result(database, bank, monkeypat
 
     monkeypatch.setattr(submission_api, "get_unit_matcher", lambda path: ConcurrentEdit())
     with TestClient(make_app(database, bank)) as client:
-        confirm(client, sid)
-        response = client.post(f"/submissions/{sid}/type-match", headers=HEADERS,
-                               json={"expected_version_number": 1})
+        response = client.post(f"/submissions/{sid}/confirm", headers=HEADERS,
+                               json={"expected_version_number": 1,
+                                     "content_text": "일차방정식 7x-2=19를 풀어라."})
         assert response.status_code == 409
         assert client.get(f"/submissions/{sid}", headers=HEADERS).json()["type_match"] is None
         with closing(sqlite3.connect(database)) as connection:
             assert connection.execute("SELECT count(*) FROM problem_input_type_matches").fetchone()[0] == 0
+
+
+def test_confirm_with_unsaved_edits_classifies_the_new_version(database, bank):
+    sid = create_input(database)
+    text = "일차방정식 0.3(x-5)-0.7(x-2)=0을 풀면?"
+    with TestClient(make_app(database, bank)) as client:
+        saved = confirm(client, sid, text, 1)
+        assert saved["latest_input"]["version_number"] == 2
+        assert saved["latest_input"]["content_text"] == text
+        assert saved["type_match"]["input_version_number"] == 2
+        assert saved["type_match"]["selected_type"]["source_topic_code"] == "7103049"
+        with closing(sqlite3.connect(database)) as connection:
+            assert connection.execute(
+                "SELECT v.version_number FROM problem_input_type_matches m "
+                "JOIN problem_input_versions v ON v.id=m.input_version_id"
+            ).fetchall() == [(2,)]
+
+
+def test_legacy_manual_selection_is_replaced_by_internal_selection(database, bank):
+    sid = create_input(database)
+    with TestClient(make_app(database, bank)) as client:
+        saved = confirm(client, sid)
+        legacy = dict(saved["type_match"])
+        legacy.pop("selection_policy_version")
+        legacy.update(method="manual", selected_type={
+            "source_topic_code": "7103049",
+            "source_topic_name": "계수에 소수가 있는 일차방정식의 풀이",
+        })
+        with submission_connection(database) as connection:
+            connection.row_factory = sqlite3.Row
+            latest = dict(connection.execute(
+                "SELECT * FROM problem_input_versions WHERE submission_id=?", (sid,),
+            ).fetchone())
+            save_type_match(connection, latest, legacy)
+        refreshed = confirm(client, sid)["type_match"]
+        assert refreshed["selected_type"]["source_topic_code"] == "7103047"
+        assert refreshed["method"] != "manual"
+        assert refreshed["selection_policy_version"] == AUTOMATIC_POLICY_VERSION
+
+
+def test_failed_classification_can_recover_without_reconfirming_input(database, bank, monkeypatch):
+    sid = create_input(database)
+
+    def unavailable(_path):
+        raise OSError("Temporary bank failure")
+
+    with TestClient(make_app(database, bank)) as client:
+        with monkeypatch.context() as patch:
+            patch.setattr(submission_api, "get_unit_matcher", unavailable)
+            saved = confirm(client, sid)
+            assert saved["review_status"] == "confirmed"
+            assert saved["type_match"]["error_code"] == "internal_type_classification_failed"
+        response = client.post(f"/submissions/{sid}/type-match", headers=HEADERS,
+                               json={"expected_version_number": 1})
+        assert response.status_code == 200
+        assert response.json()["selected_type"]["source_topic_code"] == "7103047"
+        assert "error_code" not in response.json()
+        restored = client.get(f"/submissions/{sid}", headers=HEADERS).json()
+        assert restored["review_status"] == "confirmed"
+        assert restored["latest_input"]["version_number"] == 1
+        assert restored["type_match"]["status"] == "classified"

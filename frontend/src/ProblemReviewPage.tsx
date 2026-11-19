@@ -21,7 +21,9 @@ import type { PhotoRegion } from "./types/photoRegion"
 import { isFullPhotoRegion, createPhotoRegionPreviewUrl } from "./utils/photoRegion"
 import "./problem-review.css"
 import { ProblemConditions } from "./components/ProblemConditions"
-import { ProblemTypeMatch } from "./components/ProblemTypeMatch"
+import { displayLatexSpacing } from "./utils/reviewLatex"
+import { OcrLivePreview } from "./components/OcrLivePreview"
+import type { OcrProgress } from "./utils/ocrProgress"
 
 function PartContent({ part }: { part: ContentPart }) {
   if (part.kind === "math") {
@@ -32,11 +34,26 @@ function PartContent({ part }: { part: ContentPart }) {
 }
 
 function ReviewText({ text }: { text: string }) {
-  return <>{text.split(/(\[UNREADABLE\]|\[판독불가\])/gi).map((part, index) =>
-    /^(\[UNREADABLE\]|\[판독불가\])$/i.test(part)
-      ? <mark key={index} className="review-unreadable" title="원본 사진과 비교해 수정해 주세요">{part}</mark>
-      : part
-  )}</>
+  const displayed = displayLatexSpacing(text)
+
+  return (
+    <>
+      {displayed.split(/(\[UNREADABLE\]|\[판독불가\])/gi).map(
+        (part, index) =>
+          /^(\[UNREADABLE\]|\[판독불가\])$/i.test(part) ? (
+            <mark
+              key={index}
+              className="review-unreadable"
+              title="원본 사진과 비교해 수정해 주세요"
+            >
+              {part}
+            </mark>
+          ) : (
+            part
+          ),
+      )}
+    </>
+  )
 }
 
 function createEmptyProblem(imageUrl: string | null = null): ProblemReview {
@@ -68,6 +85,7 @@ const [textEdit, setTextEdit] = useState<{
 } | null>(null)
 
 const [phase, setPhase] = useState<OcrPhase>("idle")
+const [ocrProgress, setOcrProgress] = useState<OcrProgress | null>(null)
 const [ocrError, setOcrError] = useState("")
 const ocrControllerRef = useRef<AbortController | null>(null)
 const [submission, setSubmission] = useState<Submission | null>(null)
@@ -88,6 +106,7 @@ const busy =
   phase === "restoring" || phase === "uploading" ||
   phase === "queued" || phase === "running"
 const locked = busy || saving !== null
+const liveReading = phase === "queued" || phase === "running"
 const retakeRequired = phase === "quality_review" && photoQuality?.retake_required === true
 
 const displayedPhotoRegion =
@@ -143,6 +162,7 @@ async function restoreSubmission(id: number) {
   ocrControllerRef.current = controller
   const timeout = window.setTimeout(() => controller.abort(), 30_000)
   setPhase("restoring")
+  setOcrProgress(null)
   setOcrError("")
 
   try {
@@ -180,6 +200,7 @@ async function startPhotoRecognition(file: File, imageUrl: string) {
   const timeout = window.setTimeout(() => controller.abort(), 30_000)
 
   setPhase("uploading")
+  setOcrProgress(null)
   setPendingPhoto(null)
   setPhotoQuality(null)
   setPhotoRegion(null)
@@ -234,6 +255,7 @@ async function recognizeUploadedPhoto(
 ) {
   const timeout = window.setTimeout(() => controller.abort(), 600_000)
   setPhase("queued")
+  setOcrProgress(null)
   setOcrError("")
 
   //let displayedUrl = imageUrl
@@ -260,7 +282,9 @@ async function recognizeUploadedPhoto(
     }
     const result = await recognizeSubmission(uploaded, controller.signal, (nextPhase) => {
       if (ocrControllerRef.current === controller) setPhase(nextPhase)
-    }, region)
+    }, region, (progress) => {
+      if (ocrControllerRef.current === controller) setOcrProgress(progress)
+    })
     if (ocrControllerRef.current !== controller) return
 
     let displayedUrl = imageUrl
@@ -395,7 +419,7 @@ function selectPart(part: ContentPart) {
   if (part.kind === "text") {
     setTextEdit({
       partId: part.id,
-      value: part.text,
+      value: displayLatexSpacing(part.text),
     })
 
     textDialogRef.current?.showModal()
@@ -478,7 +502,8 @@ function applyMathEdit(latex: string) {
         <span className="review-badge">
           {phase === "region_review" ? "범위 확인"
             : phase === "quality_review" ? (retakeRequired ? "재촬영 필요" : "사진 확인")
-            : phase === "restoring" ? "불러오는 중" : busy ? "인식 중"
+            : phase === "restoring" ? "불러오는 중"
+            : phase === "uploading" ? "사진 확인 중" : busy ? "인식 중"
             : confirmed ? "확인 완료" : hasEdits ? "수정 중"
               : phase === "completed" ? "확인 대기" : "문제 등록"}
         </span>
@@ -577,7 +602,8 @@ function applyMathEdit(latex: string) {
             <p>
               {phase === "completed"
                 ? "문장이나 수식을 눌러 수정해 주세요."
-                : "사진을 선택하면 문제 내용을 인식합니다."}
+                : liveReading ? "읽힌 내용이 실시간으로 표시돼요."
+                  : "문제 범위를 선택한 뒤 인식을 시작해 주세요."}
             </p>
           </div>
 
@@ -611,6 +637,8 @@ function applyMathEdit(latex: string) {
           )}
 
           <div className="review-content" aria-busy={busy}>
+            {liveReading ? <OcrLivePreview progress={ocrProgress} /> : (
+              <>
             {problem.draft.length === 0 && (
               <p className="review-help">
                 {busy ? "인식 결과를 기다리고 있어요." : "인식한 내용이 아직 없습니다."}
@@ -654,17 +682,13 @@ function applyMathEdit(latex: string) {
                 </p>
               )
             })}
+              </>
+            )}
           </div>
         </section>
         {phase === "completed" && (
           <ProblemConditions
             extraction={submission?.condition_extraction}
-          />
-        )}
-        {phase === "completed" && submission?.latest_input && (
-          <ProblemTypeMatch
-            key={`${submission.id}:${submission.latest_input.version_number}:${!!submission.latest_input.confirmed_at}:${hasEdits}`}
-            submission={submission} hasEdits={hasEdits} disabled={locked}
           />
         )}
         <section

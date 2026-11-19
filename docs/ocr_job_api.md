@@ -178,6 +178,29 @@ OCR이 완료된 제출의 `latest_input.version_number`를 확인합니다.
 응답의 `review_status`가 `confirmed`인지 확인합니다.
 수정 내용만 저장하려면 `PATCH /submissions/{submission_id}/input`을 사용합니다.
 
+### 확인 완료 후 내부 유형 분류
+
+`POST /submissions/{submission_id}/confirm`은 학생 수정본과 확인 완료 상태를
+먼저 저장하고, 저장된 최신 입력 버전으로 유형을 자동 분류합니다.
+현재 대상은 중1 1학기 3단원 문자와 식입니다.
+사용자 화면에는 유형 검색·선택 버튼을 표시하지 않습니다.
+
+- 동일 문항이 없어도 기존 검색·수식 규칙으로 찾은 1순위 유형을 내부 참고값으로 선택합니다.
+- 응답과 제출 재조회에 `type_match`가 포함됩니다. 결과는 입력 버전 ID와 본문 해시에 연결됩니다.
+- `purpose: tutoring_reference`는 단계별 안내를 위한 참고 결과임을 나타냅니다.
+- 동일 본문 매칭 조건을 충족하면 `method: exact_match`, `is_provisional: false`입니다.
+- 유사 유형을 선택한 경우 `matched_question_id: null`, `is_provisional: true`입니다.
+  후보의 유사도는 정답 확률이 아니며, 풀이 대상은 학생이 확인한 문제입니다.
+- 입력 부족·판독 불가·미지원 결과에는 유형을 임의로 만들지 않습니다.
+- 분류 실행에 실패하면 `type_match.error_code`가 `internal_type_classification_failed`이고
+  유형 상태는 `needs_review`입니다. 학생 수정본과 `review_status: confirmed`는 보존됩니다.
+- 수정본이 새 버전으로 바뀌면 이전 유형을 사용하지 않으며, 다시 확인 완료할 때 새로 분류합니다.
+
+`POST /submissions/{submission_id}/type-match`는 내부 재실행용으로 유지합니다.
+확인 완료한 최신 `expected_version_number`와 인증이 필요하며, 같은 문제은행·분류 정책의
+결과는 재사용합니다. 실패한 분류는 이 API로 다시 실행할 수 있습니다.
+기존 수동 선택 API인 `/submissions/{submission_id}/type-match/confirm`은 제거했습니다.
+
 ## OCR 스트리밍
 
 `GET /ocr-jobs/{job_id}/events`는 `text/event-stream` 형식의 SSE 응답입니다.

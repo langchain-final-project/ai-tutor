@@ -95,10 +95,65 @@
   overflow-wrap: anywhere;
 }
 
+.review-live-preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.review-live-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--blue);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.review-live-spinner {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: review-live-spin 1s linear infinite;
+}
+
+.review-live-notice {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.review-live-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.review-live-text p {
+  margin: 0;
+  line-height: 1.8;
+}
+
+.review-stream-math-pending {
+  color: var(--muted);
+}
+
+@keyframes review-live-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-live-spinner { animation: none; }
+}
+
 .review-part {
   display: inline-block;
   max-width: 100%;
-  min-height: 44px;
+  min-height: 40px;
   margin: 2px 0;
   padding: 4px;
   border: 1px solid transparent;
@@ -471,64 +526,6 @@
   font: inherit;
 }
 
-.review-type-match {
-  padding-top: 20px;
-  border-top: 1px solid var(--border);
-}
-
-.review-type-match button {
-  min-height: 44px;
-  padding: 10px 16px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--paper);
-  color: var(--navy);
-  font: inherit;
-  cursor: pointer;
-}
-
-.review-type-match .review-type-search {
-  background: var(--navy);
-  color: white;
-}
-
-.review-type-match button:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.review-type-candidates {
-  display: grid;
-  gap: 16px;
-  margin: 0;
-  padding-left: 24px;
-}
-
-.review-type-candidates li {
-  padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  line-height: 1.7;
-}
-
-.review-type-candidates h3 {
-  margin: 0 0 8px;
-  font-size: 16px;
-}
-
-.review-type-reference {
-  margin: 12px 0;
-  padding: 12px;
-  border-radius: 8px;
-  background: var(--subtle);
-  overflow-wrap: anywhere;
-}
-
-.review-type-selected {
-  padding: 12px;
-  border-radius: 8px;
-  background: var(--tint);
-}
 
 .review-region-selector,
 .review-region-preview,
