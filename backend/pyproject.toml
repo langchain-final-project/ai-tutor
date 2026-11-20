@@ -12,6 +12,7 @@ dependencies = [
     "psycopg[binary]==3.3.3",
     "SQLAlchemy==2.0.48",
     "uvicorn==0.34.3",
+    "langgraph==1.2.24",
 ]
 
 [project.optional-dependencies]

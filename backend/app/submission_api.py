@@ -33,6 +33,7 @@ from app.db.submissions import (
 from app.ocr_api import create_ocr_router
 from app.ocr_jobs import OCRJobManager, build_qwen_pipeline
 from app.solution_api import create_solution_router
+from app.tutor_api import create_tutor_router
 from app.ocr.images import open_image
 from app.ocr.selection import crop_photo_region
 from app.ocr.quality import check_photo_quality, requires_photo_retake
@@ -62,7 +63,7 @@ class InputBody(BaseModel):
 
 
 class TextSubmissionBody(BaseModel):
-    """현재 텍스트 검증 흐름에는 실수 범위의 등식 한 개를 입력한다."""
+    """튜터 질문은 본문도 받으며 수학 자동 검증은 별도의 지원 범위를 따른다."""
 
     model_config = ConfigDict(extra="forbid")
     content_text: str = Field(min_length=1, max_length=10000, strict=True)
@@ -151,6 +152,7 @@ def create_submission_app(
     owner_dependency: Callable[..., str] | None = None,
     pipeline_factory=build_qwen_pipeline,
     type_bank_database: str | Path | None = None,
+    tutor_runner=None,
 ) -> FastAPI:
     database = Path(database) if database is not None else Path(
         os.getenv("DIDGO_DATABASE", str(ROOT / "data/problem_bank/didgo.sqlite3"))
@@ -604,6 +606,7 @@ def create_submission_app(
 
     app.include_router(create_ocr_router(manager, current_owner))
     app.include_router(create_solution_router(database, current_owner))
+    app.include_router(create_tutor_router(database, current_owner, runner=tutor_runner))
 
     return app
 

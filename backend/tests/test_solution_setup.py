@@ -86,6 +86,21 @@ def test_upgrade_existing_base_preserves_question(tmp_path):
         assert connection.execute("SELECT id FROM problem_schema_migrations WHERE id=?", (setup.MIGRATION_ID,)).fetchone()
 
 
+def test_tutor_upgrade_preserves_old_rows_and_rejects_partial_schema(tmp_path):
+    target = tmp_path / 'tutor-upgrade.sqlite3'
+    create_base(target)
+    setup.prepare(target)
+    setup.prepare(target)
+    with closing(sqlite3.connect(target)) as connection:
+        assert connection.execute('SELECT content_text FROM problem_input_versions').fetchall() == [('x=2',)]
+        assert connection.execute('SELECT COUNT(*) FROM tutor_sessions').fetchone() == (0,)
+        assert connection.execute('SELECT schema_sha256 FROM problem_schema_migrations WHERE id=?',
+                                  (setup.TUTOR_MIGRATION_ID,)).fetchone() == (setup._digest(setup._schema(setup.TUTOR_SCHEMA_FILE)),)
+        connection.execute('DROP INDEX ix_tutor_one_running')
+    with pytest.raises(ValueError, match='튜터 저장 스키마가 일부'):
+        setup.prepare(target)
+
+
 def test_upgrade_previous_solution_schema_preserves_checksum_and_records(tmp_path):
     target = tmp_path / "previous-solution.sqlite3"
     create_base(target)

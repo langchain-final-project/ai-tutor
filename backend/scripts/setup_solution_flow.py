@@ -31,6 +31,8 @@ SOURCE_SCHEMA_FILE = "007_photo_equation_sources.sqlite.sql"
 SOURCE_MIGRATION_ID = "photo-equation-sources-v1"
 TYPE_SCHEMA_FILE = "007_problem_input_type_matches.sqlite.sql"
 TYPE_MIGRATION_ID = "problem-input-type-matches-v1"
+TUTOR_SCHEMA_FILE = "008_tutor_sessions.sqlite.sql"
+TUTOR_MIGRATION_ID = "tutor-sessions-v1"
 
 
 def _schema(name):
@@ -47,7 +49,7 @@ def _objects(connection):
     ))
 
 
-def _reference(*, with_regions=False, with_sources=False, with_types=False):
+def _reference(*, with_regions=False, with_sources=False, with_types=False, with_tutor=False):
     with closing(sqlite3.connect(":memory:")) as reference:
         for name, _ in BASE:
             reference.executescript(_schema(name))
@@ -59,6 +61,8 @@ def _reference(*, with_regions=False, with_sources=False, with_types=False):
             reference.executescript(_schema(SOURCE_SCHEMA_FILE))
         if with_types:
             reference.executescript(_schema(TYPE_SCHEMA_FILE))
+        if with_tutor:
+            reference.executescript(_schema(TUTOR_SCHEMA_FILE))
         full = _objects(reference)
         columns = {
             name: list(reference.execute(f'PRAGMA table_info("{name}")'))
@@ -133,6 +137,24 @@ def _has_type_match_schema(connection):
     return True
 
 
+def _has_tutor_schema(connection):
+    """부분 적용·변조 상태를 먼저 검사해 기존 기록을 덮어쓰지 않는다."""
+    with closing(sqlite3.connect(":memory:")) as reference:
+        reference.executescript(_schema(TUTOR_SCHEMA_FILE))
+        expected = _objects(reference)
+        present = set(expected).intersection(_objects(connection))
+        if not present:
+            return False
+        if present != set(expected):
+            raise ValueError("튜터 저장 스키마가 일부만 존재합니다. 적용 상태를 확인해 주세요.")
+        for name in expected:
+            actual = connection.execute("SELECT sql FROM sqlite_master WHERE name=?", (name,)).fetchone()
+            wanted = reference.execute("SELECT sql FROM sqlite_master WHERE name=?", (name,)).fetchone()
+            if actual != wanted:
+                raise ValueError("튜터 저장 스키마 내용이 변경되었습니다.")
+    return True
+
+
 def apply_migration(connection):
     """풀이·OCR 영역·사진 출처·유형 저장소를 원자적으로 적용한다."""
     if connection.in_transaction:
@@ -142,7 +164,8 @@ def apply_migration(connection):
     base, full, columns = _reference()
     has_regions = _has_region_schema(connection)
     has_types = _has_type_match_schema(connection)
-    _, extended, extended_columns = _reference(with_regions=True, with_sources=True, with_types=True)
+    has_tutor = _has_tutor_schema(connection)
+    _, extended, extended_columns = _reference(with_regions=True, with_sources=True, with_types=True, with_tutor=True)
     _, sources, _ = _reference(with_sources=True)
     current_columns = dict(extended_columns)
     if not has_regions:
@@ -168,6 +191,14 @@ def apply_migration(connection):
         "SELECT schema_sha256 FROM problem_schema_migrations WHERE id = ?",
         (TYPE_MIGRATION_ID,),
     ).fetchone()
+    tutor_schema = _schema(TUTOR_SCHEMA_FILE)
+    tutor_digest = _digest(tutor_schema)
+    tutor_row = connection.execute(
+        "SELECT schema_sha256 FROM problem_schema_migrations WHERE id = ?",
+        (TUTOR_MIGRATION_ID,),
+    ).fetchone()
+    if tutor_row is not None and (not has_tutor or tutor_row != (tutor_digest,)):
+        raise ValueError("이미 적용된 튜터 저장 SQL의 내용 또는 적용 이력이 변경되었습니다.")
     if type_row is not None and (not has_types or type_row != (type_digest,)):
         raise ValueError("이미 적용된 유형 저장 SQL의 내용 또는 적용 이력이 변경되었습니다.")
     if row is not None:
@@ -182,9 +213,9 @@ def apply_migration(connection):
         _verify_objects(connection, sources, current_columns)
     elif set(sources).difference(full).intersection(_objects(connection)):
         raise ValueError("007 객체가 일부 존재합니다. 자동으로 덮어쓰지 않습니다.")
-    if row is not None and source_row is not None and has_regions and type_row is not None:
+    if row is not None and source_row is not None and has_regions and type_row is not None and tutor_row is not None:
         _verify_objects(connection, extended, extended_columns)
-        return "이미 적용됨: 풀이·OCR 영역·사진 출처·유형 저장 구조 검증 완료"
+        return "이미 적용됨: 풀이·OCR·유형·튜터 저장 구조 검증 완료"
     pending_schema = "" if row is not None else schema
     if not has_regions:
         pending_schema += "\n" + _schema(REGION_SCHEMA_FILE)
@@ -192,6 +223,8 @@ def apply_migration(connection):
         pending_schema += "\n" + source_schema
     if not has_types:
         pending_schema += "\n" + type_schema
+    if not has_tutor:
+        pending_schema += "\n" + tutor_schema
     try:
         connection.executescript("BEGIN IMMEDIATE;\n" + pending_schema)
         _verify_objects(connection, extended, extended_columns)
@@ -213,11 +246,16 @@ def apply_migration(connection):
                 "INSERT INTO problem_schema_migrations(id, schema_sha256) VALUES (?, ?)",
                 (TYPE_MIGRATION_ID, type_digest),
             )
+        if tutor_row is None:
+            connection.execute(
+                "INSERT INTO problem_schema_migrations(id, schema_sha256) VALUES (?, ?)",
+                (TUTOR_MIGRATION_ID, tutor_digest),
+            )
         connection.commit()
     except BaseException:
         connection.rollback()
         raise
-    return "풀이·OCR 영역·사진 출처·유형 저장 구조 적용 완료"
+    return "풀이·OCR·유형·튜터 저장 구조 적용 완료"
 
 
 def _build_empty(path):

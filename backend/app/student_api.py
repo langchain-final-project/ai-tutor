@@ -20,6 +20,7 @@ def create_student_app(
     database: str | Path | None = None,
     *,
     pipeline_factory=build_qwen_pipeline,
+    tutor_runner=None,
 ) -> FastAPI:
     """학생 API는 세션 쿠키만 사용하며 개발용 Bearer 토큰으로 우회하지 않는다."""
     database = Path(database if database is not None else os.getenv(
@@ -33,6 +34,7 @@ def create_student_app(
     try:
         app = create_submission_app(
             database, owner_dependency=current_owner, pipeline_factory=pipeline_factory,
+            tutor_runner=tutor_runner,
         )
         app.include_router(create_auth_router(engine))
     except BaseException:

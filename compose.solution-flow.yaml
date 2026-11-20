@@ -29,6 +29,9 @@ services:
       DIDGO_DATABASE: /var/lib/didgo-solution/solution-flow.sqlite3
       DIDGO_QWEN_URL: ${DIDGO_QWEN_URL:-http://host.docker.internal:8081/v1}
       DIDGO_QWEN_MODEL: ${DIDGO_QWEN_MODEL:-}
+      DIDGO_TUTOR_URL: ${DIDGO_TUTOR_URL:-http://host.docker.internal:11434}
+      DIDGO_TUTOR_MODEL: ${DIDGO_TUTOR_MODEL:-qwen3:4b-instruct-2507-q4_K_M}
+      DIDGO_TUTOR_TIMEOUT: ${DIDGO_TUTOR_TIMEOUT:-90}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

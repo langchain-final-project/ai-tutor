@@ -302,6 +302,7 @@ export function SolutionWorkspace({ view, submissionId, loginUrl, sourcePhotoId 
           <p className="solution-eyebrow">한 줄씩, 내 힘으로</p>
           <h2>{sourcePhotoId !== null ? "사진에서 확인한 문제를 이어 풀어요" : view === "home" ? "막힌 식부터 다시 시작해요" : "내 문제를 이어 풀어요"}</h2>
           <p>문제를 직접 입력하고, 마지막으로 확인한 풀이에서 다음 한 걸음을 찾아보세요.</p>
+          <a className="solution-button" href="#tutor/new">질문·단계별 힌트로 AI 튜터 시작</a>
         </section>
         <div className="solution-grid">
           <section className="solution-card" aria-labelledby="new-problem-title">
@@ -355,6 +356,7 @@ export function SolutionWorkspace({ view, submissionId, loginUrl, sourcePhotoId 
         </p>}
         <div className="solution-section-header">
           <a className="solution-inline-link" href="#history/questions">← 내 질문 내역</a>
+          <a className="solution-inline-link" href={`#tutor/from-submission/${snapshot.submission.id}`}>이 문제로 AI 튜터 시작 →</a>
           <button className="solution-button is-quiet" type="button" onClick={reread} disabled={disabled}>저장된 내용 불러오기</button>
         </div>
         {backup && <section className="solution-notice is-warning" aria-label="불러오기 전 작성한 내용">

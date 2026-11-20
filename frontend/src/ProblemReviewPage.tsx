@@ -68,7 +68,10 @@ function rememberSubmission(id: number | null) {
   window.history.replaceState(null, "", url)
 }
 
-export function ProblemReviewPage({ onConfirmed }: { onConfirmed?: (submission: Submission) => void }) {
+export function ProblemReviewPage({ onConfirmed, onTutor }: {
+  onConfirmed?: (submission: Submission) => void
+  onTutor?: (submission: Submission) => void
+}) {
 const [problem, setProblem] = useState(() => createEmptyProblem())
 const [selectedId, setSelectedId] = useState<string | null>(null)
 
@@ -790,6 +793,10 @@ function applyMathEdit(latex: string) {
               onClick={() => void persistReview(true)}>
               {saving === "confirm" ? "확인 완료 처리 중…" : confirmed ? "확인 완료됨" : "문제 내용 확인 완료"}
             </button>
+            {confirmed && onTutor && <button type="button" className="review-confirm" disabled={locked}
+              onClick={() => submission && onTutor(submission)}>
+              이 문제로 AI 튜터 시작
+            </button>}
             {confirmed && onConfirmed && <button type="button" className="review-confirm" disabled={locked}
               onClick={() => submission && onConfirmed(submission)}>
               풀이에 사용할 식 입력

@@ -3,12 +3,14 @@ import { ApiError, auth } from "./auth";
 import type { Profile } from "./auth";
 import { AccountSettings } from "./AccountSettings";
 import { SolutionWorkspace } from "./SolutionWorkspace";
+import { TutorWorkspace } from "./TutorWorkspace";
 import logo from "./assets/didgo.svg";
 import "./home.css";
 import "./solution-workspace.css";
 
 const icons = {
   home: <><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M9 21v-8h6v8" /></>,
+  tutor: <><path d="M4 4h16v12H9l-5 4z" /><path d="M8 8h8M8 12h5" /></>,
   practice: <><path d="m12 3 9 5-9 5-9-5z" /><path d="m3 12 9 5 9-5M3 16l9 5 9-5" /></>,
   history: <><path d="M3 12a9 9 0 1 1 2.6 6.4M3 5v7h7" /><path d="M12 7v5l3 2" /></>,
   settings: <><path d="m9 3-.6 2.2-2 .9-2.1-.8-2 3.4 1.6 1.5v2.4L2.3 14l2 3.5 2.1-.8 2 .9.6 2.4h4l.6-2.4 2-.9 2.1.8 2-3.5-1.6-1.4v-2.4l1.6-1.5-2-3.4-2.1.8-2-.9L13 3z" /><circle cx="11" cy="11.5" r="3" /></>,
@@ -24,6 +26,7 @@ type Category = {
 
 const categories: readonly Category[] = [
   { id: "home", label: "홈", title: "학습 홈" },
+  { id: "tutor", label: "AI 튜터", title: "AI 튜터" },
   {
     id: "practice", label: "단원 연습", children: [
       { id: "grades", label: "학년별 대단원" },
@@ -57,6 +60,8 @@ function getSelection() {
   return { category, item,
     submissionId: inHistory && submissionId !== "from-photo" ? submissionId ?? null : null,
     sourcePhotoId: inHistory && submissionId === "from-photo" ? sourceId ?? "" : null,
+    tutorSessionId: category.id === "tutor" && itemId && !["new", "from-photo", "from-submission"].includes(itemId) ? itemId : null,
+    tutorSourceId: category.id === "tutor" && (itemId === "from-photo" || itemId === "from-submission") ? submissionId ?? "" : null,
   };
 }
 
@@ -170,6 +175,11 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
               key={`${profile.user_id}:${workspaceView}:${selection.submissionId ?? "list"}:${selection.sourcePhotoId ?? ""}`}
               view={workspaceView} submissionId={selection.submissionId} loginUrl={loginUrl}
               sourcePhotoId={selection.sourcePhotoId}
+            />}
+            {category.id === "tutor" && <TutorWorkspace
+              key={`${profile.user_id}:${selection.tutorSessionId ?? "new"}:${selection.tutorSourceId ?? ""}`}
+              sessionId={selection.tutorSessionId} sourceSubmissionId={selection.tutorSourceId}
+              loginUrl={loginUrl} userId={profile.user_id}
             />}
             {category.id === "settings" && <AccountSettings loginUrl={loginUrl} email={profile.email} />}
           </>

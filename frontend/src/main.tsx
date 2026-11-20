@@ -228,6 +228,8 @@ function ReviewRoute() {
   </div>;
   return <ProblemReviewPage key={session.user_id} onConfirmed={(submission) => {
     location.assign(`/home#history/solutions/from-photo/${submission.id}`);
+  }} onTutor={(submission) => {
+    location.assign(`/home#tutor/from-photo/${submission.id}`);
   }} />;
 }
 
