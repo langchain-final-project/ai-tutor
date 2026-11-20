@@ -1,59 +1,59 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import ReactCrop from "react-image-crop";
-import type { PercentCrop } from "react-image-crop";
-import type { PhotoRegion } from "../types/photoRegion";
-import { toPhotoRegion } from "../utils/photoRegion";
-import "react-image-crop/dist/ReactCrop.css";
+import { useEffect, useMemo, useRef, useState } from "react"
+import ReactCrop from "react-image-crop"
+import type { PercentCrop } from "react-image-crop"
+import type { PhotoRegion } from "../types/photoRegion"
+import { toPhotoRegion } from "../utils/photoRegion"
+import "react-image-crop/dist/ReactCrop.css"
 
-const fullCrop: PercentCrop = { unit: "%", x: 0, y: 0, width: 100, height: 100 };
+const fullCrop: PercentCrop = { unit: "%", x: 0, y: 0, width: 100, height: 100 }
 
 type PhotoRegionSelectorProps = {
-  imageUrl: string;
-  onChange: (region: PhotoRegion | null) => void;
-};
+  imageUrl: string
+  onChange: (region: PhotoRegion | null) => void
+}
 
 export function PhotoRegionSelector({ imageUrl, onChange }: PhotoRegionSelectorProps) {
-  const imageRef = useRef<HTMLImageElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [crop, setCrop] = useState<PercentCrop>(fullCrop);
-  const [imageSize, setImageSize] = useState<[number, number]>([0, 0]);
-  const [error, setError] = useState("");
+  const imageRef = useRef<HTMLImageElement>(null)
+  // const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [crop, setCrop] = useState<PercentCrop>(fullCrop)
+  const [imageSize, setImageSize] = useState<[number, number]>([0, 0])
+  const [error, setError] = useState("")
 
   const region = useMemo(
     () => toPhotoRegion(crop, imageSize[0], imageSize[1]),
     [crop, imageSize],
-  );
+  )
 
   useEffect(() => {
-    onChange(error ? null : region);
-  }, [region, error, onChange]);
+    onChange(error ? null : region)
+  }, [region, error, onChange])
 
-  useEffect(() => {
-    if (!region || error) return;
-    const frame = window.requestAnimationFrame(() => {
-      const image = imageRef.current;
-      const canvas = canvasRef.current;
-      if (!image || !canvas) return;
-      const [left, top, right, bottom] = region.bbox;
-      const width = right - left;
-      const height = bottom - top;
-      // 미리보기만 축소하고, 저장할 좌표는 원본 해상도를 유지합니다.
-      const ratio = Math.min(1, 1024 / width, 1024 / height);
-      canvas.width = Math.max(1, Math.round(width * ratio));
-      canvas.height = Math.max(1, Math.round(height * ratio));
-      const context = canvas.getContext("2d");
-      if (!context) {
-        setError("선택 영역 미리보기를 표시하지 못했습니다.");
-        return;
-      }
-      try {
-        context.drawImage(image, left, top, width, height, 0, 0, canvas.width, canvas.height);
-      } catch {
-        setError("선택 영역 미리보기를 표시하지 못했습니다.");
-      }
-    });
-    return () => window.cancelAnimationFrame(frame);
-  }, [region, error]);
+  // useEffect(() => {
+  //   if (!region || error) return
+  //   const frame = window.requestAnimationFrame(() => {
+  //     const image = imageRef.current
+  //     const canvas = canvasRef.current
+  //     if (!image || !canvas) return
+  //     const [left, top, right, bottom] = region.bbox
+  //     const width = right - left
+  //     const height = bottom - top
+  //     // 미리보기만 축소하고, 저장할 좌표는 원본 해상도를 유지합니다.
+  //     const ratio = Math.min(1, 1024 / width, 1024 / height)
+  //     canvas.width = Math.max(1, Math.round(width * ratio))
+  //     canvas.height = Math.max(1, Math.round(height * ratio))
+  //     const context = canvas.getContext("2d")
+  //     if (!context) {
+  //       setError("선택 영역 미리보기를 표시하지 못했습니다.")
+  //       return
+  //     }
+  //     try {
+  //       context.drawImage(image, left, top, width, height, 0, 0, canvas.width, canvas.height)
+  //     } catch {
+  //       setError("선택 영역 미리보기를 표시하지 못했습니다.")
+  //     }
+  //   })
+  //   return () => window.cancelAnimationFrame(frame)
+  // }, [region, error])
 
   return (
     <section className="review-region-selector" aria-label="문제 범위 선택">
@@ -64,8 +64,7 @@ export function PhotoRegionSelector({ imageUrl, onChange }: PhotoRegionSelectorP
         </button>
       </div>
       <p id="review-region-help" className="review-help">
-        사각형 안을 끌어 이동하고, 모서리나 테두리를 끌어 크기를 조절하세요.
-        본문·선택지·필요한 그림과 표를 함께 포함해 주세요.
+        문제 하나만 선택해 주세요~
       </p>
       <div className="review-region-stage" aria-describedby="review-region-help">
         <ReactCrop
@@ -94,15 +93,15 @@ export function PhotoRegionSelector({ imageUrl, onChange }: PhotoRegionSelectorP
             className="review-region-image"
             draggable={false}
             onLoad={(event) => {
-              const image = event.currentTarget;
-              setImageSize([image.naturalWidth, image.naturalHeight]);
+              const image = event.currentTarget
+              setImageSize([image.naturalWidth, image.naturalHeight])
             }}
             onError={() => setError("사진을 표시하지 못했습니다. 사진을 다시 선택해 주세요.")}
           />
         </ReactCrop>
       </div>
       {error && <p className="review-error" role="alert">{error}</p>}
-      {region && !error && (
+      {/* {region && !error && (
         <div className="review-region-preview" data-photo-region={JSON.stringify(region)}>
           <h3>선택 영역 미리보기</h3>
           <p className="review-help">
@@ -110,7 +109,7 @@ export function PhotoRegionSelector({ imageUrl, onChange }: PhotoRegionSelectorP
           </p>
           <canvas ref={canvasRef} role="img" aria-label="선택한 문제 범위 미리보기" />
         </div>
-      )}
+      )} */}
     </section>
-  );
+  )
 }

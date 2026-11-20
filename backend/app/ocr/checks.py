@@ -7,7 +7,7 @@ def text_issues(text: str) -> list[str]:
     issues = []
     if not text.strip():
         return ["인식된 내용이 없습니다."]
-    if "[판독불가]" in text:
+    if re.search(r"\[판독불가\]|\[UNREADABLE\]", text, re.IGNORECASE):
         issues.append("판독하지 못한 부분을 확인해 주세요.")
     # 수식 구분용 \( \) \[ \]는 괄호 검사에서 제외한다.
     expression = re.sub(r"\\[()\[\]]", "", text)

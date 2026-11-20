@@ -139,6 +139,19 @@ def test_job_lifecycle_and_editable_result(database):
     assert app.state.ocr_jobs.executor is None
 
 
+def test_selected_remote_model_is_recorded_in_ocr_history(database, monkeypatch):
+    model_name = "qwen3-vl:4b-instruct-q4_K_M"
+    monkeypatch.setenv("DIDGO_QWEN_MODEL", model_name)
+    app = make_app(database)
+    with TestClient(app) as client:
+        submission_id = upload(client)
+        assert client.post(f"/submissions/{submission_id}/ocr", headers=HEADERS).status_code == 202
+        drain(app)
+        history = client.get(f"/submissions/{submission_id}/ocr/history", headers=HEADERS).json()
+        assert len(history) == 1
+        assert history[0]["model_name"] == model_name
+
+
 def test_running_queued_and_duplicate_requests(database):
     entered, release = Event(), Event()
     app = make_app(
@@ -197,8 +210,8 @@ def test_failed_ocr_is_recorded_and_can_be_retried(database, mode):
         history = client.get(
             f"/submissions/{submission_id}/ocr/history", headers=HEADERS
         ).json()
-        assert len(history) == 1
-        assert history[0]["status"] == "failed"
+        assert len(history) == (1 if mode == "exception" else 2)
+        assert all(item["status"] == "failed" for item in history)
 
         app.state.ocr_jobs.pipeline_factory = FixturePipeline
         retry = client.post(

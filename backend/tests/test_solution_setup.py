@@ -49,6 +49,9 @@ def test_create_and_repeat_keeps_data(tmp_path):
     with closing(sqlite3.connect(target)) as connection:
         assert connection.execute("SELECT owner_id FROM problem_submissions").fetchall() == [("student_A",)]
         assert connection.execute("SELECT COUNT(*) FROM questions").fetchone()[0] == 0
+        assert connection.execute("SELECT COUNT(*) FROM problem_input_type_matches").fetchone()[0] == 0
+        assert connection.execute("SELECT schema_sha256 FROM problem_schema_migrations WHERE id=?",
+                                  (setup.TYPE_MIGRATION_ID,)).fetchone() == (setup._digest(setup._schema(setup.TYPE_SCHEMA_FILE)),)
         assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
 
 
@@ -131,6 +134,39 @@ def test_upgrade_team_region_schema_preserves_existing_job_and_repeats(tmp_path)
         assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
 
 
+def test_upgrade_team_type_schema_preserves_results_and_repeats(tmp_path):
+    target = tmp_path / "team-types.sqlite3"
+    create_base(target)
+    with closing(sqlite3.connect(target)) as connection:
+        connection.execute("PRAGMA foreign_keys=ON")
+        connection.executescript(setup._schema(setup.TYPE_SCHEMA_FILE))
+        connection.execute("""INSERT INTO problem_input_type_matches
+            (input_version_id,scope_key,input_sha256,result_json)
+            VALUES (1,'middle1-semester1-unit03',?,'{"status":"candidates"}')""", ("a" * 64,))
+        connection.commit()
+    setup.prepare(target)
+    setup.prepare(target)
+    with closing(sqlite3.connect(target)) as connection:
+        assert connection.execute("SELECT input_version_id,result_json FROM problem_input_type_matches").fetchall() == [
+            (1, '{"status":"candidates"}')]
+        assert connection.execute("SELECT schema_sha256 FROM problem_schema_migrations WHERE id=?",
+                                  (setup.TYPE_MIGRATION_ID,)).fetchone() == (setup._digest(setup._schema(setup.TYPE_SCHEMA_FILE)),)
+        assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
+
+
+def test_partial_type_schema_rejected_before_adding_solution_objects(tmp_path):
+    target = tmp_path / "partial-types.sqlite3"
+    create_base(target)
+    with closing(sqlite3.connect(target)) as connection:
+        connection.executescript(setup._schema(setup.TYPE_SCHEMA_FILE))
+        connection.execute("DROP INDEX ix_input_type_match_version")
+    with pytest.raises(ValueError, match="유형 저장 스키마가 일부"):
+        setup.prepare(target)
+    with closing(sqlite3.connect(target)) as connection:
+        assert connection.execute("SELECT name FROM sqlite_master WHERE name='student_work_versions'").fetchone() is None
+        assert connection.execute("SELECT content_text FROM problem_input_versions").fetchall() == [("x=2",)]
+
+
 def test_partial_region_schema_is_rejected_without_adding_solution_objects(tmp_path):
     target = tmp_path / "partial-region.sqlite3"
     create_base(target)
@@ -153,14 +189,18 @@ def test_changed_region_trigger_is_rejected(tmp_path):
         setup.prepare(target)
 
 
-def test_new_migration_checksum_mismatch_is_rejected(tmp_path):
+@pytest.mark.parametrize("migration_id,message", [
+    (setup.SOURCE_MIGRATION_ID, "007 SQL"),
+    (setup.TYPE_MIGRATION_ID, "유형 저장 SQL"),
+])
+def test_new_migration_checksum_mismatch_is_rejected(tmp_path, migration_id, message):
     target = tmp_path / "changed-source.sqlite3"
     setup.prepare(target, create_empty=True)
     with closing(sqlite3.connect(target)) as connection:
         connection.execute("UPDATE problem_schema_migrations SET schema_sha256=? WHERE id=?",
-                           ("0" * 64, setup.SOURCE_MIGRATION_ID))
+                           ("0" * 64, migration_id))
         connection.commit()
-    with pytest.raises(ValueError, match="007 SQL"):
+    with pytest.raises(ValueError, match=message):
         setup.prepare(target)
 
 
@@ -187,6 +227,7 @@ def test_failed_extension_rolls_back_region_and_source_schema(tmp_path, monkeypa
     with closing(sqlite3.connect(target)) as connection:
         assert "selected_region_json" not in {row[1] for row in connection.execute("PRAGMA table_info(problem_ocr_jobs)")}
         assert connection.execute("SELECT name FROM sqlite_master WHERE name='photo_equation_sources'").fetchone() is None
+        assert connection.execute("SELECT name FROM sqlite_master WHERE name='problem_input_type_matches'").fetchone() is None
         assert (connection.execute("SELECT name FROM sqlite_master WHERE name='student_work_versions'").fetchone() is not None) == existing_solution
         assert connection.execute("SELECT content_text FROM problem_input_versions").fetchall() == [("x=2",)]
         assert connection.execute("SELECT id FROM problem_schema_migrations WHERE id=?",

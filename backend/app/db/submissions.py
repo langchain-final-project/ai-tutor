@@ -249,7 +249,9 @@ def create_initial_input_version(connection: sqlite3.Connection, *, submission_i
     return input_version_id
 
 @contextmanager
-def submission_connection(database: str | Path | None = None, *, write=False):
+def submission_connection(
+    database: str | Path | None = None, *, immediate: bool = False, write: bool = False,
+):
     """개인 DB를 열고, 성공 시 확정하고 오류 시 되돌린 뒤 닫는다."""
     path = (
         Path(database)
@@ -262,7 +264,8 @@ def submission_connection(database: str | Path | None = None, *, write=False):
     with closing(sqlite3.connect(uri, uri=True)) as connection:
         connection.execute("PRAGMA foreign_keys = ON")
         with connection:
-            connection.execute("BEGIN IMMEDIATE" if write else "BEGIN")
+            # 학생 풀이 저장의 기존 write 호출도 같은 선점 쓰기 트랜잭션을 사용한다.
+            connection.execute("BEGIN IMMEDIATE" if immediate or write else "BEGIN")
             yield connection
 
 
@@ -375,6 +378,9 @@ def get_submission(
             """,
             (submission_id, owner_id),
         )
+    from .type_matches import load_type_match
+    result["type_match"] = load_type_match(connection, latest["id"]) if latest and latest["confirmed_at"] else None
+
     result["review_status"] = (
         "awaiting_input" if latest is None
         else "confirmed" if latest["confirmed_at"] is not None
@@ -386,6 +392,13 @@ def get_submission(
     result["image_orientation"] = None
     result["selected_region"] = None
     result["layout_detection"] = None
+    result["ocr_review"] = None
+    result["region_assembly"] = None
+    result["condition_extraction"] = {
+        "schema_version": "conditions-v1",
+        "status": "not_run",
+        "conditions": [],
+    }
     if latest is not None and latest["source_ocr_result_id"] is not None:
         ocr = _fetch_one(
             connection,
@@ -403,6 +416,27 @@ def get_submission(
                 result["selected_region"] = raw["selected_region"]
             if isinstance(raw.get("layout_detection"), dict):
                 result["layout_detection"] = raw["layout_detection"]
+            if isinstance(raw.get("retry_summary"), dict):
+                result["ocr_review"] = raw["retry_summary"]
+            if isinstance(raw.get("region_assembly"), dict):
+                result["region_assembly"] = raw["region_assembly"]
+            if "condition_extraction" in raw:
+                from app.ocr.conditions import ConditionExtraction
+
+                try:
+                    extraction = ConditionExtraction.model_validate(
+                        raw["condition_extraction"]
+                    )
+                    result["condition_extraction"] = (
+                        extraction.model_dump(mode="json")
+                    )
+
+                except (ValueError, TypeError):
+                    result["condition_extraction"] = {
+                        "schema_version": "conditions-v1",
+                        "status": "failed",
+                        "conditions": [],
+                    }
 
     return result
 

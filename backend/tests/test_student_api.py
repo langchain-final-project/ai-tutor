@@ -167,6 +167,48 @@ def test_other_account_cannot_read_or_change_text_solution(students):
     assert first.get(base + "/verification").json() == result
 
 
+def test_cookie_type_match_requires_owned_confirmed_current_input(students, monkeypatch):
+    from app import submission_api
+    from app.tutor.unit_type_matcher import UnitTypeMatcher
+
+    app, first, second, _, _ = students
+    text = "일차방정식 3(x-2)=12를 풀어라."
+    # 유형 알고리즘 자체는 기존 테스트에서 검사하고 여기서는 학생 세션 연결만 확인한다.
+    matcher = UnitTypeMatcher([{
+        "id": "student-type-fixture", "question_text": text, "figure_text": None,
+        "source_topic_code": "7103048", "source_topic_name": "괄호가 있는 일차방정식의 풀이",
+    }])
+    monkeypatch.setattr(submission_api, "get_unit_matcher", lambda path: matcher)
+    created = first.post("/submissions/text", json={"content_text": text})
+    assert created.status_code == 201, created.text
+    base = f"/submissions/{created.json()['id']}"
+    endpoint = base + "/type-match"
+    body = {"expected_version_number": 1}
+    assert first.post(endpoint, json=body).status_code == 409
+    confirmed = first.post(base + "/confirm", json={"content_text": text, **body})
+    assert confirmed.status_code == 200, confirmed.text
+    matched = first.post(endpoint, json=body)
+    assert matched.status_code == 200, matched.text
+    assert matched.json()["input_version_number"] == 1
+    assert matched.json()["selected_type"]["source_topic_code"] == "7103048"
+    assert first.get(base).json()["type_match"] == matched.json()
+    assert second.post(endpoint, json=body).status_code == 404
+    anonymous = TestClient(app)
+    try:
+        assert anonymous.post(endpoint, json=body).status_code == 401
+        assert anonymous.post(endpoint, json=body, headers={
+            "Authorization": "Bearer development-token",
+        }).status_code == 401
+    finally:
+        anonymous.close()
+
+    edited = first.patch(base + "/input", json={"content_text": "x=7", **body})
+    assert edited.status_code == 200, edited.text
+    assert edited.json()["type_match"] is None
+    assert first.post(endpoint, json=body).status_code == 409
+    assert first.post(endpoint, json={"expected_version_number": 2}).status_code == 409
+
+
 def test_other_account_cannot_access_photo_or_ocr_job(database, students):
     _, first, second, _, _ = students
     output = BytesIO()

@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import type { FormEvent } from "react";
-import { MathFormula } from "./components/MathFormula";
-import type { ContentPart, ProblemReview } from "./types/problemReview";
+import { useEffect, useRef, useState } from "react"
+import type { FormEvent } from "react"
+import { MathFormula } from "./components/MathFormula"
+import type { ContentPart, ProblemReview } from "./types/problemReview"
 import {
   uploadPhoto,
   recognizeSubmission,
@@ -11,199 +11,249 @@ import {
   saveReview,
   serializeReviewContent,
   ReviewApiError,
-} from "./api/problemOcr";
-import type { OcrPhase, Submission } from "./api/problemOcr";
-import { MathPad } from "./components/MathPad";
-import { PhotoPicker } from "./components/PhotoPicker";
-import { PhotoRegionSelector } from "./components/PhotoRegionSelector";
-import type { PhotoRegion } from "./types/photoRegion";
-import { isFullPhotoRegion } from "./utils/photoRegion";
-import "./problem-review.css";
+  isPhotoQuality,
+} from "./api/problemOcr"
+import type { OcrPhase, PhotoQuality, Submission } from "./api/problemOcr"
+import { MathPad } from "./components/MathPad"
+import { PhotoPicker } from "./components/PhotoPicker"
+import { PhotoRegionSelector } from "./components/PhotoRegionSelector"
+import type { PhotoRegion } from "./types/photoRegion"
+import { isFullPhotoRegion, createPhotoRegionPreviewUrl } from "./utils/photoRegion"
+import "./problem-review.css"
+import { ProblemConditions } from "./components/ProblemConditions"
+import { displayLatexSpacing } from "./utils/reviewLatex"
+import { OcrLivePreview } from "./components/OcrLivePreview"
+import type { OcrProgress } from "./utils/ocrProgress"
+import { RecognitionTiming, useRecognitionTiming } from "./RecognitionTiming"
 
 function PartContent({ part }: { part: ContentPart }) {
   if (part.kind === "math") {
-    return <MathFormula latex={part.latex} />;
+    return <MathFormula latex={part.latex} />
   }
 
-  return <>{part.text}</>;
+  return <ReviewText text={part.text} />
+}
+
+function ReviewText({ text }: { text: string }) {
+  const displayed = displayLatexSpacing(text)
+
+  return (
+    <>
+      {displayed.split(/(\[UNREADABLE\]|\[판독불가\])/gi).map(
+        (part, index) =>
+          /^(\[UNREADABLE\]|\[판독불가\])$/i.test(part) ? (
+            <mark
+              key={index}
+              className="review-unreadable"
+              title="원본 사진과 비교해 수정해 주세요"
+            >
+              {part}
+            </mark>
+          ) : (
+            part
+          ),
+      )}
+    </>
+  )
 }
 
 function createEmptyProblem(imageUrl: string | null = null): ProblemReview {
-  return { id: "", imageUrl, original: [], draft: [] };
+  return { id: "", imageUrl, original: [], draft: [] }
 }
 
 function rememberSubmission(id: number | null) {
-  const url = new URL(window.location.href);
-  if (id === null) url.searchParams.delete("submission");
-  else url.searchParams.set("submission", String(id));
-  window.history.replaceState(null, "", url);
+  const url = new URL(window.location.href)
+  if (id === null) url.searchParams.delete("submission")
+  else url.searchParams.set("submission", String(id))
+  window.history.replaceState(null, "", url)
 }
 
 export function ProblemReviewPage({ onConfirmed }: { onConfirmed?: (submission: Submission) => void }) {
-const [problem, setProblem] = useState(() => createEmptyProblem());
-const [selectedId, setSelectedId] = useState<string | null>(null);
+const [problem, setProblem] = useState(() => createEmptyProblem())
+const [selectedId, setSelectedId] = useState<string | null>(null)
 
-const textDialogRef = useRef<HTMLDialogElement>(null);
-const mathDialogRef = useRef<HTMLDialogElement>(null);
+const textDialogRef = useRef<HTMLDialogElement>(null)
+const mathDialogRef = useRef<HTMLDialogElement>(null)
 
 const [mathEdit, setMathEdit] = useState<{
-  partId: string;
-  latex: string;
-} | null>(null);
+  partId: string
+  latex: string
+} | null>(null)
 
 const [textEdit, setTextEdit] = useState<{
-  partId: string;
-  value: string;
-} | null>(null);
+  partId: string
+  value: string
+} | null>(null)
 
-const [phase, setPhase] = useState<OcrPhase>("idle");
-const [ocrError, setOcrError] = useState("");
-const ocrControllerRef = useRef<AbortController | null>(null);
-const [submission, setSubmission] = useState<Submission | null>(null);
+const [phase, setPhase] = useState<OcrPhase>("idle")
+const [ocrProgress, setOcrProgress] = useState<OcrProgress | null>(null)
+const timing = useRecognitionTiming()
+const [ocrError, setOcrError] = useState("")
+const ocrControllerRef = useRef<AbortController | null>(null)
+const [submission, setSubmission] = useState<Submission | null>(null)
 const [pendingPhoto, setPendingPhoto] = useState<{
-  submission: Submission;
-  imageUrl: string;
-} | null>(null);
-const [saving, setSaving] = useState<"save" | "confirm" | null>(null);
-const [photoRegion, setPhotoRegion] = useState<PhotoRegion | null>(null);
-const [saveNotice, setSaveNotice] = useState("");
-const [saveError, setSaveError] = useState("");
-const [needsReload, setNeedsReload] = useState(false);
-const saveControllerRef = useRef<AbortController | null>(null);
-const originalTextRef = useRef("");
+  submission: Submission
+  imageUrl: string
+} | null>(null)
+const [photoQuality, setPhotoQuality] = useState<PhotoQuality | null>(null)
+const [saving, setSaving] = useState<"save" | "confirm" | null>(null)
+const [photoRegion, setPhotoRegion] = useState<PhotoRegion | null>(null)
+const [saveNotice, setSaveNotice] = useState("")
+const [saveError, setSaveError] = useState("")
+const [needsReload, setNeedsReload] = useState(false)
+const saveControllerRef = useRef<AbortController | null>(null)
+const originalTextRef = useRef("")
 
 const busy =
   phase === "restoring" || phase === "uploading" ||
-  phase === "queued" || phase === "running";
-const locked = busy || saving !== null;
+  phase === "queued" || phase === "running"
+const locked = busy || saving !== null
+const liveReading = phase === "queued" || phase === "running"
+const retakeRequired = phase === "quality_review" && photoQuality?.retake_required === true
 
-let draftText = "";
-let draftError = "";
+const displayedPhotoRegion =
+  submission?.selected_region ??
+  (phase === "queued" || phase === "running"
+    ? photoRegion
+    : null)
+
+let draftText = ""
+let draftError = ""
 try {
-  draftText = serializeReviewContent(problem.draft);
-  if (submission && !draftText.trim()) draftError = "문제 내용을 입력해 주세요.";
-  else if (draftText.length > 24000) draftError = "문제 내용은 24,000자 이하로 입력해 주세요.";
+  draftText = serializeReviewContent(problem.draft)
+  if (submission && !draftText.trim()) draftError = "문제 내용을 입력해 주세요."
+  else if (draftText.length > 24000) draftError = "문제 내용은 24,000자 이하로 입력해 주세요."
 } catch (error) {
-  draftError = error instanceof Error ? error.message : "문제 내용을 확인해 주세요.";
+  draftError = error instanceof Error ? error.message : "문제 내용을 확인해 주세요."
 }
 
 const hasEdits = !!submission &&
-  (!!draftError || draftText !== submission.latest_input?.content_text);
-const confirmed = submission?.review_status === "confirmed" && !hasEdits;
+  (!!draftError || draftText !== submission.latest_input?.content_text)
+const confirmed = submission?.review_status === "confirmed" && !hasEdits
+const typeMatch = submission?.type_match
+const currentTypeMatch = !hasEdits && typeMatch?.input_version_number === submission?.latest_input?.version_number
 
 useEffect(() => {
-  const imageUrl = problem.imageUrl;
-  return () => { if (imageUrl) URL.revokeObjectURL(imageUrl); };
-}, [problem.imageUrl]);
+  const imageUrl = problem.imageUrl
+  return () => { if (imageUrl) URL.revokeObjectURL(imageUrl) }
+}, [problem.imageUrl])
 
 useEffect(() => {
-  const savedId = new URL(window.location.href).searchParams.get("submission");
+  const savedId = new URL(window.location.href).searchParams.get("submission")
   if (savedId !== null) {
-    const id = Number(savedId);
+    const id = Number(savedId)
     if (/^[1-9]\d*$/.test(savedId) && Number.isSafeInteger(id)) {
-      void restoreSubmission(id);
+      void restoreSubmission(id)
     } else {
-      setPhase("failed");
-      setOcrError("문제 주소를 확인해 주세요.");
+      setPhase("failed")
+      setOcrError("문제 주소를 확인해 주세요.")
     }
   }
 
   return () => {
-    const controller = ocrControllerRef.current;
-    ocrControllerRef.current = null;
-    controller?.abort();
-    const saveController = saveControllerRef.current;
-    saveControllerRef.current = null;
-    saveController?.abort();
-  };
-}, []);
+    const controller = ocrControllerRef.current
+    ocrControllerRef.current = null
+    controller?.abort()
+    const saveController = saveControllerRef.current
+    saveControllerRef.current = null
+    saveController?.abort()
+  }
+}, [])
 
 async function restoreSubmission(id: number) {
-  ocrControllerRef.current?.abort();
-  const controller = new AbortController();
-  ocrControllerRef.current = controller;
-  const timeout = window.setTimeout(() => controller.abort(), 30_000);
-  setPhase("restoring");
-  setOcrError("");
+  ocrControllerRef.current?.abort()
+  timing.mark("restored")
+  const controller = new AbortController()
+  ocrControllerRef.current = controller
+  const timeout = window.setTimeout(() => controller.abort(), 30_000)
+  setPhase("restoring")
+  setOcrProgress(null)
+  setOcrError("")
 
   try {
-    const result = await loadReview(id, controller.signal);
-    if (ocrControllerRef.current !== controller) return;
-    const imageUrl = URL.createObjectURL(result.photo);
-    originalTextRef.current = result.originalText;
-    setProblem(createReviewProblem(result.submission, result.originalText, imageUrl));
-    setSubmission(result.submission);
-    setPhotoRegion(result.submission.selected_region ?? null);
-    setSelectedId(null);
-    setNeedsReload(false);
-    setSaveError("");
-    setSaveNotice("");
-    setPhase("completed");
-    rememberSubmission(result.submission.id);
+    const result = await loadReview(id, controller.signal)
+    if (ocrControllerRef.current !== controller) return
+    const imageUrl = URL.createObjectURL(result.photo)
+    originalTextRef.current = result.originalText
+    setProblem(createReviewProblem(result.submission, result.originalText, imageUrl))
+    setSubmission(result.submission)
+    setPhotoRegion(result.submission.selected_region ?? null)
+    setSelectedId(null)
+    setNeedsReload(false)
+    setSaveError("")
+    setSaveNotice("")
+    setPhase("completed")
+    rememberSubmission(result.submission.id)
   } catch (error) {
-    if (ocrControllerRef.current !== controller) return;
-    setPhase("failed");
+    if (ocrControllerRef.current !== controller) return
+    setPhase("failed")
     setOcrError(controller.signal.aborted
       ? "불러오기 시간이 초과됐습니다. 다시 시도해 주세요."
-      : error instanceof Error ? error.message : "저장된 문제를 불러오지 못했습니다.");
+      : error instanceof Error ? error.message : "저장된 문제를 불러오지 못했습니다.")
   } finally {
-    window.clearTimeout(timeout);
-    controller.abort();
-    if (ocrControllerRef.current === controller) ocrControllerRef.current = null;
+    window.clearTimeout(timeout)
+    controller.abort()
+    if (ocrControllerRef.current === controller) ocrControllerRef.current = null
   }
 }
 
-async function startPhotoRecognition(file: File, imageUrl: string) {
-  ocrControllerRef.current?.abort();
-  const controller = new AbortController();
-  ocrControllerRef.current = controller;
+async function startPhotoRecognition(file: File, imageUrl: string, selectedAt: number) {
+  ocrControllerRef.current?.abort()
+  timing.mark("photo-selected", selectedAt)
+  const controller = new AbortController()
+  ocrControllerRef.current = controller
 
-  const timeout = window.setTimeout(() => controller.abort(), 30_000);
+  const timeout = window.setTimeout(() => controller.abort(), 30_000)
 
-  setPhase("uploading");
-  setPendingPhoto(null);
-  setPhotoRegion(null);
-  setOcrError("");
-  setSelectedId(null);
-  setProblem(createEmptyProblem(imageUrl));
-  setSubmission(null);
-  setSaveNotice("");
-  setSaveError("");
-  setNeedsReload(false);
-  originalTextRef.current = "";
-  rememberSubmission(null);
-  textDialogRef.current?.close();
-  mathDialogRef.current?.close();
+  setPhase("uploading")
+  setOcrProgress(null)
+  setPendingPhoto(null)
+  setPhotoQuality(null)
+  setPhotoRegion(null)
+  setOcrError("")
+  setSelectedId(null)
+  setProblem(createEmptyProblem(imageUrl))
+  setSubmission(null)
+  setSaveNotice("")
+  setSaveError("")
+  setNeedsReload(false)
+  originalTextRef.current = ""
+  rememberSubmission(null)
+  textDialogRef.current?.close()
+  mathDialogRef.current?.close()
 
   try {
-    const uploaded = await uploadPhoto(file, controller.signal);
-    window.clearTimeout(timeout);
-    if (ocrControllerRef.current !== controller) return;
+    timing.mark("upload-started")
+    const uploaded = await uploadPhoto(file, controller.signal)
+    window.clearTimeout(timeout)
+    if (ocrControllerRef.current !== controller) return
 
-    const quality = uploaded.photo_quality;
-    if (
-      !quality ||
-      !["warning", "no_warning"].includes(quality.status) ||
-      !Array.isArray(quality.warnings) ||
-      !quality.warnings.every((warning) =>
-        warning && typeof warning.code === "string" && typeof warning.message === "string"
-      )
-    ) {
-      throw new Error("사진 품질 검사 결과를 확인하지 못했습니다. API 서버를 확인해 주세요.");
+    timing.mark("upload-finished")
+    const quality = uploaded.photo_quality
+    if (!isPhotoQuality(quality)) {
+      throw new Error("사진 품질 검사 결과를 확인하지 못했습니다. API 서버를 확인해 주세요.")
     }
 
-    setPendingPhoto({ submission: uploaded, imageUrl });
-    setPhase(quality.status === "warning" ? "quality_review" : "region_review");
+    if (quality.retake_required) timing.mark("failed")
+    setPhotoQuality(quality)
+    setPendingPhoto(quality.retake_required ? null : { submission: uploaded, imageUrl })
+    setPhase(quality.retake_required || quality.status === "warning" ? "quality_review" : "region_review")
   } catch (error) {
-    if (ocrControllerRef.current !== controller) return;
-    setPhase("failed");
+    if (ocrControllerRef.current !== controller) return
+    timing.mark(controller.signal.aborted ? "cancelled" : "failed")
+    if (error instanceof ReviewApiError && error.photoQuality?.retake_required) {
+      setPhotoQuality(error.photoQuality)
+      setPhase("quality_review")
+      return
+    }
+    setPhase("failed")
     setOcrError(controller.signal.aborted
       ? "사진 업로드 시간이 초과됐습니다. 다시 시도해 주세요."
-      : error instanceof Error ? error.message : "사진 업로드에 실패했습니다.");
+      : error instanceof Error ? error.message : "사진 업로드에 실패했습니다.")
   } finally {
-    window.clearTimeout(timeout);
-    if (ocrControllerRef.current === controller) ocrControllerRef.current = null;
-    controller.abort();
+    window.clearTimeout(timeout)
+    if (ocrControllerRef.current === controller) ocrControllerRef.current = null
+    controller.abort()
   }
 }
 
@@ -213,213 +263,243 @@ async function recognizeUploadedPhoto(
   controller: AbortController,
   region: PhotoRegion,
 ) {
-  const timeout = window.setTimeout(() => controller.abort(), 360_000);
-  setPhase("queued");
-  setOcrError("");
+  const timeout = window.setTimeout(() => controller.abort(), 600_000)
+  setPhase("queued")
+  setOcrProgress(null)
+  setOcrError("")
+
+  //let displayedUrl = imageUrl
 
   try {
-    const result = await recognizeSubmission(uploaded, controller.signal, (nextPhase) => {
-      if (ocrControllerRef.current === controller) setPhase(nextPhase);
-    }, region);
-    if (ocrControllerRef.current !== controller) return;
+    if (!isFullPhotoRegion(region)) {
+      const previewUrl = await createPhotoRegionPreviewUrl(
+        imageUrl,
+        region,
+        controller.signal,
+      )
 
-    let displayedUrl = imageUrl;
-    if (result.image_rotation_ccw || (result.selected_region && !isFullPhotoRegion(result.selected_region))) {
-      const photo = await readReviewPhoto(result.id, controller.signal);
-      if (ocrControllerRef.current !== controller) return;
-      displayedUrl = URL.createObjectURL(photo);
+      if (ocrControllerRef.current !== controller) {
+        URL.revokeObjectURL(previewUrl)
+        return
+      }
+
+      // displayedUrl = previewUrl
+
+      setProblem((current) => ({
+        ...current,
+        imageUrl: previewUrl,
+      }))
     }
-    if (ocrControllerRef.current !== controller) return;
-    originalTextRef.current = result.latest_input!.content_text;
-    setProblem(createReviewProblem(result, originalTextRef.current, displayedUrl));
-    setSubmission(result);
-    setPhotoRegion(result.selected_region ?? null);
-    rememberSubmission(result.id);
-    setPhase("completed");
+    timing.mark("ocr-started")
+    const result = await recognizeSubmission(uploaded, controller.signal, (nextPhase) => {
+      if (ocrControllerRef.current === controller) setPhase(nextPhase)
+    }, region, (progress) => {
+      if (ocrControllerRef.current === controller) setOcrProgress(progress)
+    })
+    if (ocrControllerRef.current !== controller) return
+
+    timing.mark("ocr-finished")
+    let displayedUrl = imageUrl
+    if (result.image_rotation_ccw || (result.selected_region && !isFullPhotoRegion(result.selected_region))) {
+      const photo = await readReviewPhoto(result.id, controller.signal)
+      if (ocrControllerRef.current !== controller) return
+      displayedUrl = URL.createObjectURL(photo)
+    }
+    if (ocrControllerRef.current !== controller) return
+    originalTextRef.current = result.latest_input!.content_text
+    setProblem(createReviewProblem(result, originalTextRef.current, displayedUrl))
+    setSubmission(result)
+    setPhotoRegion(result.selected_region ?? null)
+    rememberSubmission(result.id)
+    timing.mark("completed")
+    setPhase("completed")
   } catch (error) {
-    if (ocrControllerRef.current !== controller) return;
-    setPhase("failed");
+    if (ocrControllerRef.current !== controller) return
+    timing.mark(controller.signal.aborted ? "cancelled" : "failed")
+    setPhase("failed")
     setOcrError(
       controller.signal.aborted
         ? "인식 대기 시간을 초과했습니다. 서버 작업은 계속될 수 있습니다."
         : error instanceof Error
           ? error.message
           : "문제 인식에 실패했습니다.",
-    );
+    )
   } finally {
-    window.clearTimeout(timeout);
+    window.clearTimeout(timeout)
     if (ocrControllerRef.current === controller) {
-      ocrControllerRef.current = null;
+      ocrControllerRef.current = null
     }
-    controller.abort();
+    controller.abort()
   }
 }
 
 function continuePhotoRecognition() {
   if (!pendingPhoto || phase !== "region_review" || !photoRegion ||
-    locked || ocrControllerRef.current) return;
+    photoQuality?.retake_required || locked || ocrControllerRef.current) return
 
-  const pending = pendingPhoto;
-  const controller = new AbortController();
-  ocrControllerRef.current = controller;
-  setPendingPhoto(null);
+  const pending = pendingPhoto
+  const controller = new AbortController()
+  ocrControllerRef.current = controller
+  setPendingPhoto(null)
 
-  void recognizeUploadedPhoto(pending.submission, pending.imageUrl, controller, photoRegion);
+  void recognizeUploadedPhoto(pending.submission, pending.imageUrl, controller, photoRegion)
 }
 
 function choosePhoto(file: File): boolean {
-  if (locked || ocrControllerRef.current || saveControllerRef.current) return false;
+  if (locked || ocrControllerRef.current || saveControllerRef.current) return false
 
   if (
     hasEdits &&
     !window.confirm("사진을 바꾸면 저장하지 않은 수정 내용이 사라집니다. 계속할까요?")
   ) {
-    return false;
+    return false
   }
 
-  void startPhotoRecognition(file, URL.createObjectURL(file));
-  return true;
+  void startPhotoRecognition(file, URL.createObjectURL(file), performance.now())
+  return true
 }
 
 async function persistReview(confirm: boolean) {
-  const latest = submission?.latest_input;
-  if (!submission || !latest || locked || saveControllerRef.current || needsReload) return;
-  if ((!confirm && !hasEdits) || (confirm && confirmed)) return;
-  if (draftError) { setSaveError(draftError); return; }
+  const latest = submission?.latest_input
+  if (!submission || !latest || locked || saveControllerRef.current || needsReload) return
+  if ((!confirm && !hasEdits) || (confirm && confirmed)) return
+  if (draftError) { setSaveError(draftError); return }
 
-  const controller = new AbortController();
-  saveControllerRef.current = controller;
-  const timeout = window.setTimeout(() => controller.abort(), 30_000);
-  setSaving(confirm ? "confirm" : "save");
-  setSaveNotice("");
-  setSaveError("");
+  const controller = new AbortController()
+  saveControllerRef.current = controller
+  const timeout = window.setTimeout(() => controller.abort(), 30_000)
+  setSaving(confirm ? "confirm" : "save")
+  setSaveNotice("")
+  setSaveError("")
 
   try {
     const updated = await saveReview(
       submission.id, draftText, latest.version_number, confirm, controller.signal,
-    );
-    if (saveControllerRef.current !== controller) return;
+    )
+    if (saveControllerRef.current !== controller) return
     if (!updated.latest_input || (confirm && updated.review_status !== "confirmed")) {
-      throw new Error("저장 상태를 확인하지 못했습니다. 최신 내용을 다시 불러와 주세요.");
+      throw new Error("저장 상태를 확인하지 못했습니다. 최신 내용을 다시 불러와 주세요.")
     }
 
-    setSubmission(updated);
+    setSubmission(updated)
     setProblem((current) => createReviewProblem(
       updated, originalTextRef.current, current.imageUrl,
-    ));
-    setSelectedId(null);
-    setSaveNotice(confirm ? "문제 내용 확인을 완료하고 저장했습니다." : "수정본을 저장했습니다.");
+    ))
+    setSelectedId(null)
+    setSaveNotice(confirm ? "문제 내용 확인을 완료하고 저장했습니다." : "수정본을 저장했습니다.")
   } catch (error) {
-    if (saveControllerRef.current !== controller) return;
+    if (saveControllerRef.current !== controller) return
     if (error instanceof ReviewApiError && error.status === 409) {
-      setNeedsReload(true);
-      setSaveError("다른 곳에서 내용이 변경되었습니다. 작성 중인 내용은 유지됩니다. 최신 내용을 불러온 뒤 다시 확인해 주세요.");
+      setNeedsReload(true)
+      setSaveError("다른 곳에서 내용이 변경되었습니다. 작성 중인 내용은 유지됩니다. 최신 내용을 불러온 뒤 다시 확인해 주세요.")
     } else {
       setSaveError(controller.signal.aborted
         ? "저장 응답을 확인하지 못했습니다. 작성 중인 내용은 유지됩니다. 최신 내용을 불러와 저장 상태를 확인해 주세요."
-        : error instanceof Error ? error.message : "저장하지 못했습니다. 다시 시도해 주세요.");
+        : error instanceof Error ? error.message : "저장하지 못했습니다. 다시 시도해 주세요.")
     }
   } finally {
-    window.clearTimeout(timeout);
+    window.clearTimeout(timeout)
     if (saveControllerRef.current === controller) {
-      saveControllerRef.current = null;
-      setSaving(null);
+      saveControllerRef.current = null
+      setSaving(null)
     }
   }
 }
 
 function reloadLatest() {
-  if (!submission || locked) return;
-  if (hasEdits && !window.confirm("저장하지 않은 수정 내용을 버리고 최신 내용을 불러올까요?")) return;
-  void restoreSubmission(submission.id);
+  if (!submission || locked) return
+  if (hasEdits && !window.confirm("저장하지 않은 수정 내용을 버리고 최신 내용을 불러올까요?")) return
+  void restoreSubmission(submission.id)
 }
 
 const phaseMessage: Record<OcrPhase, string> = {
   idle: "사진을 선택하면 인식한 내용이 여기에 표시됩니다.",
   restoring: "저장된 문제와 원본 사진을 불러오고 있어요.",
-  uploading: "사진을 업로드하고 있어요.",
-  quality_review: "사진 상태를 확인하고 인식을 계속할지 선택해 주세요.",
+  uploading: "사진을 업로드하고 흔들림·가림·잘림을 확인하고 있어요.",
+  quality_review: retakeRequired
+    ? "문제를 읽기 어려운 사진이에요. 다시 촬영하거나 다른 사진을 올려주세요."
+    : "사진 상태를 직접 확인한 뒤 인식을 계속할지 선택해 주세요.",
   region_review: "인식할 문제의 범위를 확인해 주세요.",
   queued: "문제 인식 순서를 기다리고 있어요.",
-  running: "문제 사진을 읽고 있어요. 잠시 기다려 주세요.",
+  running: "문제 사진을 읽고 결과를 확인하고 있어요. 필요하면 한 번 더 인식합니다.",
   completed: "인식이 완료됐어요. 원본과 비교해 주세요.",
   failed: "문제 인식을 완료하지 못했어요.",
-};
+}
 
 function selectPart(part: ContentPart) {
-  if (locked) return;
-  setSelectedId(part.id);
+  if (locked) return
+  setSelectedId(part.id)
 
   if (part.kind === "text") {
     setTextEdit({
       partId: part.id,
-      value: part.text,
-    });
+      value: displayLatexSpacing(part.text),
+    })
 
-    textDialogRef.current?.showModal();
+    textDialogRef.current?.showModal()
   } else {
     setMathEdit({
       partId: part.id,
       latex: part.latex,
-    });
+    })
 
-    mathDialogRef.current?.showModal();
+    mathDialogRef.current?.showModal()
   }
 }
 
 function applyTextEdit(event: FormEvent<HTMLFormElement>) {
-  event.preventDefault();
-  if (!textEdit) return;
+  event.preventDefault()
+  if (!textEdit) return
 
-  const { partId, value } = textEdit;
+  const { partId, value } = textEdit
 
   setProblem((current) => ({
     ...current,
     draft: current.draft.map((block) => {
-      if (block.kind !== "paragraph") return block;
+      if (block.kind !== "paragraph") return block
 
       return {
         ...block,
         parts: block.parts.map((part) => {
           if (part.id === partId && part.kind === "text") {
-            return { ...part, text: value };
+            return { ...part, text: value }
           }
 
-          return part;
+          return part
         }),
-      };
+      }
     }),
-  }));
+  }))
 
-  textDialogRef.current?.close();
-  setSaveNotice("");
+  textDialogRef.current?.close()
+  setSaveNotice("")
 }
 
 function applyMathEdit(latex: string) {
-  if (!mathEdit) return;
+  if (!mathEdit) return
 
-  const partId = mathEdit.partId;
+  const partId = mathEdit.partId
 
   setProblem((current) => ({
     ...current,
     draft: current.draft.map((block) => {
-      if (block.kind !== "paragraph") return block;
+      if (block.kind !== "paragraph") return block
 
       return {
         ...block,
         parts: block.parts.map((part) => {
           if (part.id === partId && part.kind === "math") {
-            return { ...part, latex };
+            return { ...part, latex }
           }
 
-          return part;
+          return part
         }),
-      };
+      }
     }),
-  }));
+  }))
 
-  mathDialogRef.current?.close();
-  setSaveNotice("");
+  mathDialogRef.current?.close()
+  setSaveNotice("")
 }
 
 
@@ -427,7 +507,7 @@ function applyMathEdit(latex: string) {
     .flatMap((block) => (
       block.kind === "paragraph" ? block.parts : []
     ))
-    .find((part) => part.id === selectedId);
+    .find((part) => part.id === selectedId)
 
   return (
     <div className="review-page">
@@ -435,8 +515,9 @@ function applyMathEdit(latex: string) {
         <a className="review-brand" href="/home">딛고</a>
         <span className="review-badge">
           {phase === "region_review" ? "범위 확인"
-            : phase === "quality_review" ? "사진 확인"
-            : phase === "restoring" ? "불러오는 중" : busy ? "인식 중"
+            : phase === "quality_review" ? (retakeRequired ? "재촬영 필요" : "사진 확인")
+            : phase === "restoring" ? "불러오는 중"
+            : phase === "uploading" ? "사진 확인 중" : busy ? "인식 중"
             : confirmed ? "확인 완료" : hasEdits ? "수정 중"
               : phase === "completed" ? "확인 대기" : "문제 등록"}
         </span>
@@ -448,19 +529,29 @@ function applyMathEdit(latex: string) {
           <p>원본과 비교하고, 다른 부분을 눌러 수정해 주세요.</p>
         </div>
 
+        <RecognitionTiming timing={timing} />
+
         <section
           className="review-section"
           aria-labelledby="review-photo-title"
         >
           <h2 id="review-photo-title">
-            {submission?.selected_region && !isFullPhotoRegion(submission.selected_region)
-              ? "선택한 문제 사진" : "원본 사진"}
+            {displayedPhotoRegion && !isFullPhotoRegion(displayedPhotoRegion)
+              ? "선택한 문제 사진"
+              : "원본 사진"}
           </h2>
 
           <PhotoPicker
             onSelect={choosePhoto}
             imageUrl={problem.imageUrl}
             disabled={locked}
+            retakeRequired={retakeRequired}
+            layout={
+              phase === "completed" &&
+              submission?.layout_detection?.status === "detected"
+                ? submission.layout_detection.layout
+                : null
+            }
             photoContent={phase === "region_review" && pendingPhoto ? (
               <PhotoRegionSelector
                 key={pendingPhoto.imageUrl}
@@ -468,24 +559,29 @@ function applyMathEdit(latex: string) {
                 onChange={setPhotoRegion}
               />
             ) : undefined}
+            photoNotice={phase === "quality_review" && photoQuality ? (
+              <div className="review-quality-warning" role="region" aria-labelledby="review-quality-title">
+                <h3 id="review-quality-title">
+                  {retakeRequired ? "문제 사진을 다시 촬영해 주세요" : "사진을 한 번 확인해 주세요"}
+                </h3>
+                <ul>
+                  {photoQuality.warnings.map((warning) => (
+                    <li key={warning.code}>{warning.message}</li>
+                  ))}
+                </ul>
+                <p>
+                  {retakeRequired
+                    ? "새 사진을 올린 뒤 품질 검사를 통과하면 문제 인식을 진행할 수 있어요."
+                    : "문제 전체가 선명하게 보이는지 확인해 주세요. 사진을 바꾸거나 이 사진으로 계속할 수 있어요."}
+                </p>
+                {!retakeRequired && pendingPhoto && (
+                  <button type="button" disabled={locked} onClick={() => setPhase("region_review")}>
+                    사진 확인했어요 · 범위 선택
+                  </button>
+                )}
+              </div>
+            ) : undefined}
           />
-          {phase === "quality_review" && pendingPhoto && (
-            <div className="review-quality-warning" role="region" aria-labelledby="review-quality-title">
-              <h3 id="review-quality-title">사진을 한 번 확인해 주세요</h3>
-              <ul>
-                {pendingPhoto.submission.photo_quality?.warnings.map((warning) => (
-                  <li key={warning.code}>{warning.message}</li>
-                ))}
-              </ul>
-              <p>
-                위의 사진 선택·재촬영 버튼으로 사진을 바꾸거나,
-                이 사진으로 인식을 계속할 수 있어요.
-              </p>
-              <button type="button" disabled={locked} onClick={() => setPhase("region_review")}>
-                이 사진으로 범위 선택
-              </button>
-            </div>
-          )}
           {phase === "region_review" && pendingPhoto && (
             <div className="review-region-actions">
               <p className="review-help">
@@ -522,7 +618,8 @@ function applyMathEdit(latex: string) {
             <p>
               {phase === "completed"
                 ? "문장이나 수식을 눌러 수정해 주세요."
-                : "사진을 선택하면 문제 내용을 인식합니다."}
+                : liveReading ? "읽힌 내용이 실시간으로 표시돼요."
+                  : "문제 범위를 선택한 뒤 인식을 시작해 주세요."}
             </p>
           </div>
 
@@ -533,14 +630,38 @@ function applyMathEdit(latex: string) {
           </p>
           {ocrError && <p className="review-error" role="alert">{ocrError}</p>}
 
+          {phase === "completed" && !!submission?.ocr_review?.review_warnings.length && (
+            <div className="review-quality-warning" role="region" aria-labelledby="review-ocr-title">
+              <h3 id="review-ocr-title">원본과 비교해서 확인할 부분이 있어요</h3>
+              <ul>
+                {submission.ocr_review.review_warnings.map((warning, index) => (
+                  <li key={`${warning.code}-${index}`}>
+                    {warning.message}
+                    {warning.first_text && warning.second_text && (
+                      <details>
+                        <summary>두 인식 결과 비교</summary>
+                        <p>{warning.first_label ?? "첫 번째 인식"}</p>
+                        <pre className="review-candidate-text">{warning.first_text}</pre>
+                        <p>{warning.second_label ?? "두 번째 인식"}</p>
+                        <pre className="review-candidate-text">{warning.second_text}</pre>
+                      </details>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <div className="review-content" aria-busy={busy}>
+            {liveReading ? <OcrLivePreview progress={ocrProgress} /> : (
+              <>
             {problem.draft.length === 0 && (
               <p className="review-help">
                 {busy ? "인식 결과를 기다리고 있어요." : "인식한 내용이 아직 없습니다."}
               </p>
             )}
             {problem.draft.map((block) => {
-              if (block.kind !== "paragraph") return null;
+              if (block.kind !== "paragraph") return null
 
               return (
                 <p key={block.id} className="review-paragraph">
@@ -555,12 +676,12 @@ function applyMathEdit(latex: string) {
                       onClick={() => selectPart(part)}
                       onKeyDown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
-                          event.preventDefault();
-                          selectPart(part);
+                          event.preventDefault()
+                          selectPart(part)
                         }
                       }}
                     >
-                      {part.text}
+                      <ReviewText text={part.text} />
                     </span>
                   ) : (
                     <button
@@ -575,11 +696,51 @@ function applyMathEdit(latex: string) {
                     </button>
                   ))}
                 </p>
-              );
+              )
             })}
+              </>
+            )}
           </div>
         </section>
-
+        {phase === "completed" && (
+          <ProblemConditions
+            extraction={submission?.condition_extraction}
+          />
+        )}
+        {phase === "completed" && typeMatch && (
+          <section className="review-section" aria-labelledby="review-type-title">
+            <div className="review-section-heading">
+              <h2 id="review-type-title">유형 후보 · 확인 필요</h2>
+            </div>
+            {!currentTypeMatch ? (
+              <p className="review-help">수정한 내용을 저장한 뒤 해당 내용의 유형 결과를 확인해 주세요.</p>
+            ) : (
+              <>
+                <p className="review-help">
+                  {typeMatch.scope && `중${typeMatch.scope.grade} · ${typeMatch.scope.unit_name}. `}
+                  {typeMatch.status === "unsupported" ? "현재 유형 분류 범위를 벗어난 문제예요."
+                    : typeMatch.status === "needs_review" ? "유형을 정하기 전에 문제 내용을 확인해 주세요."
+                      : "학습 참고용 후보예요. 유형이나 풀이의 정확성이 확정된 결과는 아니에요."}
+                </p>
+                {typeMatch.selected_type && (
+                  <p className="review-help">학습 참고 유형: {typeMatch.selected_type.source_topic_name}</p>
+                )}
+                {!!typeMatch.candidates?.length && (
+                  <ul className="review-condition-list">
+                    {typeMatch.candidates.slice(0, 3).map((candidate) => (
+                      <li className="review-condition-card" key={candidate.source_topic_code}>
+                        <p className="review-condition-label">{candidate.source_topic_name}</p>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                {typeMatch.reasons?.slice(0, 2).map((reason, index) => (
+                  <p className="review-help" key={index}>{reason}</p>
+                ))}
+              </>
+            )}
+          </section>
+        )}
         <section
           className="review-section review-selection"
           aria-labelledby="review-selection-title"
@@ -653,11 +814,11 @@ function applyMathEdit(latex: string) {
             id="review-text-input"
             value={textEdit?.value ?? ""}
             onChange={(event) => {
-              const value = event.currentTarget.value;
+              const value = event.currentTarget.value
 
               setTextEdit((current) => (
                 current ? { ...current, value } : null
-              ));
+              ))
             }}
             rows={4}
             maxLength={24000}
@@ -695,5 +856,5 @@ function applyMathEdit(latex: string) {
         )}
       </dialog>
     </div>
-  );
+  )
 }

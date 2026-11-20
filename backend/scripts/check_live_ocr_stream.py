@@ -57,6 +57,7 @@ def main():
         help="실행 중인 llama.cpp 서버. 생략하면 환경변수 또는 기본 주소 사용.",
     )
     source.add_argument("--qwen-model", type=Path, help="검증용 임시 서버로 실행할 GGUF 모델")
+    parser.add_argument("--qwen-model-name", help="원격 서버에서 선택할 모델 이름. 생략하면 DIDGO_QWEN_MODEL 사용")
     parser.add_argument("--qwen-mmproj", type=Path, help="GGUF 모델의 vision projector")
     parser.add_argument("--server-binary", default="llama-server")
     parser.add_argument("--image", type=Path, help="생략하면 검증용 이미지를 사용한다.")
@@ -64,6 +65,8 @@ def main():
     args = parser.parse_args()
     if (args.qwen_model is None) != (args.qwen_mmproj is None):
         parser.error("--qwen-model과 --qwen-mmproj는 함께 지정해야 합니다.")
+    if args.qwen_model is not None and args.qwen_model_name is not None:
+        parser.error("--qwen-model-name은 원격 서버를 사용할 때 지정해 주세요.")
     backend_options = (
         {
             "model": args.qwen_model,
@@ -73,7 +76,8 @@ def main():
         if args.qwen_model is not None
         else {
             "url": args.qwen_url
-            or os.getenv("DIDGO_QWEN_URL", "http://127.0.0.1:8081/v1")
+            or os.getenv("DIDGO_QWEN_URL", "http://127.0.0.1:8081/v1"),
+            "model_name": args.qwen_model_name or os.getenv("DIDGO_QWEN_MODEL", "").strip() or None,
         }
     )
 
@@ -110,6 +114,8 @@ def main():
             owner_id="stream-check-user",
             pipeline_factory=pipeline_factory,
         )
+        if backend_options.get("model_name") is not None:
+            app.state.ocr_jobs.model_name = backend_options["model_name"]
         headers = {"Authorization": "Bearer stream-check-token"}
         with TestClient(app) as client:
             response = client.post(

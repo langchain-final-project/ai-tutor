@@ -99,7 +99,7 @@ class OCRPipelineTests(unittest.TestCase):
 
         self.assertEqual(formula.connections, 1)
         self.assertEqual(result["regions"][0]["text"], "x^{2}-6x=0")
-        self.assertEqual(result["text"], "")
+        self.assertEqual(result["text"], r"\(x^{2}-6x=0\)")
 
     def test_incomplete_output_is_not_exposed_as_usable_problem_text(self):
         result = OCRPipeline(

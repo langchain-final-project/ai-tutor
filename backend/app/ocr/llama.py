@@ -21,6 +21,10 @@ from urllib.request import Request, urlopen
 class OCRError(RuntimeError):
     """모델 연결 또는 응답 오류."""
 
+    def __init__(self, message, *, retryable=True):
+        super().__init__(message)
+        self.retryable = retryable
+
 
 def _repeating(text: str) -> bool:
     paragraphs = Counter(p.strip() for p in re.split(r"\n\s*\n", text) if len(p.strip()) >= 20)
@@ -44,7 +48,7 @@ def _events(response):
 
 
 class LlamaClient:
-    def __init__(self, url: str, timeout: float = 90):
+    def __init__(self, url: str, timeout: float = 90, *, model_name: str | None = None):
         parsed = urlsplit(url)
         if parsed.scheme not in {"http", "https"} or not parsed.netloc or parsed.query or parsed.fragment:
             raise ValueError("서버 주소는 http(s)://호스트:포트 또는 /v1 주소여야 합니다.")
@@ -52,6 +56,9 @@ class LlamaClient:
         if not self.url.endswith("/v1"):
             self.url += "/v1"
         self.timeout = timeout
+        if model_name is not None and (not isinstance(model_name, str) or not model_name.strip()):
+            raise ValueError("서버에 요청할 모델 이름을 확인해 주세요.")
+        self.model_name = model_name
 
     def stream(self, image: bytes, prompt: str, max_tokens: int = 1024):
         """delta 이벤트 뒤에 complete 이벤트를 반환한다. 중단한 출력은 stop이 아니다."""
@@ -64,6 +71,8 @@ class LlamaClient:
             "temperature": 0, "seed": 42, "max_tokens": max_tokens,
             "stream": True, "stream_options": {"include_usage": True}, "cache_prompt": False,
         }
+        if self.model_name is not None:
+            payload["model"] = self.model_name
         request = Request(self.url + "/chat/completions", data=json.dumps(payload).encode(),
                           headers={"Content-Type": "application/json"})
         text, finish, usage = "", "incomplete", None
@@ -95,8 +104,20 @@ class LlamaClient:
                     if len(text) > 24000 or time.monotonic() - started > self.timeout:
                         finish = "limit"
                         break
-        except (HTTPError, URLError, OSError, ValueError) as error:
+        except HTTPError as error:
+            raise OCRError(
+                "OCR 서버의 응답을 확인해 주세요.",
+                retryable=error.code in {408, 429, 500, 502, 503, 504},
+            ) from error
+        except URLError as error:
+            raise OCRError(
+                "OCR 서버 연결을 확인해 주세요.",
+                retryable=not isinstance(error.reason, ConnectionRefusedError),
+            ) from error
+        except OSError as error:
             raise OCRError("OCR 서버 연결 또는 스트림을 확인해 주세요.") from error
+        except ValueError as error:
+            raise OCRError("OCR 서버 스트림 형식을 확인해 주세요.", retryable=False) from error
         yield {"type": "complete", "text": text, "finish_reason": finish,
                "usage": usage, "seconds": round(time.monotonic() - started, 3)}
 
@@ -111,6 +132,7 @@ class Backend:
     executable: str = "llama-server"
     timeout: float = 90
     image_tokens: tuple[int, int] | None = None
+    model_name: str | None = None
 
     def __post_init__(self):
         if self.timeout <= 0:
@@ -118,7 +140,7 @@ class Backend:
         if self.url:
             if self.model or self.mmproj:
                 raise ValueError("서버 주소와 모델 파일을 동시에 지정할 수 없습니다.")
-            LlamaClient(self.url, self.timeout)
+            LlamaClient(self.url, self.timeout, model_name=self.model_name)
         elif not self.model or not self.mmproj:
             raise ValueError("서버 주소 또는 모델·mmproj 파일을 지정해 주세요.")
         if self.image_tokens and not (0 < self.image_tokens[0] <= self.image_tokens[1]):
@@ -127,7 +149,7 @@ class Backend:
     @contextmanager
     def connect(self):
         if self.url:
-            yield LlamaClient(self.url, self.timeout)
+            yield LlamaClient(self.url, self.timeout, model_name=self.model_name)
             return
         for path in (self.model, self.mmproj):
             if not Path(path).is_file():
@@ -163,7 +185,7 @@ class Backend:
                     time.sleep(0.2)
                 else:
                     raise OCRError("모델 서버 준비 시간이 초과됐습니다.")
-                yield LlamaClient(url, self.timeout)
+                yield LlamaClient(url, self.timeout, model_name=self.model_name)
             finally:
                 if process.poll() is None:
                     process.terminate()

@@ -28,6 +28,7 @@ services:
     environment:
       DIDGO_DATABASE: /var/lib/didgo-solution/solution-flow.sqlite3
       DIDGO_QWEN_URL: ${DIDGO_QWEN_URL:-http://host.docker.internal:8081/v1}
+      DIDGO_QWEN_MODEL: ${DIDGO_QWEN_MODEL:-}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:

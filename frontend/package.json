@@ -4,6 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "test:ocr": "node --test tests/ocrStream.test.cjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview"
   },

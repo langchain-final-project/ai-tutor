@@ -1,47 +1,63 @@
-import { useLayoutEffect, useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react"
 import {
   TransformComponent,
   TransformWrapper,
-} from "react-zoom-pan-pinch";
+} from "react-zoom-pan-pinch"
+import type {LayoutKind, ProblemLayout,} from "../types/problemLayout"
+
 
 type PhotoViewerProps = {
-  imageUrl: string;
-  onError: () => void;
-};
+  imageUrl: string
+  onError: () => void
+  layout?: ProblemLayout | null
+}
 
-const FRAME_HEIGHT = 280;
-const MAX_SCALE = 6;
+const FRAME_HEIGHT = 280
+const MAX_SCALE = 6
+
+const LAYOUT_COLORS: Record<LayoutKind, string> = {
+  group: "#64748b",
+  text: "#2563eb",
+  formula: "#dc2626",
+  table: "#15803d",
+  figure: "#9333ea",
+  graph: "#c2410c",
+  unknown: "#475569",
+}
+
 
 export function PhotoViewer({
   imageUrl,
   onError,
+  layout = null
 }: PhotoViewerProps) {
-  const frameRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null)
 
-  const [frameWidth, setFrameWidth] = useState(0);
+  const [frameWidth, setFrameWidth] = useState(0)
   const [naturalSize, setNaturalSize] = useState({
     width: 0,
     height: 0,
-  });
-  const [scale, setScale] = useState(1);
+  })
+  const [scale, setScale] = useState(1)
+  const [showLayout, setShowLayout] = useState(true)
 
   useLayoutEffect(() => {
-    const frame = frameRef.current;
-    if (!frame) return;
+    const frame = frameRef.current
+    if (!frame) return
 
     const observer = new ResizeObserver(([entry]) => {
-      setFrameWidth(entry.contentRect.width);
-    });
+      setFrameWidth(entry.contentRect.width)
+    })
 
-    observer.observe(frame);
+    observer.observe(frame)
 
-    return () => observer.disconnect();
-  }, []);
+    return () => observer.disconnect()
+  }, [])
 
   const ready =
     frameWidth > 0 &&
     naturalSize.width > 0 &&
-    naturalSize.height > 0;
+    naturalSize.height > 0
 
   // 사진 전체가 처음에는 영역 안에 들어오도록 크기를 계산합니다.
   const fitRatio = ready
@@ -49,14 +65,40 @@ export function PhotoViewer({
         frameWidth / naturalSize.width,
         FRAME_HEIGHT / naturalSize.height,
       )
-    : 1;
+    : 1
 
-  const imageWidth = ready ? naturalSize.width * fitRatio : 1;
-  const imageHeight = ready ? naturalSize.height * fitRatio : 1;
-  const zoomed = scale > 1.01;
+  const imageWidth = ready ? naturalSize.width * fitRatio : 1
+  const imageHeight = ready ? naturalSize.height * fitRatio : 1
+  const zoomed = scale > 1.01
+
+  // 표시 중인 사진과 영역 좌표의 기준 이미지가 같은지 확인합니다.
+  const layoutMatches =
+    ready &&
+    layout?.coordinate_space === "ocr_image" &&
+    layout.image_size[0] === naturalSize.width &&
+    layout.image_size[1] === naturalSize.height
 
   return (
     <div className="review-photo-viewer">
+      {layoutMatches && (
+        <div>
+          <label>
+            <input
+              type="checkbox"
+              checked={showLayout}
+              onChange={(event) => setShowLayout(event.currentTarget.checked)}
+            />
+            {" "}검출 영역 표시
+          </label>
+
+          {showLayout && (
+            <p className="review-help">
+              파랑: 글자 · 빨강: 수식 · 초록: 표 · 보라: 그림 ·
+              주황: 그래프 · 회색 점선: 묶음
+            </p>
+          )}
+        </div>
+      )}
       <div ref={frameRef} className="review-photo-frame">
         <TransformWrapper
           key={`${imageWidth}:${imageHeight}`}
@@ -96,6 +138,7 @@ export function PhotoViewer({
                 contentStyle={{
                   width: imageWidth,
                   height: imageHeight,
+                  position: "relative",
                 }}
               >
                 <img
@@ -109,15 +152,51 @@ export function PhotoViewer({
                     visibility: ready ? "visible" : "hidden",
                   }}
                   onLoad={(event) => {
-                    const image = event.currentTarget;
+                    const image = event.currentTarget
 
                     setNaturalSize({
                       width: image.naturalWidth,
                       height: image.naturalHeight,
-                    });
+                    })
                   }}
                   onError={onError}
                 />
+                {showLayout && layoutMatches && layout && (
+                  <svg
+                    viewBox={`0 0 ${layout.image_size[0]} ${layout.image_size[1]}`}
+                    aria-hidden="true"
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      width: "100%",
+                      height: "100%",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    {layout.regions
+                      .filter((region) => region.id !== "image-root")
+                      .map((region) => {
+                        const [left, top, right, bottom] = region.bbox
+
+                        return (
+                          <rect
+                            key={region.id}
+                            x={left}
+                            y={top}
+                            width={right - left}
+                            height={bottom - top}
+                            fill="none"
+                            stroke={LAYOUT_COLORS[region.kind]}
+                            strokeWidth={2}
+                            strokeDasharray={
+                              region.kind === "group" ? "6 4" : undefined
+                            }
+                            vectorEffect="non-scaling-stroke"
+                          />
+                        )
+                      })}
+                  </svg>
+                )}
               </TransformComponent>
 
               <div
@@ -168,5 +247,5 @@ export function PhotoViewer({
         ＋/−로 확대·축소하고, 확대된 사진을 드래그하거나 휠로 이동하세요.
       </p> */}
     </div>
-  );
+  )
 }

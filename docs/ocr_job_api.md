@@ -22,6 +22,30 @@ $env:DIDGO_OCR_TIMEOUT = '300'
 모델 서버를 실행하는 명령은 모델 파일 경로와 실행 환경에 따라 다릅니다.
 모델 서버가 없으면 OCR 작업은 `failed`가 되고 실패 이력을 남깁니다.
 
+### 사진 품질 검사와 재촬영
+
+사진 업로드 시 기본 품질 지표와 Qwen의 문제 내용 가시성 검사를 실행합니다.
+선명도는 긴 변을 최대 1280픽셀로 축소한 사본에서 측정하며,
+기존 해상도·밝기 조건을 만족할 때 Laplacian 분산이 30 미만이면 흐림으로 안내합니다.
+이 기준은 같은 문제의 사진 5장으로 검증한 초기 기준입니다.
+
+- `possibly_blurred`: 흐림으로 판독이 어려울 수 있어 재촬영이 필요합니다.
+- `possibly_occluded`: 손이나 물건이 본문·수식·선택지·필요한 그림을 가립니다.
+- `possibly_cropped`: 문제 내용이 사진 경계에서 잘려 있습니다.
+- 여백만 가리거나 종이 테두리가 보이지 않는 경우에는 재촬영을 요구하지 않습니다.
+
+위 세 경고 중 하나라도 감지되면 `POST /submissions/photo`는 `422`를 반환합니다.
+`detail.code`는 `photo_retake_required`이며 `detail.photo_quality`에 사유와
+`retake_required: true`가 포함됩니다. 해당 사진과 제출 기록을 저장하지 않고
+제출 ID도 발급하지 않으므로 OCR을 시작할 수 없습니다.
+화면은 사진과 사유를 유지하고 재촬영 또는 다른 사진 선택을 제공합니다.
+새 사진을 올리면 다시 검사하며, 통과한 경우 범위 선택으로 진행합니다.
+
+검사 서버 연결 실패나 잘못된 응답은 `quality_check_unavailable` 경고로 구분합니다.
+이 경우 품질 불량으로 확정하지 않고 `retake_required: false`를 반환하며,
+사용자가 사진을 직접 확인한 뒤 계속할 수 있습니다.
+수락된 사진의 응답은 기존처럼 `201`이며 `photo_quality`를 포함합니다.
+
 ### 사진 방향 자동 보정
 
 사진 API는 EXIF 보정 후 `PP-LCNet_x1_0_doc_ori`로 90도 단위 방향을 판별하고,
@@ -153,6 +177,29 @@ OCR이 완료된 제출의 `latest_input.version_number`를 확인합니다.
 
 응답의 `review_status`가 `confirmed`인지 확인합니다.
 수정 내용만 저장하려면 `PATCH /submissions/{submission_id}/input`을 사용합니다.
+
+### 확인 완료 후 내부 유형 분류
+
+`POST /submissions/{submission_id}/confirm`은 학생 수정본과 확인 완료 상태를
+먼저 저장하고, 저장된 최신 입력 버전으로 유형을 자동 분류합니다.
+현재 대상은 중1 1학기 3단원 문자와 식입니다.
+사용자 화면에는 유형 검색·선택 버튼을 표시하지 않습니다.
+
+- 동일 문항이 없어도 기존 검색·수식 규칙으로 찾은 1순위 유형을 내부 참고값으로 선택합니다.
+- 응답과 제출 재조회에 `type_match`가 포함됩니다. 결과는 입력 버전 ID와 본문 해시에 연결됩니다.
+- `purpose: tutoring_reference`는 단계별 안내를 위한 참고 결과임을 나타냅니다.
+- 동일 본문 매칭 조건을 충족하면 `method: exact_match`, `is_provisional: false`입니다.
+- 유사 유형을 선택한 경우 `matched_question_id: null`, `is_provisional: true`입니다.
+  후보의 유사도는 정답 확률이 아니며, 풀이 대상은 학생이 확인한 문제입니다.
+- 입력 부족·판독 불가·미지원 결과에는 유형을 임의로 만들지 않습니다.
+- 분류 실행에 실패하면 `type_match.error_code`가 `internal_type_classification_failed`이고
+  유형 상태는 `needs_review`입니다. 학생 수정본과 `review_status: confirmed`는 보존됩니다.
+- 수정본이 새 버전으로 바뀌면 이전 유형을 사용하지 않으며, 다시 확인 완료할 때 새로 분류합니다.
+
+`POST /submissions/{submission_id}/type-match`는 내부 재실행용으로 유지합니다.
+확인 완료한 최신 `expected_version_number`와 인증이 필요하며, 같은 문제은행·분류 정책의
+결과는 재사용합니다. 실패한 분류는 이 API로 다시 실행할 수 있습니다.
+기존 수동 선택 API인 `/submissions/{submission_id}/type-match/confirm`은 제거했습니다.
 
 ## OCR 스트리밍
 

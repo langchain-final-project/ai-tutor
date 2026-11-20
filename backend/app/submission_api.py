@@ -2,6 +2,7 @@
 
 from contextlib import asynccontextmanager
 from io import BytesIO
+import logging
 import os
 from pathlib import Path
 import secrets
@@ -34,14 +35,21 @@ from app.ocr_jobs import OCRJobManager, build_qwen_pipeline
 from app.solution_api import create_solution_router
 from app.ocr.images import open_image
 from app.ocr.selection import crop_photo_region
-from app.ocr.quality import (
-    inspect_photo_quality,
-    evaluate_photo_quality,
+from app.ocr.quality import check_photo_quality, requires_photo_retake
+from app.db.type_matches import ensure_type_match_schema, load_type_match, save_type_match
+from app.tutor.unit_type_matcher import (
+    AUTOMATIC_POLICY_VERSION,
+    DEFAULT_BANK,
+    SCOPE,
+    VERSION as TYPE_MATCH_VERSION,
+    classify_for_tutoring,
+    get_unit_matcher,
 )
 
 ROOT = Path(__file__).resolve().parents[2]
 MAX_IMAGE_BYTES = 30 * 1024 * 1024
 bearer = HTTPBearer(auto_error=False)
+logger = logging.getLogger(__name__)
 
 
 class InputBody(BaseModel):
@@ -64,6 +72,11 @@ class EquationSubmissionBody(InputBody):
     """확인한 사진에서 학생이 직접 옮긴 평문 등식 한 개를 별도로 저장한다."""
 
     content_text: str = Field(min_length=1, max_length=512, strict=True)
+
+
+class TypeMatchBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    expected_version_number: int = Field(ge=1, strict=True)
 
 
 def validate_photo(content: bytes) -> str:
@@ -137,6 +150,7 @@ def create_submission_app(
     owner_id: str | None = None,
     owner_dependency: Callable[..., str] | None = None,
     pipeline_factory=build_qwen_pipeline,
+    type_bank_database: str | Path | None = None,
 ) -> FastAPI:
     database = Path(database) if database is not None else Path(
         os.getenv("DIDGO_DATABASE", str(ROOT / "data/problem_bank/didgo.sqlite3"))
@@ -154,10 +168,13 @@ def create_submission_app(
     )
 
     manager = OCRJobManager(database, pipeline_factory=pipeline_factory)
+    type_bank = Path(type_bank_database or os.getenv("DIDGO_TYPE_BANK_DATABASE", str(DEFAULT_BANK)))
 
     @asynccontextmanager
     async def lifespan(_app):
-        # DB 복구와 모델 작업의 종료 대기는 별도 스레드에서 처리 진행
+        with submission_connection(database) as connection:
+            ensure_type_match_schema(connection)
+        # DB 복구와 모델 작업의 종료 대기는 별도 스레드에서 처리한다.
         await run_in_threadpool(manager.start)
         try:
             yield
@@ -291,12 +308,16 @@ def create_submission_app(
             if not filename.strip() or len(filename) > 255:
                 raise HTTPException(422, "파일명을 확인해 주세요.")
 
-            quality_metrics = inspect_photo_quality(content)
+            photo_quality = check_photo_quality(content)
+            photo_quality["retake_required"] = requires_photo_retake(photo_quality)
 
-            photo_quality = {
-                **evaluate_photo_quality(quality_metrics),
-                "metrics": quality_metrics,
-            }
+            # 재촬영 대상은 제출 ID를 발급하지 않아 OCR을 시작할 수 없다.
+            if photo_quality["retake_required"]:
+                raise HTTPException(422, detail={
+                    "code": "photo_retake_required",
+                    "message": "문제 전체가 선명하게 보이도록 사진을 다시 촬영해 주세요.",
+                    "photo_quality": photo_quality,
+                })
 
             with submission_connection(database) as connection:
                 ids = create_photo_submission(
@@ -469,7 +490,6 @@ def create_submission_app(
                 student_id,
                 body.expected_version_number,
             )
-
             save_and_confirm_input(
                 connection,
                 submission_id=submission_id,
@@ -477,12 +497,110 @@ def create_submission_app(
                 content_text=body.content_text,
                 expected_version_number=body.expected_version_number,
             )
-
-            return get_submission(
+            saved = get_submission(
                 connection,
                 submission_id=submission_id,
                 owner_id=student_id,
             )
+
+        version = saved["latest_input"]["version_number"]
+        classify_confirmed_input(submission_id, student_id, version)
+
+        with submission_connection(database) as connection:
+            current, _ = confirmed_type_input(
+                connection, submission_id, student_id, version,
+            )
+            return current
+
+    def confirmed_type_input(connection, submission_id, student_id, expected):
+        current = get_submission(
+            connection, submission_id=submission_id, owner_id=student_id,
+        )
+        latest = current["latest_input"]
+        if not latest or latest["version_number"] != expected:
+            raise HTTPException(409, "문제 내용이 변경되었습니다. 최신 내용을 불러와 주세요.")
+        if not latest["confirmed_at"]:
+            raise HTTPException(409, "문제 내용 확인 완료가 필요합니다.")
+        return current, latest
+
+    def classify_confirmed_input(submission_id, student_id, expected):
+        with submission_connection(database) as connection:
+            current, latest = confirmed_type_input(
+                connection, submission_id, student_id, expected,
+            )
+            cached = load_type_match(connection, latest["id"])
+
+        try:
+            matcher = get_unit_matcher(type_bank)
+
+            def reusable(value):
+                return (
+                    value
+                    and value.get("data_version") == matcher.data_version
+                    and value.get("classifier_version") == TYPE_MATCH_VERSION
+                    and value.get("selection_policy_version") == AUTOMATIC_POLICY_VERSION
+                    and value.get("method") != "manual"
+                )
+
+            if reusable(cached):
+                result = cached
+            else:
+                layout = (current.get("layout_detection") or {}).get("layout") or {}
+                has_visuals = any(
+                    region["kind"] in {"figure", "graph", "table"}
+                    for region in layout.get("regions", [])
+                )
+                result = classify_for_tutoring(
+                    matcher, latest["content_text"], has_visuals=has_visuals,
+                )
+        except Exception:
+            logger.exception("내부 유형 분류 실패: submission_id=%s", submission_id)
+            result = {
+                "classifier_version": TYPE_MATCH_VERSION,
+                "data_version": None,
+                "selection_policy_version": AUTOMATIC_POLICY_VERSION,
+                "purpose": "tutoring_reference",
+                "status": "needs_review",
+                "method": "retrieval",
+                "scope": dict(SCOPE),
+                "bank_question_count": 0,
+                "bank_type_count": 0,
+                "selected_type": None,
+                "matched_question_id": None,
+                "is_provisional": False,
+                "candidates": [],
+                "reasons": ["내부 유형 분류를 완료하지 못했습니다."],
+                "error_code": "internal_type_classification_failed",
+            }
+
+        with submission_connection(database, immediate=True) as connection:
+            _, latest = confirmed_type_input(
+                connection, submission_id, student_id, expected,
+            )
+            existing = load_type_match(connection, latest["id"])
+            if (
+                existing
+                and existing.get("selection_policy_version") == AUTOMATIC_POLICY_VERSION
+                and existing.get("classifier_version") == TYPE_MATCH_VERSION
+                and existing.get("data_version") is not None
+                and existing.get("method") != "manual"
+                and (
+                    result["data_version"] is None
+                    or existing["data_version"] == result["data_version"]
+                )
+            ):
+                return existing
+            return save_type_match(connection, latest, result)
+
+    @app.post("/submissions/{submission_id}/type-match")
+    def match_type(
+        submission_id: int,
+        body: TypeMatchBody,
+        student_id: Annotated[str, Depends(current_owner)],
+    ):
+        return classify_confirmed_input(
+            submission_id, student_id, body.expected_version_number,
+        )
 
     app.include_router(create_ocr_router(manager, current_owner))
     app.include_router(create_solution_router(database, current_owner))

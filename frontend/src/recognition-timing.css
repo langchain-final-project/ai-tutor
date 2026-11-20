@@ -1,0 +1,18 @@
+.recognition-timing {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--subtle);
+}
+
+.recognition-timing .recognition-timing-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.recognition-timing h2 { margin: 0; font-size: 16px; }
+.recognition-timing .recognition-timing-heading span { color: var(--muted); font-size: 12px; }
+.recognition-timing dl { display: grid; gap: 8px; }
+.recognition-timing dl > div { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.recognition-timing dt { font-size: 13px; }
+.recognition-timing dd { margin: 0; font-size: 16px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.recognition-timing p { color: var(--muted); font-size: 12px; line-height: 1.6; }
