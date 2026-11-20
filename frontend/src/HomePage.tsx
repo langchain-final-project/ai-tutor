@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react"
-import { ApiError, auth } from "./auth"
-import logo from "./assets/didgo.svg"
-import "./home.css"
+import { useEffect, useState } from "react";
+import { ApiError, auth } from "./auth";
+import type { Profile } from "./auth";
+import { AccountSettings } from "./AccountSettings";
+import logo from "./assets/didgo.svg";
+import "./home.css";
 
 const icons = {
   home: <><path d="m3 10 9-7 9 7v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><path d="M9 21v-8h6v8" /></>,
@@ -9,14 +11,14 @@ const icons = {
   history: <><path d="M3 12a9 9 0 1 1 2.6 6.4M3 5v7h7" /><path d="M12 7v5l3 2" /></>,
   settings: <><path d="m9 3-.6 2.2-2 .9-2.1-.8-2 3.4 1.6 1.5v2.4L2.3 14l2 3.5 2.1-.8 2 .9.6 2.4h4l.6-2.4 2-.9 2.1.8 2-3.5-1.6-1.4v-2.4l1.6-1.5-2-3.4-2.1.8-2-.9L13 3z" /><circle cx="11" cy="11.5" r="3" /></>,
   chevron: <path d="m9 6 6 6-6 6" />,
-}
+};
 
 type Category = {
-  id: Exclude<keyof typeof icons, "chevron">
-  label: string
-  title?: string
-  children?: readonly { id: string; label: string }[]
-}
+  id: Exclude<keyof typeof icons, "chevron">;
+  label: string;
+  title?: string;
+  children?: readonly { id: string; label: string }[];
+};
 
 const categories: readonly Category[] = [
   { id: "home", label: "홈", title: "학습 홈" },
@@ -34,7 +36,7 @@ const categories: readonly Category[] = [
     ],
   },
   { id: "settings", label: "설정" },
-]
+];
 
 function Icon({ name }: { name: keyof typeof icons }) {
   return (
@@ -42,74 +44,70 @@ function Icon({ name }: { name: keyof typeof icons }) {
       strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       {icons[name]}
     </svg>
-  )
+  );
 }
 
 function getSelection() {
-  const [categoryId, itemId] = location.hash.slice(1).split("/")
-  const category = categories.find(({ id }) => id === categoryId) ?? categories[0]
-  return { category, item: category.children?.find(({ id }) => id === itemId) }
+  const [categoryId, itemId] = location.hash.slice(1).split("/");
+  const category = categories.find(({ id }) => id === categoryId) ?? categories[0];
+  return { category, item: category.children?.find(({ id }) => id === itemId) };
 }
 
-export function HomePage({ loginUrl }: { loginUrl: string }) {
-  const [selection, setSelection] = useState(getSelection)
+export function HomePage({ loginUrl, adminUrl }: { loginUrl: string; adminUrl: string }) {
+  const [selection, setSelection] = useState(getSelection);
   const [expanded, setExpanded] = useState<Category["id"] | null>(
     () => selection.category.children ? selection.category.id : null,
-  )
-  const [session, setSession] = useState<"checking" | "ready" | "unavailable">("checking")
-  const [loggingOut, setLoggingOut] = useState(false)
-  const [logoutError, setLogoutError] = useState(false)
+  );
+  const [session, setSession] = useState<Profile | "checking" | "unavailable">("checking");
+  const [canOpenAdmin, setCanOpenAdmin] = useState(false);
 
   useEffect(() => {
-    const controller = new AbortController()
-    auth.profile(controller.signal).then(() => {
-      if (!controller.signal.aborted) setSession("ready")
+    const controller = new AbortController();
+    auth.profile(controller.signal).then((profile) => {
+      if (controller.signal.aborted) return;
+      setSession(profile);
+      auth.adminSession(controller.signal).then(() => {
+        if (!controller.signal.aborted) setCanOpenAdmin(true);
+      }).catch(() => {
+        // The admin link stays hidden until the server confirms access.
+      });
     }).catch((error: unknown) => {
-      if (controller.signal.aborted) return
+      if (controller.signal.aborted) return;
       if (error instanceof ApiError && error.status === 401) {
-        location.replace(loginUrl)
+        location.replace(loginUrl);
       } else {
-        setSession("unavailable")
+        setSession("unavailable");
       }
-    })
-    return () => controller.abort()
-  }, [loginUrl])
+    });
+    return () => controller.abort();
+  }, [loginUrl]);
 
   useEffect(() => {
     function syncSelection() {
-      const next = getSelection()
-      setSelection(next)
-      if (next.category.children) setExpanded(next.category.id)
+      const next = getSelection();
+      setSelection(next);
+      if (next.category.children) setExpanded(next.category.id);
     }
-    window.addEventListener("hashchange", syncSelection)
-    return () => window.removeEventListener("hashchange", syncSelection)
-  }, [])
+    window.addEventListener("hashchange", syncSelection);
+    return () => window.removeEventListener("hashchange", syncSelection);
+  }, []);
 
-  async function logout() {
-    if (loggingOut) return
-    setLoggingOut(true)
-    setLogoutError(false)
-    try {
-      await auth.logout()
-      location.replace(loginUrl)
-    } catch {
-      setLogoutError(true)
-      setLoggingOut(false)
-    }
-  }
-
-  const { category, item } = selection
-  const title = item?.label ?? category.title ?? category.label
+  const { category, item } = selection;
+  const title = item?.label ?? category.title ?? category.label;
+  const inSettings = category.id === "settings";
+  const profile = typeof session === "object" ? session : null;
 
   return (
     <div className="student-page">
       <header className="student-header">
         <a className="student-brand" href="#home" aria-label="딛고 학습 홈"><img src={logo} alt="" /></a>
-        <span className="student-header-title">{categories[0].title}</span>
-        <span className="subject">중학 수학</span>
+        <div className="student-header-actions">
+          <span className="subject">중학 수학</span>
+          {canOpenAdmin && <a className="student-admin-link" href={adminUrl}>관리자 페이지</a>}
+        </div>
       </header>
 
-      {session === "ready" && (
+      {profile && (
         <>
           <nav className="student-sidebar" aria-label="웹 주요 메뉴">
             <ul>
@@ -151,7 +149,7 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
         </>
       )}
 
-      <main className="student-content" aria-labelledby="student-title">
+      <main className={inSettings ? "student-content student-content--settings" : "student-content"} aria-labelledby="student-title">
         <h1 id="student-title">{title}</h1>
         {session === "checking" && <p role="status">로그인 상태를 확인하고 있어요.</p>}
         {session === "unavailable" && (
@@ -160,7 +158,7 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
             <button type="button" className="primary" onClick={() => location.reload()}>다시 시도</button>
           </div>
         )}
-        {session === "ready" && (
+        {profile && (
           <>
             {!item && category.children && (
               <nav className="student-category-links" aria-label={`${category.label} 하위 메뉴`}>
@@ -169,17 +167,10 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
                 ))}
               </nav>
             )}
-            {category.id === "settings" && (
-              <div className="student-settings">
-                {logoutError && <p className="error" role="alert">로그아웃하지 못했어요. 잠시 후 다시 시도해 주세요.</p>}
-                <button className="primary" type="button" onClick={logout} disabled={loggingOut}>
-                  {loggingOut ? "로그아웃 중…" : "로그아웃"}
-                </button>
-              </div>
-            )}
+            {inSettings && <AccountSettings loginUrl={loginUrl} email={profile.email} />}
           </>
         )}
       </main>
     </div>
-  )
+  );
 }

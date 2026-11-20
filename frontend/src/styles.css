@@ -19,12 +19,12 @@
 body { margin: 0; }
 h1, h2, p, ol, dl, dd { margin: 0; }
 input, button { font: inherit; }
-a, .recovery button { color: var(--blue); font-weight: 700; text-decoration: none; }
-a:hover, .recovery button:hover { text-decoration: underline; }
+a { color: var(--blue); font-weight: 700; text-decoration: none; }
+a:hover { text-decoration: underline; }
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
 
 .auth-page { min-height: 100dvh; display: flex; flex-direction: column; }
-.desktop-strip, .desktop-only, .introduction { display: none; }
+.desktop-only, .introduction { display: none; }
 .site-header {
   display: flex;
   align-items: center;
@@ -33,7 +33,7 @@ a:hover, .recovery button:hover { text-decoration: underline; }
   min-height: 71px;
   background: var(--navy);
 }
-.brand, .brand-tile, .header-links { display: flex; align-items: center; }
+.brand, .brand-tile { display: flex; align-items: center; }
 .brand:focus-visible { outline-color: var(--yellow); }
 .brand-tile { width: 82px; height: 40px; justify-content: center; background: var(--navy); border-radius: 8px; }
 .brand-tile img { display: block; }
@@ -89,10 +89,6 @@ h1 { font-size: 28px; line-height: 40px; letter-spacing: -.025em; }
 .primary:disabled { opacity: .65; cursor: wait; }
 .status, .error { padding: 10px 12px; border-radius: 8px; background: var(--tint); font-size: 13px; }
 .error { color: #a32632; background: #fff0ef; }
-.recovery { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; min-height: 40px; }
-.recovery button { background: none; border: 0; cursor: pointer; padding: 8px 25px; font-size: 13px; }
-.recovery button + button { border-left: 1px solid var(--border); }
-.recovery p { flex-basis: 100%; text-align: center; color: var(--muted); font-size: 13px; }
 .switch-form { display: flex; justify-content: center; align-items: center; gap: clamp(12px, 7vw, 32px); min-height: 32px; font-size: 13px; color: var(--muted); }
 .switch-form a { font-size: 14px; }
 .profile-email { overflow-wrap: anywhere; }
@@ -103,11 +99,8 @@ h1 { font-size: 28px; line-height: 40px; letter-spacing: -.025em; }
   :root { --gutter: clamp(28px, 4.45vw, 64px); }
   .desktop-only { display: inline; }
   .mobile-only { display: none; }
-  .desktop-strip { display: flex; justify-content: space-between; padding: 9px 24px; background: var(--navy); color: white; font-size: 10px; line-height: 16px; }
-  .desktop-strip span:last-child { color: var(--light-blue); }
-  .site-header { background: transparent; min-height: 82px; }
-  .brand, .header-links { gap: 20px; }
-  .brand, .header-links a { font-size: 13px; font-weight: 400; color: var(--muted); }
+  .site-header { min-height: 82px; }
+  .brand { gap: 20px; font-size: 13px; font-weight: 400; color: var(--light-blue); }
   .subject { min-width: 88px; text-align: center; }
   .auth-layout {
     display: grid;

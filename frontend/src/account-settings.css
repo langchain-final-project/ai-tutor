@@ -1,0 +1,100 @@
+.account-settings {
+  --account-padding: 16px;
+  --account-danger: #aa232c;
+  display: grid;
+  gap: 18px;
+  max-width: 720px;
+}
+
+.account-card { border: 1px solid var(--border); border-radius: 15px; background: var(--paper); }
+.account-email { display: grid; gap: 5px; min-width: 0; padding: var(--account-padding); line-height: 1.45; }
+.account-email dt { font-size: 13px; font-weight: 700; }
+.account-email dd { font-size: 15px; overflow-wrap: anywhere; }
+.account-menu { padding-inline: var(--account-padding); }
+
+.account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  min-height: 49px;
+  padding: 6px 0;
+  border: 0;
+  background: transparent;
+  color: var(--navy);
+  font-size: 15px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.account-row + .account-row { border-top: 1px solid var(--border); }
+.account-row img { flex: none; }
+.account-row:hover { color: var(--blue); }
+.account-row:disabled { opacity: .65; cursor: wait; }
+.account-row--danger, .account-row--danger:hover { color: var(--account-danger); }
+
+@media (min-width: 900px) {
+  .account-settings { --account-padding: 22px; gap: 22px; margin-top: 22px; }
+}
+
+.account-description { color: var(--muted); font-size: 14px; line-height: 1.6; }
+.account-form { display: grid; gap: 16px; }
+.account-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+
+.student-settings.account-inquiry { max-width: 560px; }
+.account-inquiry select, .account-inquiry textarea {
+  width: 100%;
+  min-height: 54px;
+  padding: 12px 15px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--paper);
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+}
+.account-inquiry textarea { resize: vertical; }
+
+.account-inquiry-list { list-style: none; margin: 0; padding: 0 16px; }
+.account-inquiry-list li + li { border-top: 1px solid var(--border); }
+.account-inquiry-list .account-row { min-height: 62px; padding: 10px 0; }
+.account-inquiry-row { display: grid; gap: 3px; min-width: 0; overflow-wrap: anywhere; }
+.account-inquiry-row .account-description { font-size: 13px; font-weight: 500; }
+.account-inquiry-detail { display: grid; gap: 10px; padding: 16px; }
+.account-inquiry-detail h3, .account-inquiry-detail h4 { margin: 0; }
+.account-inquiry-detail h3, .account-inquiry-text { overflow-wrap: anywhere; }
+.account-inquiry-text { white-space: pre-wrap; }
+.account-inquiry-reply { display: grid; gap: 6px; padding-top: 12px; border-top: 1px solid var(--border); }
+.account-inquiry-pagination { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 13px; }
+.account-inquiry-pagination .account-option { min-height: 40px; }
+
+.account-option {
+  min-height: 54px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--paper);
+  color: var(--navy);
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.account-option:hover { border-color: var(--light-blue); }
+.account-option:disabled { opacity: .65; cursor: wait; }
+.account-danger { background: #a32632; color: var(--paper); }
+
+.withdrawal-dialog {
+  width: min(400px, calc(100% - 32px));
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--paper);
+  color: var(--navy);
+}
+
+.withdrawal-dialog::backdrop { background: rgb(18 37 76 / 50%); }
+.withdrawal-dialog h2 { font-size: 21px; }
+.withdrawal-dialog p { margin-top: 10px; }
+.withdrawal-dialog .account-actions { margin-top: 22px; }
