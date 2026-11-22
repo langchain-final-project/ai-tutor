@@ -27,6 +27,7 @@ services:
       - "1"
     environment:
       DIDGO_DATABASE: /var/lib/didgo-solution/solution-flow.sqlite3
+      DIDGO_TYPE_BANK_DATABASE: /opt/didgo/problem_bank.seed.sqlite3
       DIDGO_QWEN_URL: ${DIDGO_QWEN_URL:-http://host.docker.internal:8081/v1}
       DIDGO_QWEN_MODEL: ${DIDGO_QWEN_MODEL:-}
       DIDGO_TUTOR_URL: ${DIDGO_TUTOR_URL:-http://host.docker.internal:11434}
@@ -36,6 +37,13 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - solution_data:/var/lib/didgo-solution
+      # 공유 문제은행은 수정하지 않고 유형 조회에만 사용한다. 파일이 없으면 기동 전에 알린다.
+      - type: bind
+        source: ./data/problem_bank/problem_bank.seed.sqlite3
+        target: /opt/didgo/problem_bank.seed.sqlite3
+        read_only: true
+        bind:
+          create_host_path: false
     depends_on:
       solution-flow-init:
         condition: service_completed_successfully
