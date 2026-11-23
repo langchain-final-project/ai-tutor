@@ -3,7 +3,7 @@ import type { FormEvent } from "react"
 import { MathFormula } from "./components/MathFormula"
 import type { ContentPart, ProblemReview } from "./types/problemReview"
 import {
-  uploadPhoto,
+uploadPhoto,
   recognizeSubmission,
   createReviewProblem,
   loadReview,
@@ -109,6 +109,8 @@ const busy =
 const locked = busy || saving !== null
 const liveReading = phase === "queued" || phase === "running"
 const retakeRequired = phase === "quality_review" && photoQuality?.retake_required === true
+const showComparison = liveReading || phase === "restoring" || !!submission?.latest_input
+const currentStep = submission?.latest_input ? 2 : liveReading || phase === "restoring" ? 1 : 0
 
 const displayedPhotoRegion =
   submission?.selected_region ??
@@ -134,6 +136,28 @@ useEffect(() => {
   const imageUrl = problem.imageUrl
   return () => { if (imageUrl) URL.revokeObjectURL(imageUrl) }
 }, [problem.imageUrl])
+
+useEffect(() => {
+  const viewport = window.visualViewport
+  if (!viewport) return
+
+  // 모바일 기본 키보드가 올라와도 편집창과 적용 버튼을 볼 수 있게 합니다.
+  const syncViewport = () => {
+    const inset = Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop)
+    for (const dialog of [textDialogRef.current, mathDialogRef.current]) {
+      dialog?.style.setProperty("--review-visible-height", `${viewport.height}px`)
+      dialog?.style.setProperty("--review-keyboard-inset", `${inset}px`)
+    }
+  }
+
+  syncViewport()
+  viewport.addEventListener("resize", syncViewport)
+  viewport.addEventListener("scroll", syncViewport)
+  return () => {
+    viewport.removeEventListener("resize", syncViewport)
+    viewport.removeEventListener("scroll", syncViewport)
+  }
+}, [])
 
 useEffect(() => {
   const savedId = new URL(window.location.href).searchParams.get("submission")
@@ -516,7 +540,7 @@ function applyMathEdit(latex: string) {
     .find((part) => part.id === selectedId)
 
   return (
-    <div className="review-page">
+    <div className={`review-page ${showComparison ? "review-page--compare" : "review-page--prepare"}`}>
       <header className="review-header">
         <span className="review-brand">딛고</span>
         <span className="review-badge">
@@ -535,8 +559,29 @@ function applyMathEdit(latex: string) {
           <p>원본과 비교하고, 다른 부분을 눌러 수정해 주세요.</p>
         </div>
 
+        <ol className="review-steps" aria-label="문제 등록 진행 단계">
+          {[
+            ["사진·범위", "문제 하나를 선택해요"],
+            ["문제 인식", "사진 속 내용을 읽어요"],
+            ["내용 확인", "비교하고 수정해요"],
+          ].map(([label, description], index) => (
+            <li
+              key={label}
+              className={index < currentStep ? "is-complete" : ""}
+              aria-current={currentStep === index ? "step" : undefined}
+            >
+              <span className="review-step-number" aria-hidden="true">{index < currentStep ? "✓" : index + 1}</span>
+              <div>
+                <span className="review-step-label">{label}</span>
+                <span className="review-step-description">{description}</span>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div className="review-workspace">
         <section
-          className="review-section"
+          className="review-section review-photo-panel"
           aria-labelledby="review-photo-title"
         >
           <h2 id="review-photo-title">
@@ -611,8 +656,16 @@ function applyMathEdit(latex: string) {
               사진 방향을 확인해주세요. 인식된 내용과 맞으면 그대로 진행하세요.
             </p>
           )}
+          {!showComparison && (
+            <div className="review-photo-status">
+              <p className="review-help" role="status">{phaseMessage[phase]}</p>
+              {ocrError && <p className="review-error" role="alert">{ocrError}</p>}
+            </div>
+          )}
         </section>
 
+        {showComparison && (
+        <div className="review-result-panel">
         <section
           className="review-section"
           aria-labelledby="review-content-title"
@@ -711,7 +764,7 @@ function applyMathEdit(latex: string) {
             extraction={submission?.condition_extraction}
           />
         )}
-        <section
+        {selectedPart && <section
           className="review-section review-selection"
           aria-labelledby="review-selection-title"
         >
@@ -733,7 +786,7 @@ function applyMathEdit(latex: string) {
               </p>
             )}
           </div>
-        </section>
+        </section>}
 
         {submission?.latest_input && (
           <section className="review-completion" aria-label="수정본 저장과 확인 완료" aria-busy={saving !== null}>
@@ -762,6 +815,9 @@ function applyMathEdit(latex: string) {
             </button>
           </section>
         )}
+        </div>
+        )}
+        </div>
       </main>
       <dialog
         ref={textDialogRef}

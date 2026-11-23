@@ -12,7 +12,6 @@ type PhotoViewerProps = {
   layout?: ProblemLayout | null
 }
 
-const FRAME_HEIGHT = 280
 const MAX_SCALE = 6
 
 const LAYOUT_COLORS: Record<LayoutKind, string> = {
@@ -33,7 +32,8 @@ export function PhotoViewer({
 }: PhotoViewerProps) {
   const frameRef = useRef<HTMLDivElement>(null)
 
-  const [frameWidth, setFrameWidth] = useState(0)
+  const [frameSize, setFrameSize] = useState({ width: 0, height: 0 })
+  const { width: frameWidth, height: frameHeight } = frameSize
   const [naturalSize, setNaturalSize] = useState({
     width: 0,
     height: 0,
@@ -46,7 +46,10 @@ export function PhotoViewer({
     if (!frame) return
 
     const observer = new ResizeObserver(([entry]) => {
-      setFrameWidth(entry.contentRect.width)
+      const { width, height } = entry.contentRect
+      setFrameSize((current) => current.width === width && current.height === height
+        ? current
+        : { width, height })
     })
 
     observer.observe(frame)
@@ -56,6 +59,7 @@ export function PhotoViewer({
 
   const ready =
     frameWidth > 0 &&
+    frameHeight > 0 &&
     naturalSize.width > 0 &&
     naturalSize.height > 0
 
@@ -63,7 +67,7 @@ export function PhotoViewer({
   const fitRatio = ready
     ? Math.min(
         frameWidth / naturalSize.width,
-        FRAME_HEIGHT / naturalSize.height,
+        frameHeight / naturalSize.height,
       )
     : 1
 
@@ -101,10 +105,10 @@ export function PhotoViewer({
       )}
       <div ref={frameRef} className="review-photo-frame">
         <TransformWrapper
-          key={`${imageWidth}:${imageHeight}`}
+          key={`${frameWidth}:${frameHeight}:${imageWidth}:${imageHeight}`}
           initialScale={1}
           initialPositionX={(frameWidth - imageWidth) / 2}
-          initialPositionY={(FRAME_HEIGHT - imageHeight) / 2}
+          initialPositionY={(frameHeight - imageHeight) / 2}
           minScale={1}
           maxScale={MAX_SCALE}
           centerZoomedOut
@@ -131,7 +135,7 @@ export function PhotoViewer({
               <TransformComponent
                 wrapperStyle={{
                   width: "100%",
-                  height: FRAME_HEIGHT,
+                  height: frameHeight,
                   touchAction: zoomed ? "none" : "pan-y",
                   cursor: zoomed ? "grab" : "default",
                 }}
@@ -238,14 +242,13 @@ export function PhotoViewer({
         </TransformWrapper>
       </div>
 
-      {/* <p className="review-help review-photo-touch-help">
+      <p className="review-help review-photo-touch-help">
         두 손가락으로 확대·축소하고, 확대된 사진을 끌어서 이동하세요.
-        두 번 누르면 확대하거나 처음 크기로 돌아갑니다.
       </p>
 
       <p className="review-help review-photo-mouse-help">
-        ＋/−로 확대·축소하고, 확대된 사진을 드래그하거나 휠로 이동하세요.
-      </p> */}
+        ＋/−로 확대·축소하고, 확대된 사진을 끌어서 이동하세요.
+      </p>
     </div>
   )
 }

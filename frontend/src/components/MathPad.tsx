@@ -146,21 +146,20 @@ export function MathPad({
             {error}
           </p>
         )}
-
-        <div className="review-editor-actions">
-          <button type="button" onClick={onCancel}>
-            취소
-          </button>
-          <button
-            type="button"
-            className="review-apply"
-            onClick={apply}
-          >
-            수정 적용
-          </button>
-        </div>
       </div>
 
+      <div className="review-editor-actions">
+        <button type="button" onClick={onCancel}>
+          취소
+        </button>
+        <button
+          type="button"
+          className="review-apply"
+          onClick={apply}
+        >
+          수정 적용
+        </button>
+      </div>
       <div ref={keyboardRef} className="review-math-keyboard" />
     </div>
   )
