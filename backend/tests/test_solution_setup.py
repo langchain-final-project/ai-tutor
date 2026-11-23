@@ -127,6 +127,45 @@ def test_upgrade_previous_solution_schema_preserves_checksum_and_records(tmp_pat
                                   (setup.SOURCE_MIGRATION_ID,)).fetchone() == (setup._digest(setup._schema(setup.SOURCE_SCHEMA_FILE)),)
 
 
+def test_learning_upgrade_preserves_tutor_history_and_repeats(tmp_path):
+    target = tmp_path / "before-learning.sqlite3"
+    create_base(target)
+    for schema_file, migration_id in (
+        (setup.SCHEMA_FILE, setup.MIGRATION_ID),
+        (setup.SOURCE_SCHEMA_FILE, setup.SOURCE_MIGRATION_ID),
+        (setup.TYPE_SCHEMA_FILE, setup.TYPE_MIGRATION_ID),
+        (setup.TUTOR_SCHEMA_FILE, setup.TUTOR_MIGRATION_ID),
+    ):
+        with closing(sqlite3.connect(target)) as connection:
+            connection.executescript(setup._schema(schema_file))
+            connection.execute("INSERT INTO problem_schema_migrations(id,schema_sha256) VALUES (?,?)",
+                               (migration_id, setup._digest(setup._schema(schema_file))))
+            connection.commit()
+    with closing(sqlite3.connect(target)) as connection:
+        connection.execute("""INSERT INTO tutor_sessions
+            (submission_id,input_version_id,subject,target_text,target_sha256,problem_json,state_json)
+            VALUES (1,1,'mathematics','x=2','existing-hash','{}','{}')""")
+        connection.commit()
+    setup.prepare(target)
+    setup.prepare(target)
+    with closing(sqlite3.connect(target)) as connection:
+        assert connection.execute("SELECT target_text FROM tutor_sessions").fetchall() == [('x=2',)]
+        assert connection.execute("SELECT COUNT(*) FROM learning_paths").fetchone() == (0,)
+        assert connection.execute("SELECT schema_sha256 FROM problem_schema_migrations WHERE id=?",
+                                  (setup.LEARNING_MIGRATION_ID,)).fetchone() == (
+                                      setup._digest(setup._schema(setup.LEARNING_SCHEMA_FILE)),)
+        assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
+
+
+def test_learning_partial_schema_is_rejected(tmp_path):
+    target = tmp_path / "partial-learning.sqlite3"
+    setup.prepare(target, create_empty=True)
+    with closing(sqlite3.connect(target)) as connection:
+        connection.execute("DROP INDEX ix_learning_activity_path")
+    with pytest.raises(ValueError, match="학습 경로 저장 스키마가 일부"):
+        setup.prepare(target)
+
+
 def test_upgrade_team_region_schema_preserves_existing_job_and_repeats(tmp_path):
     target = tmp_path / "team-regions.sqlite3"
     create_base(target)

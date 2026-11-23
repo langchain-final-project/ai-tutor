@@ -33,6 +33,8 @@ TYPE_SCHEMA_FILE = "007_problem_input_type_matches.sqlite.sql"
 TYPE_MIGRATION_ID = "problem-input-type-matches-v1"
 TUTOR_SCHEMA_FILE = "008_tutor_sessions.sqlite.sql"
 TUTOR_MIGRATION_ID = "tutor-sessions-v1"
+LEARNING_SCHEMA_FILE = "009_learning_paths.sqlite.sql"
+LEARNING_MIGRATION_ID = "learning-paths-v1"
 
 
 def _schema(name):
@@ -49,7 +51,8 @@ def _objects(connection):
     ))
 
 
-def _reference(*, with_regions=False, with_sources=False, with_types=False, with_tutor=False):
+def _reference(*, with_regions=False, with_sources=False, with_types=False, with_tutor=False,
+               with_learning=False):
     with closing(sqlite3.connect(":memory:")) as reference:
         for name, _ in BASE:
             reference.executescript(_schema(name))
@@ -63,6 +66,8 @@ def _reference(*, with_regions=False, with_sources=False, with_types=False, with
             reference.executescript(_schema(TYPE_SCHEMA_FILE))
         if with_tutor:
             reference.executescript(_schema(TUTOR_SCHEMA_FILE))
+        if with_learning:
+            reference.executescript(_schema(LEARNING_SCHEMA_FILE))
         full = _objects(reference)
         columns = {
             name: list(reference.execute(f'PRAGMA table_info("{name}")'))
@@ -137,22 +142,26 @@ def _has_type_match_schema(connection):
     return True
 
 
-def _has_tutor_schema(connection):
+def _has_strict_schema(connection, schema_file, label):
     """부분 적용·변조 상태를 먼저 검사해 기존 기록을 덮어쓰지 않는다."""
     with closing(sqlite3.connect(":memory:")) as reference:
-        reference.executescript(_schema(TUTOR_SCHEMA_FILE))
+        reference.executescript(_schema(schema_file))
         expected = _objects(reference)
         present = set(expected).intersection(_objects(connection))
         if not present:
             return False
         if present != set(expected):
-            raise ValueError("튜터 저장 스키마가 일부만 존재합니다. 적용 상태를 확인해 주세요.")
+            raise ValueError(f"{label} 저장 스키마가 일부만 존재합니다. 적용 상태를 확인해 주세요.")
         for name in expected:
             actual = connection.execute("SELECT sql FROM sqlite_master WHERE name=?", (name,)).fetchone()
             wanted = reference.execute("SELECT sql FROM sqlite_master WHERE name=?", (name,)).fetchone()
             if actual != wanted:
-                raise ValueError("튜터 저장 스키마 내용이 변경되었습니다.")
+                raise ValueError(f"{label} 저장 스키마 내용이 변경되었습니다.")
     return True
+
+
+def _has_tutor_schema(connection):
+    return _has_strict_schema(connection, TUTOR_SCHEMA_FILE, "튜터")
 
 
 def apply_migration(connection):
@@ -165,7 +174,9 @@ def apply_migration(connection):
     has_regions = _has_region_schema(connection)
     has_types = _has_type_match_schema(connection)
     has_tutor = _has_tutor_schema(connection)
-    _, extended, extended_columns = _reference(with_regions=True, with_sources=True, with_types=True, with_tutor=True)
+    has_learning = _has_strict_schema(connection, LEARNING_SCHEMA_FILE, "학습 경로")
+    _, extended, extended_columns = _reference(with_regions=True, with_sources=True, with_types=True,
+                                               with_tutor=True, with_learning=True)
     _, sources, _ = _reference(with_sources=True)
     current_columns = dict(extended_columns)
     if not has_regions:
@@ -197,6 +208,14 @@ def apply_migration(connection):
         "SELECT schema_sha256 FROM problem_schema_migrations WHERE id = ?",
         (TUTOR_MIGRATION_ID,),
     ).fetchone()
+    learning_schema = _schema(LEARNING_SCHEMA_FILE)
+    learning_digest = _digest(learning_schema)
+    learning_row = connection.execute(
+        "SELECT schema_sha256 FROM problem_schema_migrations WHERE id = ?",
+        (LEARNING_MIGRATION_ID,),
+    ).fetchone()
+    if learning_row is not None and (not has_learning or learning_row != (learning_digest,)):
+        raise ValueError("이미 적용된 학습 경로 저장 SQL의 내용 또는 적용 이력이 변경되었습니다.")
     if tutor_row is not None and (not has_tutor or tutor_row != (tutor_digest,)):
         raise ValueError("이미 적용된 튜터 저장 SQL의 내용 또는 적용 이력이 변경되었습니다.")
     if type_row is not None and (not has_types or type_row != (type_digest,)):
@@ -213,9 +232,10 @@ def apply_migration(connection):
         _verify_objects(connection, sources, current_columns)
     elif set(sources).difference(full).intersection(_objects(connection)):
         raise ValueError("007 객체가 일부 존재합니다. 자동으로 덮어쓰지 않습니다.")
-    if row is not None and source_row is not None and has_regions and type_row is not None and tutor_row is not None:
+    if (row is not None and source_row is not None and has_regions and type_row is not None
+            and tutor_row is not None and learning_row is not None):
         _verify_objects(connection, extended, extended_columns)
-        return "이미 적용됨: 풀이·OCR·유형·튜터 저장 구조 검증 완료"
+        return "이미 적용됨: 풀이·OCR·유형·튜터·학습 경로 저장 구조 검증 완료"
     pending_schema = "" if row is not None else schema
     if not has_regions:
         pending_schema += "\n" + _schema(REGION_SCHEMA_FILE)
@@ -225,11 +245,14 @@ def apply_migration(connection):
         pending_schema += "\n" + type_schema
     if not has_tutor:
         pending_schema += "\n" + tutor_schema
+    if not has_learning:
+        pending_schema += "\n" + learning_schema
     try:
         connection.executescript("BEGIN IMMEDIATE;\n" + pending_schema)
         _verify_objects(connection, extended, extended_columns)
         _has_region_schema(connection)
         _has_type_match_schema(connection)
+        _has_strict_schema(connection, LEARNING_SCHEMA_FILE, "학습 경로")
         _verify_integrity(connection)
         if row is None:
             connection.execute(
@@ -251,11 +274,16 @@ def apply_migration(connection):
                 "INSERT INTO problem_schema_migrations(id, schema_sha256) VALUES (?, ?)",
                 (TUTOR_MIGRATION_ID, tutor_digest),
             )
+        if learning_row is None:
+            connection.execute(
+                "INSERT INTO problem_schema_migrations(id, schema_sha256) VALUES (?, ?)",
+                (LEARNING_MIGRATION_ID, learning_digest),
+            )
         connection.commit()
     except BaseException:
         connection.rollback()
         raise
-    return "풀이·OCR·유형·튜터 저장 구조 적용 완료"
+    return "풀이·OCR·유형·튜터·학습 경로 저장 구조 적용 완료"
 
 
 def _build_empty(path):

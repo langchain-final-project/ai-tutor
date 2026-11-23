@@ -71,6 +71,10 @@ def create_tutor_router(database, current_owner, *, runner=None):
         except sqlite3.Error:
             raise HTTPException(503, '튜터 저장 구조를 준비한 뒤 다시 시도해 주세요.') from None
 
+    @router.get('/submissions/{submission_id}/tutor-targets')
+    def targets(submission_id: Annotated[int, Path(ge=1)], owner_id: Annotated[str, Depends(current_owner)]):
+        return call(records.target_options, owner_id, submission_id=submission_id)
+
     @router.post('/submissions/{submission_id}/tutor-sessions', status_code=201)
     def start(submission_id: Annotated[int, Path(ge=1)], body: StartTutorBody,
               owner_id: Annotated[str, Depends(current_owner)]):
@@ -102,7 +106,8 @@ def create_tutor_router(database, current_owner, *, runner=None):
             # 외부 모델 응답을 기다리는 동안 DB 연결·쓰기 잠금을 보유하지 않는다.
             result = (runner or run_turn)(reservation['problem'],
                                           reservation['state'], reservation['events'], payload)
-            result['response'].setdefault('usage', {})['request_seconds'] = round(monotonic() - started, 4)
+            # 모델 요청 시간과 도구·정책을 포함한 전체 턴 시간을 덮어쓰지 않고 구분한다.
+            result['response'].setdefault('usage', {})['turn_wall_seconds'] = round(monotonic() - started, 4)
         except Exception as error:
             with solution_connection(database, write=True) as connection:
                 records.fail(connection, session_id=session_id, reservation=reservation)

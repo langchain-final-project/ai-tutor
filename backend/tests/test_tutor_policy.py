@@ -3,6 +3,7 @@
 from copy import deepcopy
 from io import BytesIO
 import json
+import os
 from pathlib import Path
 import sys
 import unittest
@@ -10,7 +11,7 @@ from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.tutor.session_model import OllamaTutorClient, TutorModelError, _student_message
+from app.tutor.session_model import OllamaTutorClient, OpenAICompatibleTutorClient, TutorModelError, _student_message, create_tutor_client
 from app.tutor.session_service import initial_state, run_turn
 
 
@@ -82,6 +83,16 @@ class TutorPolicyTests(unittest.TestCase):
         self.assertEqual(model.context["current_work_status"], "verified_correct_incomplete")
         self.assertNotIn("message", model.context["recent_dialogue"][0])
 
+    def test_identical_hint_after_valid_progress_is_replaced_by_a_verified_next_step(self):
+        first = run_turn(PROBLEM, initial_state(), [], request("hint"), model_client=Model())
+        repeated = Model(first["response"]["message"].replace(" ", "  "))
+        result = run_turn(PROBLEM, first["state"], [{"response": first["response"]}],
+                          request("submit", "2x+4=3x-3"), model_client=repeated)
+        self.assertEqual(result["response"]["output_guard"], "repeated_hint_replaced")
+        self.assertIn("4=x-3", result["response"]["message"])
+        self.assertNotIn("x=7", result["response"]["message"])
+        self.assertEqual(result["response"]["verification"]["judgement"], "correct")
+
     def test_more_help_shows_one_verified_step_without_calling_model_or_final_answer(self):
         prefix = run_turn(PROBLEM, initial_state(), [], request("submit", "2x+4=3x-3"), model_client=Model())
         model = Model()
@@ -115,10 +126,62 @@ class TutorPolicyTests(unittest.TestCase):
 
     def test_unsupported_problem_still_allows_guidance_without_tool_proof(self):
         problem = dict(PROBLEM, target_text="(4x+5)+(2x-6)을 간단히 하세요.")
-        result = run_turn(problem, initial_state(), [], request("hint"), model_client=Model())
+        model = Model()
+        result = run_turn(problem, initial_state(), [], request("hint"), model_client=model)
         self.assertEqual(result["response"]["action"], "first_hint")
         self.assertFalse(result["response"]["tool_supported"])
         self.assertEqual(result["response"]["verification"]["judgement"], "undetermined")
+        self.assertNotIn("invalid_syntax", json.dumps(model.context))
+
+    def test_numbered_subquestions_request_selection_without_calling_a_model(self):
+        targets = ("다음 방정식을 풀어라.\n(1) 4/3x-3=x+6\n(2) 1/4x-1/2=-2/5x+2\n(3) 2/3x-1/6=3/2x",
+                   "\n".join(("다음 방정식을 풀어라.", r"(1) $\frac{4}{3}x-3=x+6$",
+                              r"(2) $\frac{1}{4}x-\frac{1}{2}=-\frac{2}{5}x+2$",
+                              r"(3) $\frac{2}{3}x-\frac{1}{6}=\frac{3}{2}x$")))
+        for target in targets:
+            problem = dict(PROBLEM, source_text=target, target_text=target)
+            original = deepcopy(problem)
+            for intent in ("hint", "submit", "answer"):
+                with self.subTest(target=target, intent=intent):
+                    model = Model("저는 먼저 1번을 선택하고 양변에 3을 곱해볼게요.")
+                    result = run_turn(problem, initial_state(), [], request(intent, "4x-9=3x+18", "x=27",
+                        "5x-10=-8x+40", "x=-50/13", "x=-1/5"), model_client=model)
+                    self.assertEqual(result["response"]["action"], "select_target")
+                    self.assertEqual(result["response"]["reason"], "multiple_subquestions")
+                    self.assertEqual(len(result["response"]["target_analysis"]["choices"]), 3)
+                    self.assertEqual(model.calls, 0)
+                    self.assertEqual(result["state"]["attempts"], 0)
+                    self.assertEqual(result["state"]["hint_count"], 0)
+                    self.assertFalse(result["state"]["answer_revealed"])
+            self.assertEqual(problem, original)
+
+    def test_selected_fraction_equations_complete_without_repeating_the_first_hint(self):
+        cases = ((r"\frac{4}{3}x-3=x+6", ("4x-9=3x+18", "x=27")),
+                 (r"\frac{2}{3}x-\frac{1}{6}=\frac{3}{2}x", ("4x-1=9x", "x=-1/5")))
+        for target, lines in cases:
+            with self.subTest(target=target):
+                problem, model = dict(PROBLEM, target_text=target), Model("저는 1번을 선택하고 양변에 3을 곱해볼게요.")
+                original = deepcopy(problem)
+                result = run_turn(problem, initial_state(), [], request("submit", *lines), model_client=model)
+                self.assertTrue(result["response"]["tool_supported"])
+                self.assertEqual(result["response"]["action"], "complete")
+                self.assertEqual(model.calls, 0)
+                self.assertEqual(problem, original)
+
+    def test_selected_second_fraction_equation_reports_the_actual_sign_error(self):
+        problem = dict(PROBLEM, target_text=r"\frac{1}{4}x-\frac{1}{2}=-\frac{2}{5}x+2", attempt_mode="independent")
+        model = Model()
+        result = run_turn(problem, initial_state(), [], request("submit", "5x-10=-8x+40", "x=-50/13"), model_client=model)
+        self.assertTrue(result["response"]["tool_supported"])
+        self.assertEqual(result["response"]["verification"]["judgement"], "incorrect")
+        self.assertEqual(result["response"]["verification"]["first_error_step_id"], "s2")
+        self.assertEqual(model.calls, 0)
+
+    def test_confirmed_unsupported_work_is_not_an_ocr_confirmation_request(self):
+        result = run_turn(PROBLEM, initial_state(), [], request("submit", "양변에서 같은 수를 뺐어요."), model_client=Model())
+        self.assertEqual(result["response"]["action"], "guide")
+        self.assertEqual(result["response"]["verification"]["reason_code"], "unsupported_observation")
+        self.assertFalse(result["response"]["tool_supported"])
 
     def test_direct_answer_request_records_exposure_without_solving_for_student(self):
         model = Model("양변을 정리하면 x=7이에요.")
@@ -139,6 +202,78 @@ class TutorPolicyTests(unittest.TestCase):
         self.assertNotIn("x=7", result["response"]["message"])
         self.assertEqual(result["response"]["source"], "guarded_model")
         self.assertFalse(result["state"]["answer_revealed"])
+
+    def test_latex_reversed_and_prose_answers_are_blocked_without_exposure(self):
+        for text in (r"답은 \(x=\frac{7}{1}\)입니다.", "7=x입니다.", "해는 7이에요.", "x의 값은 (7/1)이에요.", "정답=7", "x는 7이에요."):
+            with self.subTest(text=text):
+                result = run_turn(PROBLEM, initial_state(), [], request("hint"), model_client=Model(text))
+                self.assertEqual(result["response"]["output_guard"], "terminal_answer_removed")
+                self.assertTrue(result["response"]["answer_exposure_blocked"])
+                self.assertFalse(result["state"]["answer_revealed"])
+
+    def test_wrong_generated_answer_or_work_is_replaced_by_calculated_answer(self):
+        for text in ("정답은 x=8이에요.", "정답은 7이에요. 전개하면 2x+2=3x-3이에요.", "정답은 8이에요.", "정답은 7이에요. 2+2=5예요.", "y는 7이에요."):
+            with self.subTest(text=text):
+                result = run_turn(PROBLEM, initial_state(), [], request("answer"), model_client=Model(text))
+                self.assertEqual(result["response"]["source"], "verified_answer")
+                self.assertIn("x=7", result["response"]["message"])
+                self.assertFalse(result["response"]["output_verification"]["prose_verified"])
+                self.assertTrue(result["state"]["answer_revealed"])
+                self.assertFalse(result["state"]["solved"])
+
+    def test_observed_false_expansion_in_natural_language_is_not_published(self):
+        message = "2(x+2)를 전개하면 2x+2가 되어야 해요. 왼쪽을 다시 확인해 볼까요?"
+        result = run_turn(PROBLEM, initial_state(), [], request("submit", "2x+2=3x-3"), model_client=Model(message))
+        self.assertEqual(result["response"]["output_guard"], "generated_math_not_verified")
+        self.assertNotIn("2x+2", result["response"]["message"])
+        self.assertIn("왼쪽", result["response"]["message"])
+        self.assertEqual(result["response"]["verification"]["judgement"], "incorrect")
+
+    def test_correct_expansion_relation_is_retained_without_claiming_prose_verification(self):
+        message = "2(x+2)를 전개하면 2x+4가 돼요. 왼쪽의 상수항을 비교해 볼까요?"
+        result = run_turn(PROBLEM, initial_state(), [], request("submit", "2x+2=3x-3"), model_client=Model(message))
+        self.assertEqual(result["response"]["message"], message)
+        self.assertTrue(result["response"]["output_verification"]["expansions_checked"])
+        self.assertFalse(result["response"]["output_verification"]["prose_verified"])
+
+    def test_correct_generated_equations_are_checked_without_verifying_all_prose(self):
+        text = r"정답은 \(x=\frac{7}{1}\)이에요. 2x+4=3x-3에서 -x=-7을 얻어요."
+        result = run_turn(PROBLEM, initial_state(), [], request("answer"), model_client=Model(text))
+        self.assertEqual(result["response"]["message"], text)
+        self.assertEqual(result["response"]["output_verification"]["status"], "checked")
+        self.assertFalse(result["response"]["output_verification"]["prose_verified"])
+
+    def test_independent_and_review_submissions_do_not_receive_automatic_help(self):
+        for mode in ("independent", "review"):
+            for lines, expected in ((["2x+2=3x-3"], "retry"), (["2x+4=3x-3"], "continue"), (["x=7"], "complete")):
+                with self.subTest(mode=mode, lines=lines):
+                    model = Model()
+                    result = run_turn(dict(PROBLEM, attempt_mode=mode), initial_state(), [], request("submit", *lines), model_client=model)
+                    self.assertEqual(model.calls, 0)
+                    self.assertEqual(result["response"]["action"], expected)
+                    self.assertFalse(result["state"]["assisted"])
+                    self.assertEqual(result["state"]["independent_verified"], expected == "complete")
+                    if expected == "complete":
+                        self.assertEqual(result["state"]["learning_status"], mode + "_verified")
+                        self.assertFalse(result["state"]["needs_independent_check"])
+
+    def test_explicit_help_prevents_later_independent_success(self):
+        problem = dict(PROBLEM, attempt_mode="independent")
+        for intent in ("hint", "more_help", "answer"):
+            with self.subTest(intent=intent):
+                helped = run_turn(problem, initial_state(), [], request(intent), model_client=Model("정답은 x=7이에요."))
+                result = run_turn(problem, helped["state"], [], request("submit", "x=7"), model_client=Model())
+                self.assertTrue(result["state"]["assisted"])
+                self.assertFalse(result["state"]["independent_verified"])
+                self.assertTrue(result["state"]["needs_independent_check"])
+
+    def test_unsupported_independent_work_stays_undetermined_without_a_model(self):
+        model = Model()
+        result = run_turn(dict(PROBLEM, attempt_mode="independent"), initial_state(), [], request("submit", "x^2=49"), model_client=model)
+        self.assertEqual(result["response"]["action"], "undetermined")
+        self.assertEqual(result["response"]["verification"]["judgement"], "undetermined")
+        self.assertFalse(result["state"]["independent_verified"])
+        self.assertEqual(model.calls, 0)
 
     def test_repeat_request_snapshot_does_not_add_student_attempt(self):
         body = request("submit", "2x+2=3x-3")
@@ -186,6 +321,8 @@ class TutorPolicyTests(unittest.TestCase):
                         result = OllamaTutorClient().generate(PROBLEM, {"error_evidence": {"target_side": "lhs"}}, "error_hint")
                         self.assertEqual(result["message"], "왼쪽 괄호를 확인해 볼까요?")
                         self.assertEqual(result["usage"]["output_tokens"], 12)
+                        self.assertIsNone(result["usage"]["reasoning_tokens"])
+                        self.assertEqual(result["usage"]["output_token_semantics"], "ollama_eval_count_reasoning_inclusion_unspecified")
                     payload = json.loads(call.call_args.args[0].data)
                     self.assertEqual(payload["options"]["num_predict"], 480)
 
@@ -203,7 +340,64 @@ class TutorPolicyTests(unittest.TestCase):
                 self.assertIn("이번 문제는 자동 검증 도구의 지원 범위 밖", system)
                 self.assertIn("검산 단락을 억지로 붙이거나", system)
                 self.assertEqual(payload["options"]["num_predict"], 900)
-            self.assertEqual(result["usage"]["prompt_version"], "didgo-tutor-prompt-v4")
+            self.assertEqual(result["usage"]["prompt_version"], "didgo-tutor-prompt-v6")
+
+    def test_openai_compatible_stream_has_provider_usage_and_no_forced_thinking_option(self):
+        events = [
+            {"model": "local-korean-tutor", "choices": [{"delta": {"reasoning_content": "숨긴 추론"}}]},
+            {"choices": [{"delta": {"content": "한국어 힌트예요."}}]},
+            {"choices": [{"delta": {}, "finish_reason": "stop"}]},
+            {"choices": [], "usage": {"prompt_tokens": 31, "completion_tokens": 9,
+                                      "completion_tokens_details": {"reasoning_tokens": 4}}},
+        ]
+        stream = BytesIO(b"".join(b"data: " + json.dumps(event).encode() + b"\n\n" for event in events) + b"data: [DONE]\n")
+        settings = {"DIDGO_TUTOR_PROVIDER": "openai-compatible", "DIDGO_TUTOR_URL": "http://127.0.0.1:9000/v1", "DIDGO_TUTOR_MODEL": "local-korean-tutor", "DIDGO_TUTOR_PROFILE": "openai-usage"}
+        with patch.dict(os.environ, settings), patch("app.tutor.session_model.urlopen", return_value=stream) as call:
+            client = create_tutor_client()
+            self.assertIsInstance(client, OpenAICompatibleTutorClient)
+            result = client.generate(PROBLEM, {}, "hint")
+        payload = json.loads(call.call_args.args[0].data)
+        self.assertNotIn("think", payload)
+        self.assertEqual(payload["stream_options"], {"include_usage": True})
+        self.assertEqual(call.call_args.args[0].full_url, "http://127.0.0.1:9000/v1/chat/completions")
+        self.assertEqual(result["message"], "한국어 힌트예요.")
+        self.assertEqual(result["usage"]["provider"], "openai-compatible")
+        self.assertEqual(result["usage"]["input_tokens"], 31)
+        self.assertEqual(result["usage"]["reasoning_tokens"], 4)
+        self.assertEqual(result["usage"]["output_tokens"], 9)
+        self.assertEqual(result["usage"]["output_token_semantics"], "openai_completion_tokens_including_reasoning")
+        self.assertIn("model_request_seconds", result["usage"])
+        self.assertNotIn("request_seconds", result["usage"])
+
+    def test_provider_profiles_do_not_send_unsupported_options_implicitly(self):
+        event = {"message": {"content": "힌트예요."}, "done": True, "done_reason": "stop"}
+        for profile in ("standard", "ollama-no-think"):
+            with self.subTest(profile=profile), patch.dict(os.environ, {"DIDGO_TUTOR_PROFILE": profile}), patch("app.tutor.session_model.urlopen", return_value=BytesIO(json.dumps(event).encode() + b"\n")) as call:
+                OllamaTutorClient().generate(PROBLEM, {}, "hint")
+                self.assertEqual("think" in json.loads(call.call_args.args[0].data), profile == "ollama-no-think")
+
+    def test_openai_truncated_output_is_not_a_success_and_reasoning_profile_is_explicit(self):
+        settings = {"DIDGO_TUTOR_PROVIDER": "openai-compatible", "DIDGO_TUTOR_URL": "http://127.0.0.1:9000", "DIDGO_TUTOR_MODEL": "another-tutor", "DIDGO_TUTOR_PROFILE": "openai-reasoning"}
+        event = {"choices": [{"delta": {"content": "끝나지 않은 설명"}, "finish_reason": "length"}]}
+        stream = BytesIO(b"data: " + json.dumps(event).encode() + b"\n\ndata: [DONE]\n")
+        with patch.dict(os.environ, settings), patch("app.tutor.session_model.urlopen", return_value=stream) as call:
+            with self.assertRaises(TutorModelError):
+                create_tutor_client().generate(PROBLEM, {}, "answer")
+        payload = json.loads(call.call_args.args[0].data)
+        self.assertIn("max_completion_tokens", payload)
+        self.assertNotIn("temperature", payload)
+        self.assertNotIn("think", payload)
+
+    def test_guide_prompt_uses_current_work_and_keeps_the_tutor_role(self):
+        stream = BytesIO(json.dumps({"message": {"content": "현재 풀이에서 어떤 부분을 확인하고 싶나요?"},
+                                    "done": True, "done_reason": "stop"}).encode() + b"\n")
+        context = {"steps": [{"id": "s1", "text": "이미 적은 설명", "state": "active"}]}
+        with patch("app.tutor.session_model.urlopen", return_value=stream) as call:
+            OllamaTutorClient().generate(PROBLEM, context, "guide")
+        payload = json.loads(call.call_args.args[0].data)
+        self.assertIn("현재 steps와 질문을 먼저 읽으세요", payload["messages"][0]["content"])
+        self.assertIn("학생 역할로 말하지 말고", payload["messages"][0]["content"])
+        self.assertEqual(json.loads(payload["messages"][1]["content"])["context"]["steps"], context["steps"])
 
 
 if __name__ == "__main__":

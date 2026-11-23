@@ -8,6 +8,7 @@ import uuid
 
 from app.db.solution_records import ConflictError, solution_connection
 from app.db.submissions import get_submission
+from app.tutor.problem_target import analyze_target
 
 
 def _json(value):
@@ -61,6 +62,22 @@ def _current(connection, row, owner_id):
     return bool(latest and latest['id'] == row['input_version_id'] and latest['confirmed_at'])
 
 
+def _target_info(text, subject='mathematics'):
+    if subject == 'mathematics':
+        return analyze_target(text)
+    return {'status': 'open_problem', 'normalized_text': None, 'choices': [], 'message': ''}
+
+
+def target_options(connection, *, owner_id, submission_id):
+    source = get_submission(connection, submission_id=submission_id, owner_id=owner_id)
+    latest = source['latest_input']
+    if not latest:
+        raise ConflictError('문제 내용을 먼저 입력하거나 인식을 완료해 주세요.')
+    return {'submission_id': submission_id, 'input_version_number': latest['version_number'],
+            'input_confirmed': bool(latest['confirmed_at']),
+            **analyze_target(latest['content_text'])}
+
+
 def snapshot(connection, *, session_id, owner_id):
     row = _session(connection, session_id, owner_id)
     problem = json.loads(row['problem_json'])
@@ -87,19 +104,40 @@ def snapshot(connection, *, session_id, owner_id):
                 failed.append(item)
     # 오래된 요청의 재시도는 ID 순서와 다를 수 있으므로 실행 중 요청을 우선한다.
     pending = running[-1] if running else failed[-1] if failed else None
+    is_current = _current(connection, row, owner_id)
+    target_selection = _target_info(row['target_text'], row['subject'])
+    can_submit = is_current
+    if problem.get('learning_context'):
+        activity = _row(connection, '''SELECT a.id,a.status,a.mode,p.current_activity_id,p.phase,
+            original.submission_id,original.input_version_id
+            FROM learning_activities a JOIN learning_paths p ON p.id=a.path_id
+            JOIN tutor_sessions original ON original.id=p.source_session_id
+            WHERE a.session_id=?''', (session_id,))
+        # 문제 버전의 현재 여부와 학습 시도의 종료 여부를 화면에서도 구분한다.
+        can_submit = bool(is_current and activity and activity['status'] == 'active'
+                          and activity['current_activity_id'] == activity['id']
+                          and activity['phase'] == activity['mode']
+                          and _current(connection, activity, owner_id))
+    # 예전에 여러 소문항으로 시작한 세션도 기록은 남기고 대상 선택부터 다시 연결한다.
+    can_submit = can_submit and target_selection['status'] != 'selection_required'
     return {
         'id': row['id'], 'submission_id': row['submission_id'],
         'input_version_number': problem['input_version_number'],
         'subject': row['subject'], 'target_text': row['target_text'],
         'source_text': problem['source_text'], 'input_kind': problem['input_kind'],
+        'target_selection': target_selection,
+        'target_input_text': problem.get('target_input_text', row['target_text']),
+        'attempt_mode': problem.get('attempt_mode', 'practice'),
+        'learning_context': problem.get('learning_context'),
         'type_match': problem.get('type_match'), 'condition_extraction': problem.get('condition_extraction'),
         'revision': row['revision'], 'state': json.loads(row['state_json']),
         'created_at': row['created_at'], 'updated_at': row['updated_at'],
-        'is_current': _current(connection, row, owner_id), 'events': events, 'pending_request': pending,
+        'is_current': is_current, 'can_submit': can_submit, 'events': events, 'pending_request': pending,
     }
 
 
-def create(connection, *, owner_id, submission_id, expected_input_version_number, target_text, subject='mathematics'):
+def create(connection, *, owner_id, submission_id, expected_input_version_number, target_text,
+           subject='mathematics', learning_context=None):
     from app.tutor.session_service import initial_state
 
     source = get_submission(connection, submission_id=submission_id, owner_id=owner_id)
@@ -111,6 +149,11 @@ def create(connection, *, owner_id, submission_id, expected_input_version_number
     target_text = target_text.strip()
     if not target_text:
         raise ValueError('이번에 풀 문제 또는 소문항을 확인해 주세요.')
+    target_input_text = target_text
+    target_selection = _target_info(target_text, subject)
+    if target_selection['status'] == 'selection_required':
+        raise ValueError(target_selection['message'])
+    target_text = target_selection['normalized_text'] or target_text
     digest = hashlib.sha256(target_text.encode()).hexdigest()
     previous = _row(connection, '''SELECT id FROM tutor_sessions
         WHERE input_version_id=? AND subject=? AND target_sha256=?''', (latest['id'], subject, digest))
@@ -119,10 +162,24 @@ def create(connection, *, owner_id, submission_id, expected_input_version_number
     problem = {
         'submission_id': submission_id, 'input_version_number': latest['version_number'],
         'source_text': latest['content_text'], 'target_text': target_text,
+        'target_input_text': target_input_text,
         'subject': subject, 'input_kind': source['input_kind'],
         'target_confirmed': True, 'type_match': _type_reference(source.get('type_match')),
         'condition_extraction': source.get('condition_extraction'),
     }
+    if learning_context is not None:
+        # 학습 시도 종류는 학습 경로가 서버에서 정한다. 학생 요청으로 독립 평가를 위조하지 않는다.
+        if learning_context.get('mode') not in {'practice', 'independent', 'review'}:
+            raise ValueError('지원하지 않는 학습 시도입니다.')
+        problem['attempt_mode'] = learning_context['mode']
+        problem['learning_context'] = dict(learning_context)
+        if learning_context.get('type_code') and learning_context.get('type_name'):
+            problem['type_match'] = {
+                'status': 'curated_reference', 'is_provisional': True,
+                'selected_type': {'source_topic_code': learning_context['type_code'],
+                                  'source_topic_name': learning_context['type_name']},
+                'reasons': ['기존 문제은행 유형에 연결한 검수 문항입니다. 개념 숙달 판정은 아닙니다.'],
+            }
     state = initial_state()
     selected_type = (problem['type_match'] or {}).get('selected_type') or {}
     if selected_type.get('source_topic_name'):
@@ -156,6 +213,11 @@ def reserve(connection, *, owner_id, session_id, request):
         raise ConflictError('같은 요청 번호로 다른 내용을 전송할 수 없습니다.')
     if prior and prior['status'] == 'completed':
         return None, snapshot(connection, session_id=session_id, owner_id=owner_id)
+    if _target_info(row['target_text'], row['subject'])['status'] == 'selection_required':
+        raise ConflictError('여러 소문항이 함께 있어요. 이번에 풀 소문항을 선택한 뒤 새 튜터로 이어가 주세요.')
+    if json.loads(row['problem_json']).get('learning_context'):
+        from app.db.learning_paths import require_active_attempt
+        require_active_attempt(connection, owner_id=owner_id, session_id=session_id)
     if row['revision'] != request['expected_revision']:
         raise ConflictError('다른 요청으로 학습 기록이 바뀌었습니다. 최신 기록을 확인해 주세요.')
     now = time.time()
@@ -198,11 +260,25 @@ def finish(connection, *, owner_id, session_id, reservation, result):
         connection.execute("UPDATE tutor_turns SET status='stale',error=? WHERE id=?",
                            ('응답을 기다리는 동안 문제가 바뀌어 이 도움은 공개하지 않았어요.', turn['id']))
         return False
+    linked = json.loads(row['problem_json']).get('learning_context')
+    if linked:
+        from app.db.learning_paths import require_active_attempt
+        try:
+            require_active_attempt(connection, owner_id=owner_id, session_id=session_id)
+        except ConflictError:
+            # 원본 경로가 바뀐 동안 도착한 응답도 완료 처리하거나 다시 공개하지 않는다.
+            connection.execute("UPDATE tutor_turns SET status='stale',error=? WHERE id=?",
+                               ('학습 경로가 바뀌어 이전 응답을 공개하지 않았어요.', turn['id']))
+            return False
     connection.execute('''UPDATE tutor_turns SET status='completed',response_json=?,state_after_json=?,
         completed_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?''',
         (_json(result['response']), _json(result['state']), turn['id']))
     connection.execute('''UPDATE tutor_sessions SET state_json=?,revision=revision+1,
         updated_at=strftime('%Y-%m-%dT%H:%M:%fZ','now') WHERE id=?''', (_json(result['state']), session_id))
+    if linked:
+        # 도움 공개와 다음 학습 상태는 같은 트랜잭션에서 함께 저장한다.
+        from app.db.learning_paths import record_tutor_result
+        record_tutor_result(connection, owner_id=owner_id, session_id=session_id, result=result)
     return True
 
 

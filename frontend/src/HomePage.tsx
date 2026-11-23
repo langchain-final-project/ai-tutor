@@ -4,6 +4,7 @@ import type { Profile } from "./auth";
 import { AccountSettings } from "./AccountSettings";
 import { SolutionWorkspace } from "./SolutionWorkspace";
 import { TutorWorkspace } from "./TutorWorkspace";
+import { LearningPathList } from "./LearningPathPanel";
 import logo from "./assets/didgo.svg";
 import "./home.css";
 import "./solution-workspace.css";
@@ -181,6 +182,17 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
               sessionId={selection.tutorSessionId} sourceSubmissionId={selection.tutorSourceId}
               loginUrl={loginUrl} userId={profile.user_id}
             />}
+            {category.id === "practice" && <div className="solution-workspace">
+              <section className="solution-card"><h2>문자와 식 연습</h2>
+                <p>간단한 일차방정식과 괄호가 있는 일차방정식부터 연습해요. 문제를 확인한 뒤 개념 보충과 유사 문제, 독립 풀이를 이어갈 수 있어요.</p>
+                <a className="solution-button" href="#tutor/new">문제에서 학습 시작하기</a>
+              </section>
+              <LearningPathList loginUrl={loginUrl} />
+            </div>}
+            {category.id === "history" && item?.id === "mistakes" && <section className="solution-card">
+              <p>오답 노트는 준비 중이에요. 지금은 튜터 기록에서 다시 확인할 풀이와 받은 도움을 살펴볼 수 있어요.</p>
+              <a className="solution-button is-secondary" href="#tutor/new">튜터 기록 보기</a>
+            </section>}
             {category.id === "settings" && <AccountSettings loginUrl={loginUrl} email={profile.email} />}
           </>
         )}

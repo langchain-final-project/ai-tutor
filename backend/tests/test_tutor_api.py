@@ -5,6 +5,8 @@ from contextlib import closing
 from copy import deepcopy
 from io import BytesIO
 import importlib.util
+import hashlib
+import json
 from pathlib import Path
 import sqlite3
 from threading import Event
@@ -340,3 +342,102 @@ def test_running_retry_takes_priority_over_later_failed_request(tutor):
     assert saved["pending_request"] is None
     assert [event["request_id"] for event in saved["events"]] == [first_body["request_id"]]
     assert len(runner.calls) == 3
+
+
+MULTI_QUESTION = r'''다음 방정식을 풀어라.
+(1) \(\frac{4}{3}x-3=x+6\)
+(2) \(\frac{1}{4}x-\frac{1}{2}=-\frac{2}{5}x+2\)
+(3) \(\frac{2}{3}x-\frac{1}{6}=\frac{3}{2}x\)'''
+
+
+def confirmed_multi_problem(client):
+    response = client.post('/submissions/text', json={'content_text': MULTI_QUESTION})
+    assert response.status_code == 201
+    ident = response.json()['id']
+    assert client.post(f'/submissions/{ident}/confirm', json={
+        'content_text': MULTI_QUESTION, 'expected_version_number': 1}).status_code == 200
+    return ident
+
+
+def test_target_choices_preserve_source_and_keep_cookie_ownership(tutor):
+    _, app, client, runner, _ = tutor
+    ident = confirmed_multi_problem(client)
+    endpoint = f'/submissions/{ident}/tutor-targets'
+    choices = client.get(endpoint)
+    assert choices.status_code == 200, choices.text
+    value = choices.json()
+    assert value['submission_id'] == ident and value['input_version_number'] == 1
+    assert value['status'] == 'selection_required' and len(value['choices']) == 3
+    assert value['choices'][0]['target_text'] == '(4/3)*x-3=x+6'
+    assert client.post(f'/submissions/{ident}/tutor-sessions', json={
+        'expected_input_version_number': 1, 'target_text': MULTI_QUESTION}).status_code == 422
+    selected = client.post(f'/submissions/{ident}/tutor-sessions', json={
+        'expected_input_version_number': 1, 'target_text': value['choices'][0]['target_text']})
+    assert selected.status_code == 201, selected.text
+    assert selected.json()['source_text'] == MULTI_QUESTION
+    assert selected.json()['target_selection']['status'] == 'single_equation'
+    with TestClient(app) as other:
+        assert other.get(endpoint).status_code == 401
+        login(other, 'target-other@example.com')
+        assert other.get(endpoint).status_code == 404
+    assert runner.calls == []
+
+
+def test_legacy_multi_target_can_recover_without_changing_its_history(tutor):
+    database, _, client, runner, owner = tutor
+    ident = confirmed_multi_problem(client)
+    # 수정 전 저장 형식의 세션과 공개 이력을 임시 DB에 그대로 재현한다.
+    from app.tutor.session_service import initial_state
+    with submission_connection(database, write=True) as connection:
+        version_id = connection.execute('SELECT id FROM problem_input_versions WHERE submission_id=?', (ident,)).fetchone()[0]
+        problem_json = {'source_text': MULTI_QUESTION, 'target_text': MULTI_QUESTION,
+                        'input_version_number': 1, 'input_kind': 'text', 'subject': 'mathematics'}
+        cursor = connection.execute('''INSERT INTO tutor_sessions(submission_id,input_version_id,
+            subject,target_text,target_sha256,problem_json,state_json) VALUES(?,?,?,?,?,?,?)''',
+            (ident, version_id, 'mathematics', MULTI_QUESTION, hashlib.sha256(MULTI_QUESTION.encode()).hexdigest(),
+             json.dumps(problem_json), json.dumps(initial_state())))
+        old_id = cursor.lastrowid
+        request = turn('legacy-multi-001')
+        response = {'action': 'guide', 'message': '양변에 3을 곱해 보세요.', 'verification': None}
+        connection.execute('''INSERT INTO tutor_turns(session_id,request_id,request_sha256,
+            expected_revision,request_json,status,lease_token,lease_expires_at,response_json,state_after_json)
+            VALUES(?,?,?,?,?,'completed',?,0,?,?)''', (old_id, request['request_id'], 'legacy', 0,
+            json.dumps(request), 'legacy', json.dumps(response), json.dumps(initial_state())))
+    legacy = client.get(f'/tutor-sessions/{old_id}').json()
+    assert legacy['is_current'] is True and legacy['can_submit'] is False
+    assert legacy['target_selection']['status'] == 'selection_required'
+    assert len(legacy['events']) == 1
+    assert client.post(f'/tutor-sessions/{old_id}/turns', json=turn()).status_code == 409
+    recovered = client.post(f'/submissions/{ident}/tutor-sessions', json={
+        'expected_input_version_number': 1, 'target_text': '(4/3)*x-3=x+6'})
+    assert recovered.status_code == 201, recovered.text
+    assert recovered.json()['id'] != old_id and recovered.json()['events'] == []
+    assert client.get(f'/tutor-sessions/{old_id}').json() == legacy
+    assert runner.calls == []
+
+
+def test_selected_fraction_work_is_verified_without_calling_the_model(tutor):
+    database, _, client, _, _ = tutor
+    from app.tutor.session_service import run_turn
+
+    class NoModel:
+        def generate(self, *_args):
+            raise AssertionError('완성한 풀이 검산에서 모델을 호출하면 안 됩니다.')
+
+    def exact_runner(problem, state, events, request):
+        return run_turn(problem, state, events, request, model_client=NoModel())
+
+    ident = confirmed_multi_problem(client)
+    with TestClient(create_student_app(database, pipeline_factory=no_pipeline, tutor_runner=exact_runner)) as checked:
+        login(checked, register=False)
+        targets = checked.get(f'/submissions/{ident}/tutor-targets').json()['choices']
+        session = checked.post(f'/submissions/{ident}/tutor-sessions', json={
+            'expected_input_version_number': 1, 'target_text': targets[0]['display_text']}).json()
+        body = {**turn('fraction-complete-001', intent='submit'), 'student_text': '', 'steps': [
+            {'id': 's1', 'text': '4x-9=3x+18', 'state': 'active'},
+            {'id': 's2', 'text': 'x=27', 'state': 'active'}]}
+        result = checked.post(f"/tutor-sessions/{session['id']}/turns", json=body)
+        assert result.status_code == 200, result.text
+        assert result.json()['state']['solved'] is True
+        assert result.json()['events'][-1]['response']['model'] is None
+        assert result.json()['events'][-1]['response']['verification']['judgement'] == 'correct'

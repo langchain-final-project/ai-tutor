@@ -67,7 +67,8 @@ export function RecognitionTiming({ timing }: {
   const status = clock.restored ? "저장된 문제" : clock.outcome === "completed" ? "완료" :
     clock.outcome === "failed" ? "실패 시점에서 정지" : clock.outcome === "cancelled" ? "중단 시점에서 정지" :
       clock.selectedAt === null ? "사진 선택 전" : clock.ocrEnd !== null ? "표시용 사진을 불러오는 중" :
-        clock.ocrAt !== null ? "인식 중" : clock.uploadEnd !== null ? "사진·범위 확인 대기" : "업로드 중";
+        clock.ocrAt !== null ? "인식 중" : clock.uploadEnd !== null ? "사진 상태 확인 대기" :
+          clock.uploadAt === null ? "범위 확인 대기" : "업로드 중";
 
   return <section className="recognition-timing" aria-label="사진 업로드와 인식 진행 시간">
     <div className="recognition-timing-heading"><h2>진행 시간</h2><span>{status}</span></div>

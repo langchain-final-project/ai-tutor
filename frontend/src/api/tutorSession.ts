@@ -19,6 +19,7 @@ export type TutorState = {
   solved?: boolean;
   independent_verified?: boolean;
   needs_independent_check?: boolean;
+  learning_status?: string;
 };
 export type TutorVerification = {
   judgement: "correct" | "incorrect" | "undetermined";
@@ -42,6 +43,8 @@ export type TutorResponse = {
   verification: TutorVerification | null;
   model: string | null;
   usage: Record<string, unknown>;
+  output_verification?: { scope: string; status: string; prose_verified: false };
+  output_guard?: string;
 };
 export type TutorEvent = {
   id: number;
@@ -53,11 +56,21 @@ export type TutorEvent = {
   state_after: TutorState;
   created_at: string;
 };
+export type TutorTargetChoice = { id: string; label: string; display_text: string; target_text: string };
+export type TutorTargetSelection = {
+  status: "single_equation" | "selection_required" | "open_problem";
+  normalized_text: string | null;
+  choices: TutorTargetChoice[];
+  message: string;
+};
+export type TutorTargetPreview = TutorTargetSelection & { submission_id: number; input_version_number: number };
 export type TutorSnapshot = {
   id: number;
   submission_id: number;
   input_version_number: number;
   subject: string;
+  attempt_mode?: "practice" | "independent" | "review";
+  learning_context?: Record<string, unknown> | null;
   source_text: string;
   target_text: string;
   input_kind: "photo" | "text";
@@ -65,6 +78,8 @@ export type TutorSnapshot = {
   condition_extraction?: ConditionExtraction | null;
   revision: number;
   is_current: boolean;
+  can_submit?: boolean;
+  target_selection?: TutorTargetSelection;
   created_at: string;
   state: TutorState;
   events: TutorEvent[];
@@ -92,6 +107,7 @@ export const tutorApi = {
     return Array.isArray(value) ? value : value.sessions;
   },
   get: (id: number, signal?: AbortSignal) => request<TutorSnapshot>(`/tutor-sessions/${id}`, signal),
+  targets: (submissionId: number, signal?: AbortSignal) => request<TutorTargetPreview>(`/submissions/${submissionId}/tutor-targets`, signal),
   start: (submissionId: number, version: number, target: string, signal?: AbortSignal) =>
     request<TutorSnapshot>(`/submissions/${submissionId}/tutor-sessions`, signal, {
       expected_input_version_number: version, target_text: target, subject: "mathematics",

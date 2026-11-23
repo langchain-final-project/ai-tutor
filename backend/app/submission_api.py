@@ -34,6 +34,7 @@ from app.ocr_api import create_ocr_router
 from app.ocr_jobs import OCRJobManager, build_qwen_pipeline
 from app.solution_api import create_solution_router
 from app.tutor_api import create_tutor_router
+from app.learning_api import create_learning_router
 from app.ocr.images import open_image
 from app.ocr.selection import crop_photo_region
 from app.ocr.quality import check_photo_quality, requires_photo_retake
@@ -607,6 +608,7 @@ def create_submission_app(
     app.include_router(create_ocr_router(manager, current_owner))
     app.include_router(create_solution_router(database, current_owner))
     app.include_router(create_tutor_router(database, current_owner, runner=tutor_runner))
+    app.include_router(create_learning_router(database, current_owner, bank_database=type_bank))
 
     return app
 

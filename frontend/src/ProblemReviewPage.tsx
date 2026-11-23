@@ -95,7 +95,8 @@ const [ocrError, setOcrError] = useState("")
 const ocrControllerRef = useRef<AbortController | null>(null)
 const [submission, setSubmission] = useState<Submission | null>(null)
 const [pendingPhoto, setPendingPhoto] = useState<{
-  submission: Submission
+  file: File
+  submission: Submission | null
   imageUrl: string
 } | null>(null)
 const [photoQuality, setPhotoQuality] = useState<PhotoQuality | null>(null)
@@ -200,17 +201,13 @@ async function restoreSubmission(id: number) {
   }
 }
 
-async function startPhotoRecognition(file: File, imageUrl: string, selectedAt: number) {
+function startPhotoRecognition(file: File, imageUrl: string, selectedAt: number) {
   ocrControllerRef.current?.abort()
+  ocrControllerRef.current = null
   timing.mark("photo-selected", selectedAt)
-  const controller = new AbortController()
-  ocrControllerRef.current = controller
-
-  const timeout = window.setTimeout(() => controller.abort(), 30_000)
-
-  setPhase("uploading")
+  setPhase("region_review")
   setOcrProgress(null)
-  setPendingPhoto(null)
+  setPendingPhoto({ file, submission: null, imageUrl })
   setPhotoQuality(null)
   setPhotoRegion(null)
   setOcrError("")
@@ -224,40 +221,6 @@ async function startPhotoRecognition(file: File, imageUrl: string, selectedAt: n
   rememberSubmission(null)
   textDialogRef.current?.close()
   mathDialogRef.current?.close()
-
-  try {
-    timing.mark("upload-started")
-    const uploaded = await uploadPhoto(file, controller.signal)
-    window.clearTimeout(timeout)
-    if (ocrControllerRef.current !== controller) return
-
-    timing.mark("upload-finished")
-    const quality = uploaded.photo_quality
-    if (!isPhotoQuality(quality)) {
-      throw new Error("사진 품질 검사 결과를 확인하지 못했습니다. API 서버를 확인해 주세요.")
-    }
-
-    if (quality.retake_required) timing.mark("failed")
-    setPhotoQuality(quality)
-    setPendingPhoto(quality.retake_required ? null : { submission: uploaded, imageUrl })
-    setPhase(quality.retake_required || quality.status === "warning" ? "quality_review" : "region_review")
-  } catch (error) {
-    if (ocrControllerRef.current !== controller) return
-    timing.mark(controller.signal.aborted ? "cancelled" : "failed")
-    if (error instanceof ReviewApiError && error.photoQuality?.retake_required) {
-      setPhotoQuality(error.photoQuality)
-      setPhase("quality_review")
-      return
-    }
-    setPhase("failed")
-    setOcrError(controller.signal.aborted
-      ? "사진 업로드 시간이 초과됐습니다. 다시 시도해 주세요."
-      : error instanceof Error ? error.message : "사진 업로드에 실패했습니다.")
-  } finally {
-    window.clearTimeout(timeout)
-    if (ocrControllerRef.current === controller) ocrControllerRef.current = null
-    controller.abort()
-  }
 }
 
 async function recognizeUploadedPhoto(
@@ -336,16 +299,70 @@ async function recognizeUploadedPhoto(
   }
 }
 
-function continuePhotoRecognition() {
-  if (!pendingPhoto || phase !== "region_review" || !photoRegion ||
+async function continuePhotoRecognition() {
+  if (!pendingPhoto || !photoRegion ||
+    (phase !== "region_review" && phase !== "quality_review") ||
     photoQuality?.retake_required || locked || ocrControllerRef.current) return
 
   const pending = pendingPhoto
+  const region = photoRegion
   const controller = new AbortController()
   ocrControllerRef.current = controller
-  setPendingPhoto(null)
+  const timeout = window.setTimeout(() => controller.abort(), 30_000)
+  setPhase("uploading")
+  setOcrError("")
 
-  void recognizeUploadedPhoto(pending.submission, pending.imageUrl, controller, photoRegion)
+  try {
+    let uploaded = pending.submission
+
+    // 범위를 확정한 뒤 업로드하고, 품질 경고 확인 후에는 업로드를 재사용합니다.
+    if (!uploaded) {
+      timing.mark("upload-started")
+      uploaded = await uploadPhoto(pending.file, controller.signal)
+      if (ocrControllerRef.current !== controller) return
+      timing.mark("upload-finished")
+
+      const quality = uploaded.photo_quality
+      if (!isPhotoQuality(quality)) {
+        throw new Error("사진 품질 검사 결과를 확인하지 못했습니다. API 서버를 확인해 주세요.")
+      }
+
+      setPhotoQuality(quality)
+      if (quality.retake_required) {
+        timing.mark("failed")
+        setPendingPhoto(null)
+        setPhase("quality_review")
+        return
+      }
+
+      setPendingPhoto({ ...pending, submission: uploaded })
+      if (quality.status === "warning") {
+        setPhase("quality_review")
+        return
+      }
+    }
+
+    window.clearTimeout(timeout)
+    setPendingPhoto(null)
+    await recognizeUploadedPhoto(uploaded, pending.imageUrl, controller, region)
+  } catch (error) {
+    if (ocrControllerRef.current !== controller) return
+    timing.mark(controller.signal.aborted ? "cancelled" : "failed")
+    if (error instanceof ReviewApiError && error.photoQuality?.retake_required) {
+      setPhotoQuality(error.photoQuality)
+      setPendingPhoto(null)
+      setPhase("quality_review")
+      return
+    }
+    setPhase("failed")
+    setOcrError(controller.signal.aborted
+      ? "사진 업로드 시간이 초과됐습니다. 다시 시도해 주세요."
+      : error instanceof Error ? error.message : "사진 업로드에 실패했습니다.")
+  } finally {
+    window.clearTimeout(timeout)
+    if (ocrControllerRef.current === controller) ocrControllerRef.current = null
+    controller.abort()
+  }
 }
 
 function choosePhoto(file: File): boolean {
@@ -358,7 +375,7 @@ function choosePhoto(file: File): boolean {
     return false
   }
 
-  void startPhotoRecognition(file, URL.createObjectURL(file), performance.now())
+  startPhotoRecognition(file, URL.createObjectURL(file), performance.now())
   return true
 }
 
@@ -578,8 +595,8 @@ function applyMathEdit(latex: string) {
                     : "문제 전체가 선명하게 보이는지 확인해 주세요. 사진을 바꾸거나 이 사진으로 계속할 수 있어요."}
                 </p>
                 {!retakeRequired && pendingPhoto && (
-                  <button type="button" disabled={locked} onClick={() => setPhase("region_review")}>
-                    사진 확인했어요 · 범위 선택
+                  <button type="button" disabled={locked} onClick={() => void continuePhotoRecognition()}>
+                    사진 확인했어요 · 인식 계속하기
                   </button>
                 )}
               </div>

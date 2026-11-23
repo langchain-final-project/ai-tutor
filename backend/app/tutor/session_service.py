@@ -10,10 +10,11 @@ from typing import TypedDict
 from langgraph.graph import END, START, StateGraph
 
 from . import guided_feedback, step_verifier
-from .session_model import OllamaTutorClient, TutorModelError, _student_message
+from .problem_target import analyze_target
+from .session_model import create_tutor_client, TutorModelError, _student_message
 
 
-POLICY_VERSION = "didgo-tutor-policy-v1"
+POLICY_VERSION = "didgo-tutor-policy-v3"
 
 
 def initial_state():
@@ -107,12 +108,18 @@ def _evidence(turn):
     )
     if not steps and request["intent"] == "submit" and inline_equation:
         steps = [{"id": "response", "text": student_text, "state": "active"}]
-    target = problem["target_text"].strip()
+    raw_target = problem["target_text"].strip()
+    target_analysis = analyze_target(raw_target) if problem.get("subject", "mathematics") == "mathematics" else {
+        "status": "open_problem", "normalized_text": None, "choices": [], "message": "",
+    }
+    # 확인한 원문은 보존하고 선택된 한 등식의 명확한 표기만 계산 관찰에 사용한다.
+    target = target_analysis["normalized_text"] if target_analysis["status"] == "single_equation" else raw_target
     letters = set(re.findall(r"[A-Za-z]", target))
     verification = _generic_verification()
     evidence, source, observed, solution = {}, None, None, None
     supported = False
-    if problem.get("subject", "mathematics") == "mathematics" and len(letters) == 1 and len(target) <= 512:
+    if (target_analysis["status"] != "selection_required" and problem.get("subject", "mathematics") == "mathematics"
+            and len(letters) == 1 and len(target) <= 512):
         source = {
             "schema_version": "verification-problem-v1", "id": str(problem.get("id", "tutor")),
             "revision": str(problem.get("input_version_number", "1")), "equation": target,
@@ -129,9 +136,20 @@ def _evidence(turn):
             if supported:
                 evidence = guided_feedback.error_evidence(source, observed, verification)
                 solution = step_verifier._equation(target, source["variable"])["root"]
+            else:
+                # 정상적인 다른 종류의 문제를 등호 누락 등 입력 오류로 안내하지 않는다.
+                verification = _generic_verification("unsupported_problem")
         except ValueError:
             verification = _generic_verification("unsupported_observation")
     uncertain = any(step["state"] == "uncertain" for step in steps)
+    if supported and not uncertain and verification["action"] == "ask_confirmation":
+        # 학생이 확인한 표현을 도구가 읽지 못하는 경우와 OCR 확인 필요를 구분한다.
+        verification.update(action="unsupported", judgement="undetermined", reason_code="unsupported_observation",
+                            reason="현재 풀이 표현은 자동 검증 범위 밖이에요. 오답으로 판단하지 않았어요.")
+        for row in verification["steps"]:
+            if row["judgement"] == "undetermined":
+                row.update(reason_code="unsupported_observation", reason="이 표현은 현재 자동으로 확인할 수 없어요.")
+        evidence, supported = {}, False
     if uncertain and not supported:
         verification.update(action="ask_confirmation", reason_code="uncertain_step",
                             earliest_unresolved_step_id=next(step["id"] for step in steps if step["state"] == "uncertain"))
@@ -139,6 +157,7 @@ def _evidence(turn):
                                 ensure_ascii=False, sort_keys=True).encode()).hexdigest()
     return {"observation": {"steps": steps, "student_text": student_text, "verification": verification,
                             "evidence": evidence, "tool_supported": supported, "source": source,
+                            "target_analysis": target_analysis,
                             "solution": solution, "fingerprint": fingerprint,
                             "help_comment": bool(re.search(r"모르겠|힌트|어떻게|막혔|도와", student_text)) and not inline_equation}}
 
@@ -148,7 +167,9 @@ def _policy(turn):
     state = deepcopy(previous)
     verification = observed["verification"]
     active = [step for step in observed["steps"] if step["state"] != "deleted" and step["text"].strip()]
+    needs_selection = observed["target_analysis"]["status"] == "selection_required"
     new_attempt = (request["intent"] == "submit" and bool(active or observed["student_text"])
+                   and not needs_selection
                    and not (observed["help_comment"] and not request.get("steps"))
                    and observed["fingerprint"] != state.get("last_work_fingerprint"))
     if new_attempt:
@@ -162,13 +183,34 @@ def _policy(turn):
     state["solved"] = completed
     state["independent_verified"] = False
     response_source = "policy"
-    if turn["problem"].get("needs_confirmation") or verification["action"] == "ask_confirmation":
+    mode = turn["problem"].get("attempt_mode", "practice")
+    assessment = mode in {"independent", "review"}
+    if needs_selection:
+        # 여러 문항의 풀이를 한 문제의 연속 과정으로 추측하거나 첫 문제를 대신 고르지 않는다.
+        action, reason, needs_model = "select_target", "multiple_subquestions", False
+        message = observed["target_analysis"]["message"] or "여러 소문항이 있어요. 이번에 풀 소문항 하나를 먼저 선택해 주세요."
+    elif turn["problem"].get("needs_confirmation") or verification["action"] == "ask_confirmation":
         action, reason = "ask_confirmation", "unconfirmed_input"
         message = "표시된 문제 조건이나 풀이 기호를 먼저 확인해 주세요. 읽기 불확실한 부분을 오답으로 판단하지 않았어요."
         needs_model = False
     elif request["intent"] == "answer":
         action, reason, message, needs_model = "answer", "explicit_answer_request", "", True
         state.update(answer_revealed=True, assisted=True, help_level=3, needs_independent_check=True)
+    elif assessment and request["intent"] == "submit":
+        # 독립·복습 평가는 도움을 요청하기 전까지 모델이나 자동 힌트를 호출하지 않는다.
+        needs_model = False
+        if completed:
+            action, reason = "complete", "verified_assessment_work"
+            message = "지원 범위에서 현재 문제의 풀이와 답을 확인했어요."
+        elif verification["judgement"] == "incorrect":
+            action, reason = "retry", "assessment_retry_without_hint"
+            message = "다시 확인할 풀이가 있어요. 도움 없이 다시 시도하거나 필요한 도움을 요청할 수 있어요."
+        elif observed["tool_supported"] and verification["judgement"] == "correct":
+            action, reason = "continue", "assessment_incomplete_without_hint"
+            message = "여기까지 입력한 풀이를 확인했어요. 마지막 답까지 작성해 주세요."
+        else:
+            action, reason = "undetermined", "assessment_not_verified"
+            message = "이 표현은 자동 판정 범위 밖이라 독립 수행을 확인하지 않았어요. 오답으로 판단하지 않았어요."
     elif completed:
         action, reason, needs_model = "complete", "verified_current_work", False
         message = "입력한 활성 풀이와 마지막 답이 확인한 등식의 해를 유지해요. 다른 문제를 도움 없이 푸는 독립 확인은 별도로 진행해요."
@@ -199,10 +241,16 @@ def _policy(turn):
         state["hint_count"] += 1
         state["assisted"] = True
     state["max_help_level"] = max(state["max_help_level"], state["help_level"])
+    independent = completed and assessment and not state["assisted"] and not state["answer_revealed"]
+    state["independent_verified"] = independent
     if completed:
-        state["learning_status"] = "solved_with_help" if state["assisted"] else "solved_without_recorded_help"
+        state["learning_status"] = ("review_verified" if mode == "review" else "independent_verified") if independent else (
+            "solved_with_help" if state["assisted"] else "solved_without_recorded_help")
+        state["needs_independent_check"] = not independent
     elif action == "answer":
         state["learning_status"] = "answer_viewed"
+    elif action == "select_target":
+        state["learning_status"] = "needs_target_selection"
     elif action == "ask_confirmation":
         state["learning_status"] = "needs_confirmation"
     else:
@@ -225,12 +273,15 @@ def _policy(turn):
         "student_text": observed["student_text"], "steps": observed["steps"],
         "verification": verification, "error_evidence": observed["evidence"],
         "tool_supported": observed["tool_supported"],
+        "attempt_mode": mode,
         "learning_state": {key: state.get(key) for key in (
             "attempts", "help_level", "hint_count", "answer_revealed", "assisted",
             "goal_concept", "goal_concept_source", "goal_concept_is_provisional",
         )},
         "recent_dialogue": history,
     }
+    if observed["target_analysis"]["status"] == "single_equation":
+        context["normalized_target_text"] = observed["target_analysis"]["normalized_text"]
     if action == "next_step":
         context["current_work_status"] = "verified_correct_incomplete"
         context["historical_error_status"] = "superseded_by_current_verified_work"
@@ -245,11 +296,116 @@ def _policy(turn):
             "response": {"action": action, "reason": reason, "policy_version": POLICY_VERSION,
                          "message": message, "verification": verification,
                          "tool_supported": observed["tool_supported"], "evidence": observed["evidence"],
+                         "target_analysis": observed["target_analysis"],
                          "model": None, "usage": {}, "source": response_source}}
 
 
+def _output_math(message):
+    """생성된 표시 수식만 좁게 읽으며 학생 입력과 저장 원문은 바꾸지 않는다."""
+    value = message.translate(str.maketrans({"−": "-", "＝": "=", "×": "*", "÷": "/"}))
+    value = re.sub(r"\\(?:left|right|displaystyle|textstyle)\b", "", value)
+    for old, new in ((r"\times", "*"), (r"\cdot", "*"), (r"\div", "/")):
+        value = value.replace(old, new)
+    # 중첩 분수도 횟수를 제한해 처리하며 알 수 없는 LaTeX는 검증 완료로 취급하지 않는다.
+    for _ in range(12):
+        converted = re.sub(r"\\(?:dfrac|tfrac|frac)\s*\{([^{}]+)\}\s*\{([^{}]+)\}", r"((\1)/(\2))", value)
+        if converted == value:
+            break
+        value = converted
+    value = re.sub(r"\\boxed\s*\{([^{}]+)\}", r"\1", value)
+    value = re.sub(r"\\[()\[\]]|[$`]", "", value)
+    equations = []
+    for match in re.finditer(r"[A-Za-z0-9_(){}+*/=.^\\-][A-Za-z0-9_(){}+*/=.^\\ \t-]*", value):
+        fragment = re.sub(r"^\.\s+", "", match.group().strip()).rstrip(".")
+        if "=" in fragment:
+            parts = fragment.split("=")
+            equations.extend(left.strip() + "=" + right.strip() for left, right in zip(parts, parts[1:]))
+    claims = [(label, item.strip().rstrip(".")) for label, item in re.findall(
+        r"((?:정답|답|해|[A-Za-z]의\s*값)\s*(?:은|는|이|가)?|[A-Za-z](?:은|는|이|가))\s*[:：=]?\s*([+\-]?\s*(?:\d|\()[0-9()+*/. \t-]*)", value)]
+    expansions = re.findall(r"([A-Za-z0-9()+*/.\-]+)\s*(?:을|를)?\s*전개하면\s*([A-Za-z0-9()+*/.\-]+)", value)
+    return equations, claims, expansions
+
+
+def _linear_expression_value(text, variable):
+    """지원 문법의 두 일차식이 같은지 비교하며 서술 문장의 의미는 추론하지 않는다."""
+    parser = step_verifier._Parser(step_verifier._tokens(text, variable), variable)
+    parsed = parser.expression()
+    if parser.current() is not None:
+        raise ValueError("지원 문법으로 식을 끝까지 읽을 수 없습니다.")
+    return parsed.coefficient, parsed.constant
+
+
+def _verified_answer(observed):
+    variable = observed["source"]["variable"]
+    (left, constant), (right, other) = guided_feedback._sides(observed["source"]["equation"], variable)
+    coefficient, result = left - right, other - constant
+    collected = _linear_text(coefficient, 0, variable) + "=" + str(result)
+    return (f"정답은 {variable}={observed['solution']}이에요. "
+            f"양변의 같은 항을 정리하면 {collected}이고, 양변을 {coefficient}로 나누면 이 답을 얻어요. "
+            "원래 식에서 계산한 해와 일치해요.")
+
+
+def _guard_output(response, observed):
+    """모델 문장의 권위보다 지원 수식의 계산 근거와 답 공개 정책을 우선한다."""
+    equations, claims, expansions = _output_math(response["message"])
+    side = observed["evidence"].get("target_side")
+    safe_hint = ("표시된 줄의 " + ("왼쪽" if side == "lhs" else "오른쪽") + " 식이 앞 식과 같은 의미인지 확인해 볼까요?"
+                 if side in {"lhs", "rhs"} else "현재 식에서 어떤 항을 먼저 정리할 수 있을까요? 한 단계만 적어 주세요.")
+    supported = observed["solution"] is not None
+    verified_final, mismatch = False, False
+    if supported:
+        variable = observed["source"]["variable"]
+        for before, after in expansions:
+            try:
+                mismatch = mismatch or _linear_expression_value(before, variable) != _linear_expression_value(after, variable)
+            except ValueError:
+                mismatch = True
+        for text in equations:
+            try:
+                parsed = step_verifier._equation(text, variable)
+                valid = (parsed["root"] == observed["solution"] if parsed["coefficient"]
+                         else parsed["constant"] == 0)
+                mismatch = mismatch or not valid
+                verified_final = verified_final or (valid and parsed["complete"])
+            except ValueError:
+                mismatch = True
+        for label, value in claims:
+            try:
+                valid = (set(re.findall(r"[A-Za-z]", label)) <= {variable}
+                         and step_verifier._equation(variable + "=" + value, variable)["root"] == observed["solution"])
+                mismatch = mismatch or not valid
+                verified_final = verified_final or valid
+            except (ValueError, ZeroDivisionError):
+                mismatch = True
+        if response["action"] == "answer" and (mismatch or not verified_final):
+            response.update(message=_verified_answer(observed), source="verified_answer",
+                            output_guard="generated_answer_replaced")
+        elif mismatch:
+            response.update(message=safe_hint,
+                            source="guarded_model", output_guard="generated_math_not_verified")
+        response["output_verification"] = {"scope": "displayed_linear_equations_and_answer", "prose_verified": False,
+                                           "expansions_checked": bool(expansions),
+                                           "status": "replaced" if response.get("output_guard") else "checked" if equations or claims or expansions else "no_math_claim"}
+    else:
+        response["output_verification"] = {"scope": "unsupported", "status": "not_verified", "prose_verified": False}
+    # 분수·역방향·자연어 답 표기도 공개로 읽되, 차단한 내용은 공개 이력에 넣지 않는다.
+    if response["action"] != "answer":
+        terminal = bool(claims)
+        for text in equations:
+            try:
+                variable = observed["source"]["variable"] if supported else next(iter(set(re.findall(r"[A-Za-z]", text))))
+                terminal = terminal or step_verifier._equation(text, variable)["complete"]
+            except (ValueError, StopIteration):
+                pass
+        if terminal:
+            response.update(message=safe_hint,
+                            source="guarded_model", output_guard="terminal_answer_removed", answer_exposure_blocked=True)
+            response["output_verification"]["status"] = "replaced"
+    return response
+
+
 def _generate(turn):
-    client = turn.get("model_client") or OllamaTutorClient()
+    client = turn.get("model_client") or create_tutor_client()
     response = dict(turn["response"])
     generated = client.generate(turn["problem"], turn["context"], response["action"])
     message = generated.get("message", "")
@@ -278,23 +434,16 @@ def _generate(turn):
                 message=f"여기까지 입력한 식은 확인됐어요. {variable}를 혼자 남기려면 다음으로 양변에 어떤 같은 계산을 할 수 있을까요?",
                 source="guarded_model", output_guard="current_verified_work_preserved",
             )
-    # 일차방정식의 최종 해를 직접 공개한 힌트는 공개하지 않고 안전한 질문으로 바꾼다.
-    if response["action"] != "answer" and observed["solution"] is not None:
-        variable = observed["source"]["variable"]
-        terminal = re.findall(r"\b" + re.escape(variable) + r"\s*=\s*([+\-−]?\s*\d+(?:\.\d+)?(?:\s*/\s*\d+)?)", response["message"])
-        from fractions import Fraction
-        leaked = False
-        for value in terminal:
-            try:
-                leaked = leaked or Fraction(value.replace("−", "-").replace(" ", "")) == observed["solution"]
-            except (ValueError, ZeroDivisionError):
-                pass
-        if leaked:
-            side = observed["evidence"].get("target_side")
-            response["message"] = ("표시된 줄의 " + ("왼쪽" if side == "lhs" else "오른쪽") + " 식이 앞 식과 같은 의미인지 확인해 볼까요?"
-                                   if side in ("lhs", "rhs") else "현재 식에서 어떤 항을 먼저 정리할 수 있을까요? 한 단계만 적어 주세요.")
-            response.update(source="guarded_model", output_guard="terminal_answer_removed")
-    return {"response": response}
+        elif turn["events"]:
+            previous_message = (turn["events"][-1].get("response") or {}).get("message", "")
+            if previous_message and re.sub(r"\s+", "", message) == re.sub(r"\s+", "", previous_message):
+                # 이미 수행한 단계를 똑같이 요구하면 검증된 다음 발판이나 고정 질문으로 바꾼다.
+                follow_up = _verified_scaffold(observed)
+                response.update(
+                    message=follow_up or "여기까지 입력한 식은 확인됐어요. 마지막 식에서 문자를 혼자 남기는 다음 한 줄을 적어 볼까요?",
+                    source="guarded_model", output_guard="repeated_hint_replaced",
+                )
+    return {"response": _guard_output(response, observed)}
 
 
 @lru_cache(maxsize=1)
