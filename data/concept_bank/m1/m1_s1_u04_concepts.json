@@ -1,0 +1,548 @@
+{
+  "grade": 1,
+  "semester": 1,
+  "unit_code": "04",
+  "unit_name": "좌표평면과 그래프",
+  "sections": [
+    {
+      "title": "좌표와 그래프",
+      "subsections": [
+        {
+          "title": "순서쌍과 좌표",
+          "concepts": [
+            {
+              "concept_id": "m1.s1.u04.c001",
+              "title": "수직선 위의 점의 좌표",
+              "definition": "수직선 위의 한 점에 대응하는 수를 그 점의 좌표라고 한다.",
+              "rules": [
+                "점 P에 대응하는 수가 a이면 점 P의 좌표는 a이고, P(a)로 나타낸다.",
+                "좌표가 0인 점을 원점이라고 하고, 보통 O로 표시한다."
+              ],
+              "examples": [
+                {
+                  "description": "점 P와 원점 O를 좌표로 나타낸다.",
+                  "latex": "P(a),\\quad O(0)"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "number_line",
+                  "caption": "원문 수직선에서 원점 O와 오른쪽에 있는 점 P의 위치를 나타낸다.",
+                  "x_range": [
+                    -2,
+                    3
+                  ],
+                  "arrow_directions": [
+                    "negative",
+                    "positive"
+                  ],
+                  "show_numeric_ticks": false,
+                  "points": [
+                    {
+                      "position": 0,
+                      "label": "O",
+                      "coordinate_label": "0"
+                    },
+                    {
+                      "position": 1,
+                      "label": "P",
+                      "coordinate_label": "a"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m1.s1.u04.c002",
+              "title": "좌표평면 위의 점의 좌표",
+              "definition": "가로 수직선인 x축과 세로 수직선인 y축을 좌표축이라고 한다. 두 좌표축이 그려진 평면을 좌표평면이라고 한다.",
+              "rules": [
+                "두 좌표축은 원점 O에서 수직으로 만나고, 원점의 좌표는 (0, 0)이다. 좌표평면에서는 각 축의 양의 방향에 화살표를 표시한다.",
+                "순서쌍은 순서를 고려해 두 수를 쌍으로 나타낸 것이다. 점 P에서 각 축에 내린 수선이 x축, y축과 만나는 곳의 수가 각각 a, b이면 그 점을 P(a, b)로 나타낸다.",
+                "순서쌍의 첫 번째 수가 x좌표, 두 번째 수가 y좌표이다. a와 b가 서로 다를 때 (a, b)와 (b, a)는 서로 다른 점을 나타낸다."
+              ],
+              "examples": [
+                {
+                  "description": "순서쌍을 나타낸다.",
+                  "latex": "(1,2),\\quad \\left(\\frac12,-7\\right)"
+                },
+                {
+                  "description": "일반적인 점 P와 원점 O를 좌표로 나타낸다.",
+                  "latex": "P(a,b),\\quad O(0,0)"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "coordinate_plane",
+                  "caption": "점에서 각 축에 내린 수선을 따라 x좌표와 y좌표를 읽는다.",
+                  "x_range": [
+                    -2,
+                    4
+                  ],
+                  "y_range": [
+                    -8,
+                    4
+                  ],
+                  "points": [
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "label": "O"
+                    },
+                    {
+                      "x": 1,
+                      "y": 2,
+                      "label": "(1, 2)",
+                      "show_projections": true
+                    },
+                    {
+                      "x": 0.5,
+                      "y": -7,
+                      "label": "(1/2, -7)",
+                      "show_projections": true
+                    }
+                  ],
+                  "equal_scale": true
+                }
+              ]
+            },
+            {
+              "concept_id": "m1.s1.u04.c003",
+              "title": "좌표평면에서 사분면",
+              "definition": "두 좌표축이 나누는 좌표평면의 네 부분을 사분면이라고 한다.",
+              "rules": [
+                "제1사분면은 오른쪽 위로 두 좌표가 모두 양수이다. 제2사분면은 왼쪽 위로 x좌표는 음수, y좌표는 양수이다.",
+                "제3사분면은 왼쪽 아래로 두 좌표가 모두 음수이다. 제4사분면은 오른쪽 아래로 x좌표는 양수, y좌표는 음수이다.",
+                "두 좌표축은 어느 사분면에도 속하지 않는다. x축 위의 점은 (a, 0), y축 위의 점은 (0, b)로 나타내며 원점은 (0, 0)이다."
+              ],
+              "visuals": [
+                {
+                  "type": "coordinate_plane",
+                  "caption": "원점을 기준으로 네 사분면의 위치와 좌표 부호를 표시한다.",
+                  "x_range": [
+                    -4,
+                    4
+                  ],
+                  "y_range": [
+                    -4,
+                    4
+                  ],
+                  "points": [
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "label": "O"
+                    }
+                  ],
+                  "quadrant_labels": {
+                    "1": "제1사분면 (+, +)",
+                    "2": "제2사분면 (−, +)",
+                    "3": "제3사분면 (−, −)",
+                    "4": "제4사분면 (+, −)"
+                  },
+                  "equal_scale": true
+                }
+              ]
+            }
+          ],
+          "references": [
+            {
+              "title": "대칭점의 좌표",
+              "definition": "좌표평면에서 두 점의 좌표를 비교하여 x축, y축, 원점에 대해 대칭인 점을 찾을 수 있다.",
+              "rules": [
+                "x축 대칭은 x좌표가 같고 y좌표의 부호가 반대이다. y축 대칭은 y좌표가 같고 x좌표의 부호가 반대이다.",
+                "원점 대칭은 두 좌표의 부호가 각각 반대이다. 두 점을 잇는 선분의 중점은 원점이며, x축과 y축에 대해 차례로 대칭시켜서도 구할 수 있다.",
+                "제1사분면에 있는 P(a, b)를 x축, y축, 원점에 대해 대칭시킨 점은 각각 제4사분면, 제2사분면, 제3사분면에 놓인다."
+              ],
+              "examples": [
+                {
+                  "description": "x축 대칭인 두 점이다.",
+                  "latex": "(3,7),\\quad (3,-7)"
+                },
+                {
+                  "description": "y축 대칭인 두 점이다.",
+                  "latex": "(5,4),\\quad (-5,4)"
+                },
+                {
+                  "description": "원점 대칭인 두 점이다.",
+                  "latex": "(2,-6),\\quad (-2,6)"
+                },
+                {
+                  "description": "P(a, b)를 x축, y축, 원점에 대해 대칭시킨 좌표를 차례로 나타낸다.",
+                  "latex": "(a,-b),\\quad (-a,b),\\quad (-a,-b)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "그래프와 그 해석",
+          "concepts": [
+            {
+              "concept_id": "m1.s1.u04.c004",
+              "title": "그래프의 정의",
+              "definition": "두 변수 x, y의 값의 순서쌍 (x, y)를 좌표로 하는 점을 좌표평면 위에 모두 나타낸 것을 그래프라고 한다.",
+              "rules": [
+                "변수는 여러 가지로 변하는 값을 나타내는 문자이다.",
+                "그래프는 점, 직선, 곡선 등으로 나타낼 수 있다. 개념서에서는 주로 제1사분면에서 두 변수 사이의 관계를 살핀다.",
+                "그래프로 나타내면 두 변수 사이의 관계와 변화를 한눈에 파악하기 쉽다."
+              ]
+            },
+            {
+              "concept_id": "m1.s1.u04.c005",
+              "title": "그래프의 해석",
+              "definition": "그래프의 각 축이 무엇을 뜻하는지 알아보고, 한 변수의 값에 따라 다른 변수의 값이 어떻게 달라지는지 읽는다.",
+              "rules": [
+                "두 변수 x와 y가 각각 무엇을 뜻하는지 파악한다.",
+                "주어진 x의 값에 따른 y의 값을 읽는다.",
+                "x가 증가할 때 y가 증가하는지, 감소하는지, 일정한지 살핀다.",
+                "주어진 상황에 맞는 그래프를 고른다."
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "정비례와 반비례",
+      "subsections": [
+        {
+          "title": "정비례",
+          "concepts": [
+            {
+              "concept_id": "m1.s1.u04.c006",
+              "title": "정비례 관계의 정의",
+              "definition": "x가 2배, 3배, 4배, …가 될 때 y도 같은 배수로 변하면 y는 x에 정비례한다고 한다."
+            },
+            {
+              "concept_id": "m1.s1.u04.c007",
+              "title": "정비례 관계식",
+              "definition": "y가 x에 정비례하면 그 관계를 y=ax로 나타낼 수 있다. a는 0이 아닌 상수이다.",
+              "rules": [
+                "y=ax이고 a가 0이 아닌 상수이면 y는 x에 정비례한다.",
+                "x가 0이 아닐 때 y/x의 값은 항상 a이다."
+              ],
+              "examples": [
+                {
+                  "description": "관계식과 일정한 비를 나타낸다.",
+                  "latex": "y=ax\\;(a\\ne0),\\qquad \\frac{y}{x}=a\\;(x\\ne0)"
+                }
+              ]
+            },
+            {
+              "concept_id": "m1.s1.u04.c008",
+              "title": "정비례 관계의 활용",
+              "definition": "두 양이 같은 배수로 변하거나 x가 0이 아닌 곳에서 y/x가 일정하면 정비례 관계를 이용한다.",
+              "rules": [
+                "변화하는 두 양을 x와 y로 놓고 두 변수 사이의 관계를 파악한다.",
+                "주어진 x와 y의 값을 y=ax에 대입하여 상수 a를 구한다.",
+                "구한 관계식으로 문제에서 묻는 값을 구한 뒤 답이 상황에 맞는지 확인한다."
+              ]
+            },
+            {
+              "concept_id": "m1.s1.u04.c009",
+              "title": "정비례 그래프",
+              "definition": "정비례 관계 y=ax의 그래프는 원점을 지나는 직선이다.",
+              "rules": [
+                "a>0이면 제1사분면과 제3사분면을 지나고 x가 증가할 때 y도 증가한다.",
+                "a<0이면 제2사분면과 제4사분면을 지나고 x가 증가할 때 y는 감소한다.",
+                "a의 절댓값이 클수록 직선은 y축에 가까워진다.",
+                "그래프가 지나는 점 (p, q)의 좌표를 관계식에 대입하면 등식이 성립한다.",
+                "관계식이 주어지면 x에 간단한 값을 대입해 원점 이외의 한 점을 찾고, 그 점과 원점을 지나는 직선을 그린다.",
+                "그래프가 주어지면 원점 이외의 한 점의 좌표를 y=ax에 대입하여 a를 구한다."
+              ],
+              "examples": [
+                {
+                  "description": "y=2x가 지나는 점 (3, 6)의 좌표를 대입한다.",
+                  "latex": "6=2\\times3"
+                },
+                {
+                  "description": "y=-2x에 x=-1을 대입해 (-1, 2)를 얻는다. 이 점과 원점을 지나는 직선을 그린다.",
+                  "latex": "y=-2\\times(-1)=2"
+                },
+                {
+                  "description": "그래프가 (2, 3)을 지나므로 3=2a이고, 관계식은 y=(3/2)x이다.",
+                  "latex": "3=2a\\ \\Rightarrow\\ a=\\frac32,\\qquad y=\\frac32x"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "coordinate_plane",
+                  "caption": "y=2x의 그래프 위에 있는 점 (3, 6)을 확인한다.",
+                  "x_range": [
+                    -4,
+                    4
+                  ],
+                  "y_range": [
+                    -8,
+                    8
+                  ],
+                  "series": [
+                    {
+                      "relation": "direct_proportion",
+                      "a": 2,
+                      "label": "y=2x"
+                    }
+                  ],
+                  "points": [
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "label": "O"
+                    },
+                    {
+                      "x": 3,
+                      "y": 6,
+                      "label": "(3, 6)",
+                      "show_projections": true
+                    }
+                  ],
+                  "equal_scale": true
+                },
+                {
+                  "type": "coordinate_plane",
+                  "caption": "원점과 (-1, 2)를 지나는 y=-2x의 그래프를 그린다.",
+                  "x_range": [
+                    -4,
+                    4
+                  ],
+                  "y_range": [
+                    -8,
+                    8
+                  ],
+                  "series": [
+                    {
+                      "relation": "direct_proportion",
+                      "a": -2,
+                      "label": "y=-2x"
+                    }
+                  ],
+                  "points": [
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "label": "O"
+                    },
+                    {
+                      "x": -1,
+                      "y": 2,
+                      "label": "(-1, 2)",
+                      "show_projections": true
+                    }
+                  ],
+                  "equal_scale": true
+                },
+                {
+                  "type": "coordinate_plane",
+                  "caption": "직선 위의 점 (2, 3)을 읽어 관계식을 구한다.",
+                  "x_range": [
+                    -4,
+                    4
+                  ],
+                  "y_range": [
+                    -6,
+                    6
+                  ],
+                  "series": [
+                    {
+                      "relation": "direct_proportion",
+                      "a": 1.5,
+                      "label": ""
+                    }
+                  ],
+                  "points": [
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "label": "O"
+                    },
+                    {
+                      "x": 2,
+                      "y": 3,
+                      "label": "(2, 3)",
+                      "show_projections": true
+                    }
+                  ],
+                  "equal_scale": true
+                },
+                {
+                  "type": "coordinate_plane",
+                  "caption": "|a|가 2인 두 직선이 |a|가 1인 직선보다 y축에 가깝다.",
+                  "x_range": [
+                    -4,
+                    4
+                  ],
+                  "y_range": [
+                    -4,
+                    4
+                  ],
+                  "series": [
+                    {
+                      "relation": "direct_proportion",
+                      "a": 1,
+                      "label": "y=x"
+                    },
+                    {
+                      "relation": "direct_proportion",
+                      "a": 2,
+                      "label": "y=2x"
+                    },
+                    {
+                      "relation": "direct_proportion",
+                      "a": -1,
+                      "label": "y=-x"
+                    },
+                    {
+                      "relation": "direct_proportion",
+                      "a": -2,
+                      "label": "y=-2x"
+                    }
+                  ],
+                  "points": [
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "label": "O"
+                    }
+                  ],
+                  "equal_scale": true
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "반비례",
+          "concepts": [
+            {
+              "concept_id": "m1.s1.u04.c010",
+              "title": "반비례 관계의 정의",
+              "definition": "x가 2배, 3배, 4배, …가 될 때 y가 각각 1/2배, 1/3배, 1/4배, …가 되면 y는 x에 반비례한다고 한다."
+            },
+            {
+              "concept_id": "m1.s1.u04.c011",
+              "title": "반비례 관계식",
+              "definition": "y가 x에 반비례하면 그 관계를 y=a/x로 나타낼 수 있다. a는 0이 아닌 상수이고, x는 0이 아니다.",
+              "rules": [
+                "y=a/x를 만족하고 a가 0이 아닌 상수이면 y는 x에 반비례한다.",
+                "x와 y의 곱 xy는 항상 a이다."
+              ],
+              "examples": [
+                {
+                  "description": "관계식과 일정한 곱을 나타낸다.",
+                  "latex": "y=\\frac{a}{x}\\;(a\\ne0,\\ x\\ne0),\\qquad xy=a"
+                }
+              ]
+            },
+            {
+              "concept_id": "m1.s1.u04.c012",
+              "title": "반비례 관계의 활용",
+              "definition": "한 양이 어떤 배수로 변할 때 다른 양이 그 역수만큼 변하거나 두 양의 곱이 일정하면 반비례 관계를 이용한다.",
+              "rules": [
+                "변화하는 두 양을 x와 y로 놓고 두 변수 사이의 관계를 파악한다.",
+                "주어진 x와 y의 값을 y=a/x에 대입하여 상수 a를 구한다.",
+                "구한 관계식으로 문제에서 묻는 값을 구한 뒤 답이 상황에 맞는지 확인한다."
+              ]
+            },
+            {
+              "concept_id": "m1.s1.u04.c013",
+              "title": "반비례 그래프",
+              "definition": "x가 0이 아닌 모든 수일 때 반비례 그래프는 원점에 대해 서로 대칭인 두 곡선으로 이루어진다. 두 곡선은 각 좌표축에 한없이 가까워진다.",
+              "rules": [
+                "a>0이면 제1사분면과 제3사분면에 곡선이 그려진다. x>0인 범위와 x<0인 범위에서 각각 x가 증가하면 y는 감소한다.",
+                "a<0이면 제2사분면과 제4사분면에 곡선이 그려진다. x>0인 범위와 x<0인 범위에서 각각 x가 증가하면 y도 증가한다.",
+                "a의 절댓값이 작을수록 그래프는 원점에 가깝다.",
+                "a>0인 그래프를 x축 또는 y축에 대해 대칭시키면 부호를 바꾼 a에 대한 그래프가 된다.",
+                "그래프가 지나는 점의 좌표를 y=a/x에 대입해서 관계식을 구할 수 있다."
+              ],
+              "examples": [
+                {
+                  "description": "제1사분면에서 y=1/x와 y=2/x를 비교한다. y=1/x 쪽이 원점에 가깝다.",
+                  "latex": "y=\\frac1x,\\quad y=\\frac2x\\quad(x>0)"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "coordinate_plane",
+                  "caption": "제1사분면에서 y=1/x와 y=2/x의 위치를 비교한다.",
+                  "x_range": [
+                    0,
+                    5
+                  ],
+                  "y_range": [
+                    0,
+                    5
+                  ],
+                  "series": [
+                    {
+                      "relation": "inverse_proportion",
+                      "a": 1,
+                      "label": "y=1/x",
+                      "excluded_x": [
+                        0
+                      ]
+                    },
+                    {
+                      "relation": "inverse_proportion",
+                      "a": 2,
+                      "label": "y=2/x",
+                      "excluded_x": [
+                        0
+                      ]
+                    }
+                  ],
+                  "points": [
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "label": "O"
+                    }
+                  ],
+                  "equal_scale": true
+                },
+                {
+                  "type": "coordinate_plane",
+                  "caption": "양의 a에 해당하는 그래프와 x축 대칭으로 얻은 그래프를 비교한다.",
+                  "x_range": [
+                    -5,
+                    5
+                  ],
+                  "y_range": [
+                    -5,
+                    5
+                  ],
+                  "series": [
+                    {
+                      "relation": "inverse_proportion",
+                      "a": 1,
+                      "label": "y=1/x",
+                      "excluded_x": [
+                        0
+                      ]
+                    },
+                    {
+                      "relation": "inverse_proportion",
+                      "a": -1,
+                      "label": "y=-1/x",
+                      "excluded_x": [
+                        0
+                      ]
+                    }
+                  ],
+                  "points": [
+                    {
+                      "x": 0,
+                      "y": 0,
+                      "label": "O"
+                    }
+                  ],
+                  "equal_scale": true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

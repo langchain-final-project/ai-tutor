@@ -1,0 +1,3272 @@
+{
+  "grade": 2,
+  "semester": 2,
+  "unit_code": "06",
+  "unit_name": "삼각형과 사각형의 성질",
+  "chapter_name": "도형의 성질",
+  "sections": [
+    {
+      "title": "삼각형의 성질",
+      "subsections": [
+        {
+          "title": "이등변삼각형",
+          "concepts": [
+            {
+              "concept_id": "m2.s2.u06.c001",
+              "title": "이등변삼각형의 뜻",
+              "definition": "두 변의 길이가 같은 삼각형이다.",
+              "rules": [
+                "길이가 같은 두 변이 이루는 각은 꼭지각, 그 맞은편 변은 밑변, 밑변 양 끝의 각은 밑각이다.",
+                "정삼각형도 길이가 같은 두 변을 가지므로 이등변삼각형에 포함된다."
+              ],
+              "examples": [
+                {
+                  "description": "AB와 AC가 같을 때 꼭지각은 각 A이고 밑변은 BC이다.",
+                  "latex": "\\overline{\\mathrm{AB}}=\\overline{\\mathrm{AC}},\\quad \\angle\\mathrm{A},\\quad \\overline{\\mathrm{BC}}"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c002",
+              "title": "이등변삼각형의 성질",
+              "definition": "두 밑각의 크기가 같고, 꼭지각의 이등분선은 밑변을 수직이등분한다.",
+              "rules": [
+                "밑변의 중점과 꼭짓점을 이으면 두 삼각형은 SSS합동이다. 대응각이 같아서 밑각이 같다.",
+                "꼭지각의 이등분선을 그으면 공통변과 그 끼인각을 이용하여 두 삼각형이 SAS합동임을 보일 수 있다.",
+                "합동에서 나온 밑변의 두 부분은 길이가 같고, 이등분선과 밑변이 이룬 두 각은 크기가 같으며 합이 180°이다."
+              ],
+              "examples": [
+                {
+                  "description": "길이가 같은 두 변이 AB와 AC이고 꼭지각의 이등분선이 BC와 D에서 만난다.",
+                  "latex": "\\angle\\mathrm{B}=\\angle\\mathrm{C},\\quad \\overline{\\mathrm{BD}}=\\overline{\\mathrm{DC}},\\quad \\overline{\\mathrm{AD}}\\perp\\overline{\\mathrm{BC}}"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "AB와 AC의 길이가 같다. 꼭지각의 이등분선 AD는 밑변 BC를 수직이등분한다.",
+                  "points": {
+                    "A": [
+                      0,
+                      4
+                    ],
+                    "B": [
+                      -3,
+                      0
+                    ],
+                    "C": [
+                      3,
+                      0
+                    ],
+                    "D": [
+                      0,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "C"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "D"
+                      ],
+                      "tick_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "C"
+                      ],
+                      "tick_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "D"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "A",
+                      "arms": [
+                        "B",
+                        "D"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1
+                    },
+                    {
+                      "vertex": "A",
+                      "arms": [
+                        "D",
+                        "C"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1
+                    },
+                    {
+                      "vertex": "D",
+                      "arms": [
+                        "A",
+                        "C"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c003",
+              "title": "이등변삼각형이 되는 조건",
+              "definition": "두 내각의 크기가 같은 삼각형은 그 두 각의 대변의 길이가 같다.",
+              "rules": [
+                "같은 두 내각에 대응하는 밑변에 꼭짓점에서 수선을 내린다. 그 수선은 두 삼각형의 공통변이고, 수선 양 끝의 대응각이 각각 같아서 ASA합동이다.",
+                "합동인 두 삼각형에서 같은 길이의 대응변이 원래 두 내각의 대변이 된다."
+              ],
+              "examples": [
+                {
+                  "description": "각 B와 C의 크기가 같으면 그 두 각의 대변이 같다.",
+                  "latex": "\\angle\\mathrm{B}=\\angle\\mathrm{C}\\ \\Rightarrow\\ \\overline{\\mathrm{AC}}=\\overline{\\mathrm{AB}}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "직각삼각형",
+          "concepts": [
+            {
+              "concept_id": "m2.s2.u06.c004",
+              "title": "직각삼각형의 합동 조건",
+              "definition": "직각삼각형에서 직각의 맞은편 변을 빗변이라고 한다.",
+              "rules": [
+                "RHA합동은 빗변의 길이와 한 예각의 크기가 각각 같은 경우이다. 나머지 예각도 같으므로 빗변을 끼운 ASA합동으로 설명할 수 있다.",
+                "RHS합동은 빗변과 직각을 이루는 한 변의 길이가 각각 같은 경우이다. 길이가 같은 직각변을 겹쳐 이등변삼각형을 만들면 밑각이 같아 RHA합동으로 이어진다.",
+                "RHA와 RHS를 적용할 때는 두 빗변의 길이가 같음을 확인한다. 주어진 조건에 따라 일반적인 ASA나 SAS합동도 적용할 수 있다."
+              ],
+              "examples": [
+                {
+                  "description": "두 직각삼각형의 빗변과 대응하는 예각이 같다.",
+                  "latex": "\\angle\\mathrm{C}=\\angle\\mathrm{F}=90^\\circ,\\quad \\overline{\\mathrm{AB}}=\\overline{\\mathrm{DE}},\\quad \\angle\\mathrm{A}=\\angle\\mathrm{D}"
+                },
+                {
+                  "description": "두 직각삼각형의 빗변과 대응하는 직각변이 같다.",
+                  "latex": "\\angle\\mathrm{C}=\\angle\\mathrm{F}=90^\\circ,\\quad \\overline{\\mathrm{AB}}=\\overline{\\mathrm{DE}},\\quad \\overline{\\mathrm{AC}}=\\overline{\\mathrm{DF}}"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "RHA합동에서 크기가 같은 예각과 길이가 같은 빗변을 표시한다.",
+                  "points": {
+                    "A": [
+                      0,
+                      3
+                    ],
+                    "B": [
+                      4,
+                      0
+                    ],
+                    "C": [
+                      0,
+                      0
+                    ],
+                    "D": [
+                      6,
+                      3
+                    ],
+                    "E": [
+                      10,
+                      0
+                    ],
+                    "F": [
+                      6,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "E"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "F"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "F"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "C",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "F",
+                      "arms": [
+                        "D",
+                        "E"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "A",
+                      "arms": [
+                        "B",
+                        "C"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1
+                    },
+                    {
+                      "vertex": "D",
+                      "arms": [
+                        "E",
+                        "F"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "RHS합동에서 길이가 같은 빗변과 직각변을 표시한다.",
+                  "points": {
+                    "A": [
+                      0,
+                      3
+                    ],
+                    "B": [
+                      4,
+                      0
+                    ],
+                    "C": [
+                      0,
+                      0
+                    ],
+                    "D": [
+                      6,
+                      3
+                    ],
+                    "E": [
+                      10,
+                      0
+                    ],
+                    "F": [
+                      6,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "E"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "F"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "C"
+                      ],
+                      "tick_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "F"
+                      ],
+                      "tick_marks": 2
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "C",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "F",
+                      "arms": [
+                        "D",
+                        "E"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c005",
+              "title": "각의 이등분선과 두 변까지의 거리",
+              "definition": "각의 내부에서 각의 이등분선 위의 점은 두 변까지의 거리가 같다.",
+              "rules": [
+                "두 변까지의 거리는 각각 그 변에 내린 수선의 길이이다.",
+                "각을 이등분한다는 조건에서 공통 빗변과 같은 예각을 이용하면 두 직각삼각형은 RHA합동이다.",
+                "거꾸로 각의 내부에 있는 점에서 두 변까지의 수선 길이가 같으면 두 직각삼각형은 RHS합동이다. 따라서 그 점은 이등분선 위에 있다."
+              ],
+              "examples": [
+                {
+                  "description": "P가 각의 내부에 있고 A, B가 수선의 발일 때 성립한다.",
+                  "latex": "\\angle\\mathrm{XOP}=\\angle\\mathrm{YOP}\\ \\Longleftrightarrow\\ \\overline{\\mathrm{PA}}=\\overline{\\mathrm{PB}}"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "각의 이등분선 위의 P에서 두 변에 내린 수선 PA와 PB의 길이가 같다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "P": [
+                      2,
+                      2
+                    ],
+                    "A": [
+                      2,
+                      0
+                    ],
+                    "B": [
+                      0,
+                      2
+                    ],
+                    "X": [
+                      3,
+                      0
+                    ],
+                    "Y": [
+                      0,
+                      3
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "P": "P",
+                    "A": "A",
+                    "B": "B",
+                    "X": "X",
+                    "Y": "Y"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "X"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "Y"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "P"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "A"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ],
+                      "tick_marks": 1
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "A",
+                      "arms": [
+                        "P",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "B",
+                      "arms": [
+                        "P",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "O",
+                      "arms": [
+                        "X",
+                        "P"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1
+                    },
+                    {
+                      "vertex": "O",
+                      "arms": [
+                        "P",
+                        "Y"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "references": [
+            {
+              "title": "선분의 수직이등분선",
+              "definition": "선분의 두 끝점으로부터 같은 거리에 있는 점들의 모임이다.",
+              "rules": [
+                "수직이등분선 위의 점 P에서 양 끝점 A, B를 이으면 공통 높이와 같은 두 반쪽으로 이루어진 직각삼각형이 SAS합동이므로 PA=PB이다."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "삼각형의 외심",
+          "concepts": [
+            {
+              "concept_id": "m2.s2.u06.c006",
+              "title": "외접원과 외심",
+              "definition": "삼각형의 세 꼭짓점을 모두 지나는 원이 외접원이고 그 중심이 외심이다.",
+              "rules": [
+                "외심에서 각 꼭짓점까지의 거리는 외접원의 반지름이므로 서로 같다."
+              ],
+              "examples": [
+                {
+                  "description": "O가 외심이고 외접원의 반지름이 R이다.",
+                  "latex": "\\overline{\\mathrm{OA}}=\\overline{\\mathrm{OB}}=\\overline{\\mathrm{OC}}=R"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c007",
+              "title": "외심의 성질과 위치",
+              "definition": "삼각형의 세 변의 수직이등분선은 외심에서 만난다.",
+              "rules": [
+                "두 변의 수직이등분선을 그어 만나는 점만 구해도 외심을 찾을 수 있다. 남은 변의 수직이등분선 역시 그 점을 지난다.",
+                "외심과 각 변의 양 끝점을 이으면 이등변삼각형이 된다. 외심에서 변에 내린 수선이 그 변을 이등분한다.",
+                "예각삼각형의 외심은 내부, 직각삼각형의 외심은 빗변의 중점, 둔각삼각형의 외심은 외부에 있다."
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "예각삼각형의 외심 O는 내부에 있고 세 꼭짓점은 같은 원 위에 있다.",
+                  "points": {
+                    "A": [
+                      0,
+                      4
+                    ],
+                    "B": [
+                      -3,
+                      0
+                    ],
+                    "C": [
+                      3,
+                      0
+                    ],
+                    "O": [
+                      0,
+                      0.875
+                    ],
+                    "M1": [
+                      -1.5,
+                      2
+                    ],
+                    "M2": [
+                      0,
+                      0
+                    ],
+                    "M3": [
+                      1.5,
+                      2
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "O": "O"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "A"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "B"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "C"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "M1"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "M2"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "M3"
+                      ]
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "직각삼각형의 외심 O는 빗변 AC의 중점이다.",
+                  "points": {
+                    "A": [
+                      0,
+                      4
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      3,
+                      0
+                    ],
+                    "O": [
+                      1.5,
+                      2
+                    ],
+                    "M1": [
+                      0,
+                      2
+                    ],
+                    "M2": [
+                      1.5,
+                      0
+                    ],
+                    "M3": [
+                      1.5,
+                      2
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "O": "O"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "A"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "B"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "C"
+                      ],
+                      "tick_marks": 1
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "둔각삼각형의 외심 O는 삼각형 바깥에 있다.",
+                  "points": {
+                    "A": [
+                      0,
+                      1.5
+                    ],
+                    "B": [
+                      -3,
+                      0
+                    ],
+                    "C": [
+                      3,
+                      0
+                    ],
+                    "O": [
+                      0,
+                      -2.25
+                    ],
+                    "M1": [
+                      -1.5,
+                      0.75
+                    ],
+                    "M2": [
+                      0,
+                      0
+                    ],
+                    "M3": [
+                      1.5,
+                      0.75
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "O": "O"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "A"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "B"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "C"
+                      ],
+                      "tick_marks": 1
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c008",
+              "title": "외심을 이용한 각의 크기",
+              "definition": "외심과 꼭짓점을 이어 생기는 이등변삼각형의 밑각을 이용한다.",
+              "rules": [
+                "개념서의 예각삼각형에서 삼각형 OAB, OBC, OCA의 공통된 밑각 크기를 각각 x, y, z라 하면 전체 내각의 합은 2(x+y+z)이다.",
+                "그림처럼 O가 내부에 있는 경우, O에서 B와 C를 이은 중심각은 같은 호 BC를 보는 각 A의 두 배이다. AO를 연장한 뒤 이등변삼각형의 외각을 이용해 설명할 수 있다."
+              ],
+              "examples": [
+                {
+                  "description": "개념서의 예각삼각형 그림에서 성립한다.",
+                  "latex": "x+y+z=90^\\circ,\\qquad \\angle\\mathrm{BOC}=2\\angle\\mathrm{A}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "삼각형의 내심",
+          "concepts": [
+            {
+              "concept_id": "m2.s2.u06.c009",
+              "title": "원의 접선과 접점",
+              "definition": "원과 직선이 한 점에서 만나면 그 직선을 접선, 그 점을 접점이라고 한다.",
+              "rules": [
+                "접선은 접점을 지나는 반지름과 수직이다. 반지름의 원 위 끝점에서 반지름에 수직인 직선은 접선이다.",
+                "원과 두 점에서 만나는 직선은 할선이다."
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c010",
+              "title": "내접원과 내심",
+              "definition": "삼각형의 세 변 모두에 접하는 원이 내접원이고, 그 중심이 내심이다.",
+              "rules": [
+                "삼각형의 내심은 항상 삼각형 안에 있다.",
+                "세 내각의 이등분선은 내심에서 만난다. 내심에서 세 변까지의 거리는 모두 내접원의 반지름이다.",
+                "내심과 꼭짓점을 이으면 공통 빗변과 같은 반지름을 가진 직각삼각형이 RHS합동이다. 따라서 꼭짓점에서 내심을 이은 선은 그 내각의 이등분선이다.",
+                "이등변삼각형의 내심과 외심은 꼭지각의 이등분선 위에 있고, 정삼각형에서는 두 중심이 일치한다."
+              ],
+              "examples": [
+                {
+                  "description": "D, E, F가 각 변과 내접원의 접점이다.",
+                  "latex": "\\overline{\\mathrm{ID}}=\\overline{\\mathrm{IE}}=\\overline{\\mathrm{IF}}=r"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "내심 I에서 세 접점 D, E, F에 내린 수선의 길이는 내접원의 반지름과 같다.",
+                  "points": {
+                    "A": [
+                      0,
+                      4
+                    ],
+                    "B": [
+                      -3,
+                      0
+                    ],
+                    "C": [
+                      3,
+                      0
+                    ],
+                    "I": [
+                      0,
+                      1.5
+                    ],
+                    "D": [
+                      0,
+                      0
+                    ],
+                    "E": [
+                      1.2000000000000002,
+                      2.4
+                    ],
+                    "F": [
+                      -1.2000000000000002,
+                      2.4
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "I": "I",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "I",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "I",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "I",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "I",
+                        "D"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "I",
+                        "E"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "I",
+                        "F"
+                      ],
+                      "tick_marks": 1
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "D",
+                      "arms": [
+                        "I",
+                        "C"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "E",
+                      "arms": [
+                        "I",
+                        "C"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "F",
+                      "arms": [
+                        "I",
+                        "A"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "I",
+                      "through": "D",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c011",
+              "title": "내심을 이용한 각의 크기",
+              "definition": "내각의 이등분선과 삼각형의 내각 합으로 각의 크기를 구한다.",
+              "rules": [
+                "세 내각의 절반씩을 더하면 90°가 된다.",
+                "삼각형 BIC에서 B와 C의 각은 각각 원래의 각 B와 C의 절반이므로, 각 BIC는 90°에 각 A의 절반을 더한 값이다."
+              ],
+              "examples": [
+                {
+                  "description": "I가 삼각형 ABC의 내심일 때이다.",
+                  "latex": "\\frac12(\\angle\\mathrm{A}+\\angle\\mathrm{B}+\\angle\\mathrm{C})=90^\\circ,\\qquad \\angle\\mathrm{BIC}=90^\\circ+\\frac12\\angle\\mathrm{A}"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c012",
+              "title": "내접원의 반지름과 삼각형의 넓이",
+              "definition": "내심과 세 꼭짓점을 이으면 내접원의 반지름을 공통 높이로 하는 삼각형 세 개가 생긴다.",
+              "rules": [
+                "작은 삼각형 세 개의 넓이를 더하면 원래 삼각형의 넓이를 구할 수 있다.",
+                "삼각형의 넓이와 둘레를 알면 내접원의 반지름을 구할 수 있다."
+              ],
+              "examples": [
+                {
+                  "description": "세 변의 길이가 a, b, c이고 내접원 반지름이 r이다.",
+                  "latex": "S=\\frac12(a+b+c)r,\\qquad r=\\frac{2S}{a+b+c}"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c013",
+              "title": "내접원에 그은 두 접선의 길이",
+              "definition": "한 꼭짓점에서 내접원에 그은 두 접선에서, 꼭짓점부터 접점까지의 거리가 서로 같다.",
+              "rules": [
+                "꼭짓점과 내심을 잇는 공통 빗변과 원의 반지름을 이용하면 대응하는 두 직각삼각형이 RHS합동이다."
+              ],
+              "examples": [
+                {
+                  "description": "D, E, F는 각각 BC, CA, AB와 내접원의 접점이다.",
+                  "latex": "\\overline{\\mathrm{AE}}=\\overline{\\mathrm{AF}},\\quad \\overline{\\mathrm{BF}}=\\overline{\\mathrm{BD}},\\quad \\overline{\\mathrm{CD}}=\\overline{\\mathrm{CE}}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "사각형의 성질",
+      "subsections": [
+        {
+          "title": "평행사변형",
+          "concepts": [
+            {
+              "concept_id": "m2.s2.u06.c014",
+              "title": "평행사변형의 뜻과 성질",
+              "definition": "두 쌍의 대변이 각각 평행한 사각형을 평행사변형이라고 한다.",
+              "rules": [
+                "사각형에서 마주 보는 변을 대변, 마주 보는 각을 대각이라고 한다.",
+                "평행사변형의 두 쌍의 대변은 길이가 각각 같고, 두 쌍의 대각도 크기가 각각 같다.",
+                "두 대각선은 만나는 점에서 서로를 이등분한다."
+              ],
+              "examples": [
+                {
+                  "description": "O는 두 대각선의 교점이다.",
+                  "latex": "\\overline{\\mathrm{OA}}=\\overline{\\mathrm{OC}},\\qquad \\overline{\\mathrm{OB}}=\\overline{\\mathrm{OD}}"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "평행사변형의 대변은 각각 평행하고, 두 대각선은 O에서 서로를 이등분한다.",
+                  "points": {
+                    "A": [
+                      1,
+                      3
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      5,
+                      0
+                    ],
+                    "D": [
+                      6,
+                      3
+                    ],
+                    "O": [
+                      3,
+                      1.5
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "O": "O"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ],
+                      "parallel_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ],
+                      "parallel_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ],
+                      "parallel_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ],
+                      "parallel_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "C"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "O"
+                      ],
+                      "tick_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "D"
+                      ],
+                      "tick_marks": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c015",
+              "title": "평행사변형이 되는 조건",
+              "definition": "다음 다섯 조건 중 하나를 만족하면 평행사변형이다.",
+              "rules": [
+                "두 쌍의 대변이 각각 평행하다.",
+                "두 쌍의 대변의 길이가 각각 같다.",
+                "두 쌍의 대각의 크기가 각각 같다.",
+                "두 대각선이 서로를 이등분한다.",
+                "한 쌍의 대변이 서로 평행하면서 그 한 쌍의 길이가 같다."
+              ]
+            }
+          ]
+        },
+        {
+          "title": "평행사변형의 활용",
+          "concepts": [
+            {
+              "concept_id": "m2.s2.u06.c016",
+              "title": "평행사변형이 되는 조건의 활용",
+              "definition": "평행사변형 ABCD에서 새로 만든 사각형 EBFD의 대변, 대각선 또는 대각을 비교한다.",
+              "rules": [
+                "각 B와 D의 이등분선이 각각 AD와 BC를 만나는 점을 E, F로 잡으면, 평행선의 엇각과 동위각으로 BE와 DF가 평행함을 보일 수 있다. ED와 BF도 평행이다.",
+                "대각선의 교점 O를 사이에 두고 AC 위에 OE=OF인 E, F를 잡으면, EF와 BD가 서로를 이등분한다.",
+                "AB 위의 E와 CD 위의 F가 BE=DF를 만족하면, BE와 DF는 평행하면서 길이가 같다.",
+                "B와 D에서 AC에 내린 수선의 발을 E, F라 하면 BE와 DF는 서로 평행하다. 빗변과 예각이 각각 같은 직각삼각형을 써서 두 수선의 길이가 같음을 보인다."
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "각 B와 D의 이등분선이 각각 AD와 BC에 닿으면 BE와 DF가 평행하다.",
+                  "points": {
+                    "A": [
+                      1,
+                      3
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      5,
+                      0
+                    ],
+                    "D": [
+                      6,
+                      3
+                    ],
+                    "E": [
+                      4.16227766016838,
+                      3
+                    ],
+                    "F": [
+                      1.83772233983162,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "B"
+                      ],
+                      "parallel_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "F",
+                        "D"
+                      ],
+                      "parallel_marks": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "대각선 AC 위에서 O와 거리가 같은 두 점 E와 F를 잡는다.",
+                  "points": {
+                    "A": [
+                      1,
+                      3
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      5,
+                      0
+                    ],
+                    "D": [
+                      6,
+                      3
+                    ],
+                    "O": [
+                      3,
+                      1.5
+                    ],
+                    "E": [
+                      2,
+                      2.25
+                    ],
+                    "F": [
+                      4,
+                      0.75
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "O": "O",
+                    "E": "E",
+                    "F": "F"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "F"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "F",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "E"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "E"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "F"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "F",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "O"
+                      ],
+                      "tick_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "D"
+                      ],
+                      "tick_marks": 2
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "AB 위의 E와 CD 위의 F를 잡아 BE와 DF의 길이를 같게 한다.",
+                  "points": {
+                    "A": [
+                      1,
+                      3
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      5,
+                      0
+                    ],
+                    "D": [
+                      6,
+                      3
+                    ],
+                    "E": [
+                      0.5,
+                      1.5
+                    ],
+                    "F": [
+                      5.5,
+                      1.5
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "F",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "E"
+                      ],
+                      "tick_marks": 1,
+                      "parallel_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "F"
+                      ],
+                      "tick_marks": 1,
+                      "parallel_marks": 1
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "AC에 내린 두 수선 BE와 DF는 길이가 같고 서로 평행하다.",
+                  "points": {
+                    "A": [
+                      1,
+                      3
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      5,
+                      0
+                    ],
+                    "D": [
+                      6,
+                      3
+                    ],
+                    "E": [
+                      1.8,
+                      2.4
+                    ],
+                    "F": [
+                      4.2,
+                      0.6000000000000001
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "F"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "E"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "E"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "F"
+                      ],
+                      "tick_marks": 1
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "E",
+                      "arms": [
+                        "B",
+                        "A"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "F",
+                      "arms": [
+                        "D",
+                        "C"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c017",
+              "title": "평행사변형의 대각선과 넓이",
+              "definition": "대각선 한 개는 넓이를 이등분하고, 대각선 두 개는 넓이를 사등분한다.",
+              "rules": [
+                "대각선 한 개가 만드는 두 삼각형은 합동이다.",
+                "두 대각선을 그어 생긴 삼각형에서는 밑변의 길이와 높이를 비교하여 네 삼각형의 넓이가 같음을 보일 수 있다."
+              ],
+              "examples": [
+                {
+                  "description": "O가 대각선의 교점일 때 네 삼각형의 넓이는 각각 전체의 4분의 1이다.",
+                  "latex": "[\\triangle\\mathrm{ABO}]=[\\triangle\\mathrm{BCO}]=[\\triangle\\mathrm{CDO}]=[\\triangle\\mathrm{DAO}]=\\frac14[\\square\\mathrm{ABCD}]"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "평행사변형의 대변은 각각 평행하고, 두 대각선은 O에서 서로를 이등분한다.",
+                  "points": {
+                    "A": [
+                      1,
+                      3
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      5,
+                      0
+                    ],
+                    "D": [
+                      6,
+                      3
+                    ],
+                    "O": [
+                      3,
+                      1.5
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "O": "O"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ],
+                      "parallel_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ],
+                      "parallel_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ],
+                      "parallel_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ],
+                      "parallel_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "C"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "O"
+                      ],
+                      "tick_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "D"
+                      ],
+                      "tick_marks": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c018",
+              "title": "평행사변형 내부의 점과 넓이",
+              "definition": "내부의 한 점 P를 네 꼭짓점에 연결하면, 서로 마주 보는 두 삼각형의 넓이의 합은 전체 넓이의 절반이다.",
+              "rules": [
+                "AB, CD를 각각 밑변으로 하는 두 삼각형의 밑변 길이는 같다. 두 삼각형의 높이의 합은 평행한 두 변 사이의 거리이다.",
+                "AD, BC를 각각 밑변으로 하는 반대쪽 두 삼각형에도 같은 원리를 적용한다."
+              ],
+              "examples": [
+                {
+                  "description": "마주 보는 두 삼각형의 넓이를 더한다.",
+                  "latex": "[\\triangle\\mathrm{PAB}]+[\\triangle\\mathrm{PCD}]=[\\triangle\\mathrm{PAD}]+[\\triangle\\mathrm{PBC}]=\\frac12[\\square\\mathrm{ABCD}]"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "내부의 점 P를 네 꼭짓점에 잇는다. 서로 마주 보는 두 삼각형을 한 쌍으로 본다.",
+                  "points": {
+                    "A": [
+                      1,
+                      3
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      5,
+                      0
+                    ],
+                    "D": [
+                      6,
+                      3
+                    ],
+                    "P": [
+                      2,
+                      1
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "P": "P"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "D"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "직사각형, 마름모, 정사각형",
+          "concepts": [
+            {
+              "concept_id": "m2.s2.u06.c019",
+              "title": "직사각형",
+              "definition": "네 내각의 크기가 모두 같은 사각형이다. 따라서 네 내각이 모두 90°이다.",
+              "rules": [
+                "직사각형은 평행사변형이고 두 대각선은 길이가 같으며 서로를 이등분한다.",
+                "사각형의 두 대각선이 길이가 같으면서 서로를 이등분하면 직사각형이다.",
+                "평행사변형에서 한 내각이 직각이거나 두 대각선의 길이가 같으면 직사각형이다."
+              ],
+              "examples": [
+                {
+                  "description": "O가 대각선의 교점인 직사각형이다.",
+                  "latex": "\\overline{\\mathrm{AO}}=\\overline{\\mathrm{BO}}=\\overline{\\mathrm{CO}}=\\overline{\\mathrm{DO}}"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "직사각형에서는 대각선 교점과 네 꼭짓점 사이의 네 길이가 같다.",
+                  "points": {
+                    "A": [
+                      -3,
+                      2
+                    ],
+                    "B": [
+                      -3,
+                      -2
+                    ],
+                    "C": [
+                      3,
+                      -2
+                    ],
+                    "D": [
+                      3,
+                      2
+                    ],
+                    "O": [
+                      0,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "O": "O"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "A",
+                      "arms": [
+                        "B",
+                        "D"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c020",
+              "title": "마름모",
+              "definition": "네 변의 길이가 모두 같은 사각형이다.",
+              "rules": [
+                "마름모는 평행사변형이고 두 대각선은 서로를 수직이등분한다.",
+                "사각형의 두 대각선이 서로를 수직이등분하면 마름모이다.",
+                "평행사변형에서 이웃한 두 변의 길이가 같거나 두 대각선이 수직이면 마름모이다."
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "마름모에서 두 대각선은 수직이고 각각 O에서 이등분된다.",
+                  "points": {
+                    "A": [
+                      0,
+                      2
+                    ],
+                    "B": [
+                      -3,
+                      0
+                    ],
+                    "C": [
+                      0,
+                      -2
+                    ],
+                    "D": [
+                      3,
+                      0
+                    ],
+                    "O": [
+                      0,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "O": "O"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "O"
+                      ],
+                      "tick_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "O"
+                      ],
+                      "tick_marks": 2
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "O",
+                      "arms": [
+                        "A",
+                        "D"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c021",
+              "title": "정사각형",
+              "definition": "네 변의 길이가 같고 네 내각이 직각인 사각형이다.",
+              "rules": [
+                "정사각형은 직사각형이면서 마름모이다. 두 대각선의 길이가 같으며 서로를 수직이등분한다.",
+                "사각형의 두 대각선이 길이가 같으면서 서로를 수직이등분하면 정사각형이다.",
+                "직사각형에서 이웃한 두 변의 길이가 같거나 두 대각선이 수직이면 정사각형이다.",
+                "마름모에서 한 내각이 직각이거나 두 대각선의 길이가 같으면 정사각형이다."
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "정사각형은 두 대각선의 길이가 같고, 두 대각선이 서로를 수직이등분한다.",
+                  "points": {
+                    "A": [
+                      0,
+                      2
+                    ],
+                    "B": [
+                      -2,
+                      0
+                    ],
+                    "C": [
+                      0,
+                      -2
+                    ],
+                    "D": [
+                      2,
+                      0
+                    ],
+                    "O": [
+                      0,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "O": "O"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "O"
+                      ],
+                      "tick_marks": 1
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "O",
+                      "arms": [
+                        "A",
+                        "D"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "여러 가지 사각형의 관계",
+          "concepts": [
+            {
+              "concept_id": "m2.s2.u06.c022",
+              "title": "등변사다리꼴",
+              "definition": "평행한 두 밑변 중 한 밑변의 양 끝 각이 같은 사다리꼴이다.",
+              "rules": [
+                "사다리꼴은 개념서의 분류에서 한 쌍의 대변이 평행한 사각형이다.",
+                "등변사다리꼴에서 평행하지 않은 두 대변의 길이가 서로 같고 두 대각선의 길이도 서로 같다.",
+                "한 쌍의 대변만 평행한 사다리꼴에서 다른 두 변의 길이가 같으면 등변사다리꼴이다."
+              ],
+              "examples": [
+                {
+                  "description": "AD와 BC가 평행하고 각 ABC와 DCB의 크기가 같을 때 성립한다.",
+                  "latex": "\\overline{\\mathrm{AB}}=\\overline{\\mathrm{CD}},\\qquad \\overline{\\mathrm{AC}}=\\overline{\\mathrm{BD}}"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "등변사다리꼴에서 평행하지 않은 대변의 길이가 같고, 두 대각선의 길이도 같다.",
+                  "points": {
+                    "A": [
+                      -2,
+                      2
+                    ],
+                    "B": [
+                      -3,
+                      0
+                    ],
+                    "C": [
+                      3,
+                      0
+                    ],
+                    "D": [
+                      2,
+                      2
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ],
+                      "parallel_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ],
+                      "tick_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ],
+                      "parallel_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "C"
+                      ],
+                      "tick_marks": 2
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "D"
+                      ],
+                      "tick_marks": 2
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c023",
+              "title": "여러 가지 사각형의 포함 관계와 대각선",
+              "definition": "평행한 대변의 쌍과 각, 변, 대각선의 조건으로 여러 사각형의 관계를 구분한다.",
+              "rules": [
+                "사다리꼴에 다른 한 쌍의 대변도 평행하다는 조건을 더하면 평행사변형이다.",
+                "직사각형과 마름모는 모두 평행사변형이다. 두 조건을 모두 만족하는 사각형은 정사각형이다.",
+                "등변사다리꼴에서는 두 대각선의 길이가 같다. 평행사변형에서는 서로를 이등분한다.",
+                "직사각형은 이등분과 길이 같음, 마름모는 수직이등분, 정사각형은 수직이등분과 길이 같음을 만족한다."
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c024",
+              "title": "사각형의 각 변의 중점을 연결한 사각형",
+              "definition": "사각형의 각 변의 중점을 차례로 연결하면 평행사변형이 만들어진다. 원래 사각형에 따라 더 구체적인 모양을 알 수 있다.",
+              "rules": [
+                "일반 사각형과 평행사변형에서 얻는 도형은 평행사변형이다.",
+                "직사각형과 등변사다리꼴에서 얻는 도형은 마름모이다.",
+                "마름모에서는 직사각형, 정사각형에서는 정사각형을 얻는다.",
+                "개념서에서는 그림과 도형의 성질로 먼저 확인하며, 중점연결정리를 배운 뒤에는 그 정리로 설명할 수 있다."
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "평행사변형의 네 변의 중점을 연결하면 평행사변형이 된다.",
+                  "points": {
+                    "A": [
+                      1,
+                      3
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      5,
+                      0
+                    ],
+                    "D": [
+                      6,
+                      3
+                    ],
+                    "E": [
+                      0.5,
+                      1.5
+                    ],
+                    "F": [
+                      2.5,
+                      0
+                    ],
+                    "G": [
+                      5.5,
+                      1.5
+                    ],
+                    "H": [
+                      3.5,
+                      3
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F",
+                    "G": "G",
+                    "H": "H"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "F"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "F",
+                        "G"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "G",
+                        "H"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "H",
+                        "E"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "직사각형의 네 변의 중점을 연결하면 마름모가 된다.",
+                  "points": {
+                    "A": [
+                      -3,
+                      2
+                    ],
+                    "B": [
+                      -3,
+                      -2
+                    ],
+                    "C": [
+                      3,
+                      -2
+                    ],
+                    "D": [
+                      3,
+                      2
+                    ],
+                    "E": [
+                      -3,
+                      0
+                    ],
+                    "F": [
+                      0,
+                      -2
+                    ],
+                    "G": [
+                      3,
+                      0
+                    ],
+                    "H": [
+                      0,
+                      2
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F",
+                    "G": "G",
+                    "H": "H"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "F"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "F",
+                        "G"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "G",
+                        "H"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "H",
+                        "E"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "마름모의 네 변의 중점을 연결하면 직사각형이 된다.",
+                  "points": {
+                    "A": [
+                      0,
+                      2
+                    ],
+                    "B": [
+                      -3,
+                      0
+                    ],
+                    "C": [
+                      0,
+                      -2
+                    ],
+                    "D": [
+                      3,
+                      0
+                    ],
+                    "E": [
+                      -1.5,
+                      1
+                    ],
+                    "F": [
+                      -1.5,
+                      -1
+                    ],
+                    "G": [
+                      1.5,
+                      -1
+                    ],
+                    "H": [
+                      1.5,
+                      1
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F",
+                    "G": "G",
+                    "H": "H"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "F"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "F",
+                        "G"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "G",
+                        "H"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "H",
+                        "E"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "정사각형의 네 변의 중점을 연결하면 정사각형이 된다.",
+                  "points": {
+                    "A": [
+                      0,
+                      2
+                    ],
+                    "B": [
+                      -2,
+                      0
+                    ],
+                    "C": [
+                      0,
+                      -2
+                    ],
+                    "D": [
+                      2,
+                      0
+                    ],
+                    "E": [
+                      -1,
+                      1
+                    ],
+                    "F": [
+                      -1,
+                      -1
+                    ],
+                    "G": [
+                      1,
+                      -1
+                    ],
+                    "H": [
+                      1,
+                      1
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F",
+                    "G": "G",
+                    "H": "H"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "F"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "F",
+                        "G"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "G",
+                        "H"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "H",
+                        "E"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "일반 사각형의 네 변의 중점을 연결하면 평행사변형이 된다.",
+                  "points": {
+                    "A": [
+                      -2,
+                      3
+                    ],
+                    "B": [
+                      -3,
+                      0
+                    ],
+                    "C": [
+                      3,
+                      -1
+                    ],
+                    "D": [
+                      1,
+                      2
+                    ],
+                    "E": [
+                      -2.5,
+                      1.5
+                    ],
+                    "F": [
+                      0,
+                      -0.5
+                    ],
+                    "G": [
+                      2,
+                      0.5
+                    ],
+                    "H": [
+                      -0.5,
+                      2.5
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F",
+                    "G": "G",
+                    "H": "H"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "F"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "F",
+                        "G"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "G",
+                        "H"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "H",
+                        "E"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "등변사다리꼴의 네 변의 중점을 연결하면 마름모가 된다.",
+                  "points": {
+                    "A": [
+                      -2,
+                      2
+                    ],
+                    "B": [
+                      -3,
+                      0
+                    ],
+                    "C": [
+                      3,
+                      0
+                    ],
+                    "D": [
+                      2,
+                      2
+                    ],
+                    "E": [
+                      -2.5,
+                      1
+                    ],
+                    "F": [
+                      0,
+                      0
+                    ],
+                    "G": [
+                      2.5,
+                      1
+                    ],
+                    "H": [
+                      0,
+                      2
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F",
+                    "G": "G",
+                    "H": "H"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "E",
+                        "F"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "F",
+                        "G"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "G",
+                        "H"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "H",
+                        "E"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s2.u06.c025",
+              "title": "평행선과 삼각형의 넓이",
+              "definition": "같은 밑변을 공유하는 삼각형에서 나머지 꼭짓점이 밑변과 평행한 한 직선 위에 있으면 넓이가 같다.",
+              "rules": [
+                "평행선 사이의 거리는 일정하므로 두 삼각형의 높이가 같다.",
+                "높이가 같은 두 삼각형의 넓이의 비는 각 삼각형 밑변 길이의 비와 같다.",
+                "밑변으로 삼은 두 선분의 길이도 같으면 두 삼각형의 넓이가 같다."
+              ],
+              "examples": [
+                {
+                  "description": "밑변 BC를 공유하고 A와 A′가 BC에 평행한 직선 위에 있다.",
+                  "latex": "[\\triangle\\mathrm{ABC}]=[\\triangle\\mathrm{A'BC}]"
+                },
+                {
+                  "description": "B, C, D가 한 직선 위에 있고 두 삼각형의 높이가 같다.",
+                  "latex": "[\\triangle\\mathrm{ABC}]:[\\triangle\\mathrm{ACD}]=\\overline{\\mathrm{BC}}:\\overline{\\mathrm{CD}}"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "A와 A′는 BC와 평행한 직선 위에 있다. 두 삼각형의 밑변과 높이가 같다.",
+                  "points": {
+                    "A": [
+                      0,
+                      2
+                    ],
+                    "A′": [
+                      2,
+                      2
+                    ],
+                    "B": [
+                      -2,
+                      0
+                    ],
+                    "C": [
+                      3,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "A′": "A′",
+                    "B": "B",
+                    "C": "C"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "A′"
+                      ],
+                      "parallel_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ],
+                      "parallel_marks": 1
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A′",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A′",
+                        "C"
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "높이가 같으므로 두 삼각형의 넓이의 비는 밑변 BC와 CD의 길이의 비이다.",
+                  "points": {
+                    "A": [
+                      0,
+                      2
+                    ],
+                    "B": [
+                      -2,
+                      0
+                    ],
+                    "C": [
+                      1,
+                      0
+                    ],
+                    "D": [
+                      3,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
