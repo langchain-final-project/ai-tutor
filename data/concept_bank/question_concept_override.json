@@ -1,0 +1,3786 @@
+{
+  "M1_1_01_00041_42325.png": {
+    "status": "unlinked",
+    "reason": "문제와 해설 불일치",
+    "detail": "문제는 가장 큰 분수를 묻지만 해설은 최대공약수와 최소공배수의 관계를 풀이한다."
+  },
+  "M1_1_02_00041_41166.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c006"
+    ],
+    "source_topic_code": "7102029",
+    "reason": "문제의 핵심은 -1<a<b<0에서 역수의 대소를 판단하는 것이며, 덧셈·뺄셈 혼합 계산 유형 코드와 일치하지 않는다."
+  },
+  "M1_1_03_00041_64297.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u03.c024"
+    ],
+    "source_topic_code": "7103009",
+    "reason": "왕복 시간 관계식을 세워 거리를 구하는 문항으로, 일반적인 수량의 식 표현이 아니라 거리·속력·시간 일차방정식 활용이 핵심이다."
+  },
+  "M1_1_01_00043_00938.png":{
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u01.c007",
+      "m1.s1.u01.c009"
+    ],
+    "source_topic_code": "7101009"
+  },
+  "M1_1_01_00043_02800.png":{
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u01.c007",
+      "m1.s1.u01.c009"
+    ],
+    "source_topic_code": "7101009"
+  },
+  "M1_1_01_00043_02797.png":{
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u01.c007",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7101009"
+  },
+  "M1_1_01_00041_45770.png":{
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u01.c014",
+      "m1.s1.u01.c015",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7101015"
+  },
+  "M1_1_01_00041_42292.png":{
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u01.c017",
+      "m1.s1.u01.c018",
+      "m1.s1.u02.c014"
+    ],
+    "source_topic_code": "7101024"
+  },
+  "M1_1_01_00041_42293.png":{
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u01.c017",
+      "m1.s1.u01.c018",
+      "m1.s1.u02.c014"
+    ],
+    "source_topic_code": "7101024"
+  },
+  "M1_1_01_00041_42294.png":{
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u01.c017",
+      "m1.s1.u01.c018",
+      "m1.s1.u02.c014"
+    ],
+    "source_topic_code": "7101024"
+  },
+  "M1_1_01_00041_42295.png":{
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u01.c017",
+      "m1.s1.u01.c018",
+      "m1.s1.u02.c014"
+    ],
+    "source_topic_code": "7101024"
+  },
+  "M1_1_01_00041_42297.png":{
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u01.c017",
+      "m1.s1.u01.c018",
+      "m1.s1.u02.c014"
+    ],
+    "source_topic_code": "7101024"
+  },
+
+  "M1_1_02_00041_41167.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41168.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41485.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41486.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41496.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41500.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41569.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41572.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41580.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41581.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41582.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41583.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41584.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41585.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41587.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41592.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41593.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41594.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41595.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41596.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41597.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41598.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41599.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41600.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41601.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41602.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41608.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41609.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41611.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41612.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41614.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41615.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41617.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41618.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41619.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41620.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41621.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41622.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41623.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41627.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41628.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41629.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41630.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41631.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41632.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41633.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41634.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41635.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41640.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41641.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41642.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41643.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41645.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41646.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41648.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41649.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41650.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41653.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41654.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41658.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41659.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41662.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41682.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41683.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41684.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41685.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41686.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41687.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41688.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41694.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41699.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41700.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41701.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41702.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_41710.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45491.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45492.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45498.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45499.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45503.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45504.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45505.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45506.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45507.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45508.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45511.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45514.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45516.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45520.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45521.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45522.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45523.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45524.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45525.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45531.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45542.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45548.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45549.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45553.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45554.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45555.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_45556.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60188.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60189.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60190.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60193.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60194.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60197.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60229.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60230.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60231.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60232.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60233.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60234.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60235.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60236.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60237.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60238.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60239.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60240.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60241.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60242.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60243.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60244.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60246.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60247.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60250.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60251.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60252.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60253.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60254.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60255.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60267.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60271.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60272.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60273.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60275.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60285.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60300.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60301.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60302.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60304.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60306.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60312.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60331.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60332.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60333.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60334.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60335.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60336.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60339.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60344.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60346.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60347.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60351.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60352.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60353.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60354.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60358.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60359.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60384.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60386.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60387.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60390.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60392.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60396.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60550.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60554.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60558.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60559.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60576.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60577.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60578.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60579.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60580.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60581.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60606.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60611.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60612.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60613.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60614.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60616.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60621.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60622.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60624.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60627.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60629.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60637.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60640.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60641.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60642.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60643.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60644.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60675.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60678.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60692.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60694.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60695.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60696.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60697.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60698.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60700.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60701.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60702.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60703.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60704.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60706.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60707.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60708.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60714.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60722.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60740.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60741.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60742.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60743.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60758.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60760.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60761.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60762.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60763.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60764.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60767.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60769.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60770.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60773.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60787.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_60788.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61748.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61762.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61763.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61765.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61770.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61851.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61852.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61853.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61855.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61857.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61859.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61862.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61865.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61866.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61872.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61876.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61877.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61878.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61886.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61888.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_61890.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62140.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62141.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62142.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62143.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62145.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62147.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62148.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62156.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62157.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62158.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62159.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62194.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62197.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62199.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62201.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62202.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62203.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62205.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62211.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62218.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62221.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62222.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62223.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62224.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62226.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62227.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62228.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62230.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62231.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62234.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62238.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62285.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62286.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62291.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62298.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62300.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62302.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62309.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62317.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62318.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62320.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62323.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62325.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62327.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62329.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62330.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62336.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62337.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62373.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62381.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62382.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62383.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62384.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62385.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62387.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62388.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62392.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62395.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62396.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62397.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62398.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62399.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62400.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62401.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62403.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62404.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62432.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62436.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62438.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62440.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62443.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62444.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62446.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62450.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62452.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62453.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62454.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62455.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62456.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62457.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62458.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62459.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62462.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62463.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_62465.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_63974.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64010.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64019.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64020.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64027.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64030.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64031.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64041.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64045.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64073.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64074.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64075.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64077.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64079.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64080.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64083.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64084.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64085.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64086.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64094.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64095.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64096.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64102.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64103.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64104.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64105.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64109.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64110.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64111.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64113.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64115.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64117.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64121.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64126.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64127.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64128.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64131.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64137.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64140.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64141.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64143.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64179.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64181.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64183.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64184.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64185.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64189.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64190.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64193.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64195.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64198.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00041_64200.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_04129.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_04184.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_04239.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94432.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94433.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94434.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94435.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94436.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94438.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94439.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94440.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94441.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94442.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94443.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_94444.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_95887.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_95888.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_95890.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_95891.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_95892.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_95893.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_95895.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_95896.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00042_95899.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_00868.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_00869.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_00870.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_00871.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_00872.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_00877.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_00878.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_00879.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_00880.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01150.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01151.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01200.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01203.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01204.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01205.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01207.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01212.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01215.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01216.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01220.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01223.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01224.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01226.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01227.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01230.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01233.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01237.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01241.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01242.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01243.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01249.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01250.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01251.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01252.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01253.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01254.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01255.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01257.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01258.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01259.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01260.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01264.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01267.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_01269.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_03735.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_03736.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_03737.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021",
+      "m1.s1.u02.c022"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04111.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04118.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04135.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04142.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04161.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04164.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04165.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04166.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04170.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04173.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04176.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04177.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04181.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04186.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04188.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c019"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04191.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04192.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04197.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04198.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04199.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04201.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04206.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04209.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04211.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04212.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04216.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04217.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04220.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04222.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04224.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04228.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04229.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04235.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04236.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04238.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04241.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04242.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04243.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04245.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04251.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04260.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04262.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04263.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04265.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04266.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04267.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04273.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c009",
+      "m1.s1.u02.c010"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04274.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04276.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c023"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04277.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04278.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c020"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04287.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04288.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04291.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04293.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04304.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c021"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04305.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c017"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04307.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_02_00043_04309.png": {
+    "status": "override",
+    "concept_ids": [
+      "m1.s1.u02.c018"
+    ],
+    "source_topic_code": "7102029"
+  },
+  "M1_1_03_00041_42113.png": {
+    "status": "unlinked",
+    "reason": "문제와 정답·해설 불일치",
+    "detail": "문제의 식과 정답·해설에서 푼 식이 서로 다르다."
+  },
+  "M1_1_03_00043_01433.png": {
+    "status": "unlinked",
+    "reason": "문제와 정답 불일치",
+    "detail": "②의 해는 -4이고 나머지 식의 해는 6이지만 저장된 정답은 ①이다."
+  }
+}

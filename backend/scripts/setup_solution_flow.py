@@ -35,6 +35,8 @@ TUTOR_SCHEMA_FILE = "008_tutor_sessions.sqlite.sql"
 TUTOR_MIGRATION_ID = "tutor-sessions-v1"
 LEARNING_SCHEMA_FILE = "009_learning_paths.sqlite.sql"
 LEARNING_MIGRATION_ID = "learning-paths-v1"
+LEARNING_TYPES_FILE = "010_learning_path_types.sqlite.sql"
+LEARNING_TYPES_ID = "learning-path-types-v2"
 
 
 def _schema(name):
@@ -68,6 +70,7 @@ def _reference(*, with_regions=False, with_sources=False, with_types=False, with
             reference.executescript(_schema(TUTOR_SCHEMA_FILE))
         if with_learning:
             reference.executescript(_schema(LEARNING_SCHEMA_FILE))
+            reference.executescript(_schema(LEARNING_TYPES_FILE))
         full = _objects(reference)
         columns = {
             name: list(reference.execute(f'PRAGMA table_info("{name}")'))
@@ -142,10 +145,12 @@ def _has_type_match_schema(connection):
     return True
 
 
-def _has_strict_schema(connection, schema_file, label):
+def _has_strict_schema(connection, schema_file, label, *, upgrade=None):
     """부분 적용·변조 상태를 먼저 검사해 기존 기록을 덮어쓰지 않는다."""
     with closing(sqlite3.connect(":memory:")) as reference:
         reference.executescript(_schema(schema_file))
+        if upgrade is not None:
+            reference.executescript(_schema(upgrade))
         expected = _objects(reference)
         present = set(expected).intersection(_objects(connection))
         if not present:
@@ -174,7 +179,6 @@ def apply_migration(connection):
     has_regions = _has_region_schema(connection)
     has_types = _has_type_match_schema(connection)
     has_tutor = _has_tutor_schema(connection)
-    has_learning = _has_strict_schema(connection, LEARNING_SCHEMA_FILE, "학습 경로")
     _, extended, extended_columns = _reference(with_regions=True, with_sources=True, with_types=True,
                                                with_tutor=True, with_learning=True)
     _, sources, _ = _reference(with_sources=True)
@@ -214,6 +218,20 @@ def apply_migration(connection):
         "SELECT schema_sha256 FROM problem_schema_migrations WHERE id = ?",
         (LEARNING_MIGRATION_ID,),
     ).fetchone()
+    learning_types_schema = _schema(LEARNING_TYPES_FILE)
+    learning_types_digest = _digest(learning_types_schema)
+    learning_types_row = connection.execute(
+        "SELECT schema_sha256 FROM problem_schema_migrations WHERE id = ?",
+        (LEARNING_TYPES_ID,),
+    ).fetchone()
+    if learning_types_row is not None and (
+        learning_row is None or learning_types_row != (learning_types_digest,)
+    ):
+        raise ValueError("이미 적용된 학습 유형 SQL의 내용 또는 적용 이력이 변경되었습니다.")
+    has_learning = _has_strict_schema(
+        connection, LEARNING_SCHEMA_FILE, "학습 경로",
+        upgrade=LEARNING_TYPES_FILE if learning_types_row is not None else None,
+    )
     if learning_row is not None and (not has_learning or learning_row != (learning_digest,)):
         raise ValueError("이미 적용된 학습 경로 저장 SQL의 내용 또는 적용 이력이 변경되었습니다.")
     if tutor_row is not None and (not has_tutor or tutor_row != (tutor_digest,)):
@@ -233,7 +251,7 @@ def apply_migration(connection):
     elif set(sources).difference(full).intersection(_objects(connection)):
         raise ValueError("007 객체가 일부 존재합니다. 자동으로 덮어쓰지 않습니다.")
     if (row is not None and source_row is not None and has_regions and type_row is not None
-            and tutor_row is not None and learning_row is not None):
+            and tutor_row is not None and learning_types_row is not None):
         _verify_objects(connection, extended, extended_columns)
         return "이미 적용됨: 풀이·OCR·유형·튜터·학습 경로 저장 구조 검증 완료"
     pending_schema = "" if row is not None else schema
@@ -247,12 +265,17 @@ def apply_migration(connection):
         pending_schema += "\n" + tutor_schema
     if not has_learning:
         pending_schema += "\n" + learning_schema
+    if learning_types_row is None:
+        pending_schema += "\n" + learning_types_schema
+        # 경로와 활동의 순환 외래키를 유지하며 경로 테이블을 교체한다.
+        # 커밋 전에 참조를 전부 검사하고 이 연결의 외래키 검사를 복구한다.
+        connection.execute("PRAGMA foreign_keys = OFF")
     try:
         connection.executescript("BEGIN IMMEDIATE;\n" + pending_schema)
         _verify_objects(connection, extended, extended_columns)
         _has_region_schema(connection)
         _has_type_match_schema(connection)
-        _has_strict_schema(connection, LEARNING_SCHEMA_FILE, "학습 경로")
+        _has_strict_schema(connection, LEARNING_SCHEMA_FILE, "학습 경로", upgrade=LEARNING_TYPES_FILE)
         _verify_integrity(connection)
         if row is None:
             connection.execute(
@@ -279,10 +302,18 @@ def apply_migration(connection):
                 "INSERT INTO problem_schema_migrations(id, schema_sha256) VALUES (?, ?)",
                 (LEARNING_MIGRATION_ID, learning_digest),
             )
+        if learning_types_row is None:
+            connection.execute(
+                "INSERT INTO problem_schema_migrations(id, schema_sha256) VALUES (?, ?)",
+                (LEARNING_TYPES_ID, learning_types_digest),
+            )
         connection.commit()
     except BaseException:
         connection.rollback()
         raise
+    finally:
+        if learning_types_row is None:
+            connection.execute("PRAGMA foreign_keys = ON")
     return "풀이·OCR·유형·튜터·학습 경로 저장 구조 적용 완료"
 
 

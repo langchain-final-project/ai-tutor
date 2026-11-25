@@ -184,7 +184,7 @@ export function HomePage({ loginUrl }: { loginUrl: string }) {
             />}
             {category.id === "practice" && <div className="solution-workspace">
               <section className="solution-card"><h2>문자와 식 연습</h2>
-                <p>간단한 일차방정식과 괄호가 있는 일차방정식부터 연습해요. 문제를 확인한 뒤 개념 보충과 유사 문제, 독립 풀이를 이어갈 수 있어요.</p>
+                <p>간단한 일차방정식, 괄호가 있는 일차방정식, 분수 계수 일차방정식을 연습해요.</p>
                 <a className="solution-button" href="#tutor/new">문제에서 학습 시작하기</a>
               </section>
               <LearningPathList loginUrl={loginUrl} />

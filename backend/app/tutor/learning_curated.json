@@ -1,0 +1,50 @@
+[
+  {
+    "question_id": "M1_1_03_00041_45910.png",
+    "type_code": "7103047",
+    "target_text": "2x-3=-5",
+    "source_text_sha256": "5f5d95d4c16b59b6f904901624d05d2287564970e8cb27b68fc5718a23bbb09c"
+  },
+  {
+    "question_id": "M1_1_03_00041_45911.png",
+    "type_code": "7103047",
+    "target_text": "-3x+4=-2",
+    "source_text_sha256": "39b8f3401bb03d964c11a346e95acdc1befc2c98fff9d881dc68e2fb302672d9"
+  },
+  {
+    "question_id": "M1_1_03_00041_45912.png",
+    "type_code": "7103047",
+    "target_text": "x=3x-8",
+    "source_text_sha256": "e45910372ec71e52d13411cc2ecee520bf2405b564af60cbb8ff318d17a0643a"
+  },
+  {
+    "question_id": "M1_1_03_00041_45913.png",
+    "type_code": "7103047",
+    "target_text": "-3x=2x-10",
+    "source_text_sha256": "760e83e65ead650d8f683a2f00d1779f4fb9a83537e936ae62adf1127f0ec98a"
+  },
+  {
+    "question_id": "M1_1_03_00041_45918.png",
+    "type_code": "7103048",
+    "target_text": "2x-3=3(x+1)",
+    "source_text_sha256": "60899e84432bfe21164ab2c7ad4f87ba5aa32a439aa67d81ce1783eefa30e318"
+  },
+  {
+    "question_id": "M1_1_03_00041_45967.png",
+    "type_code": "7103048",
+    "target_text": "4x-2(x+2)=-2(x-2)",
+    "source_text_sha256": "c1fb379e4dc869fb4d9962f8bfb62d79a8f34a9e33b6e30aa9e3e05b3809bef9"
+  },
+  {
+    "question_id": "M1_1_03_00041_45968.png",
+    "type_code": "7103048",
+    "target_text": "-3(x-1)+4=-2(x-3)",
+    "source_text_sha256": "4b1566d8c2ac49ab61905ab4ddd9b1c77148022e6d90f4f74ade82b8d6ddda4d"
+  },
+  {
+    "question_id": "M1_1_03_00041_45969.png",
+    "type_code": "7103048",
+    "target_text": "-3(2x-1)+2x=-x-6",
+    "source_text_sha256": "5df9787ac582a8fafaf63d6ec2623707c61aad02f745692f2c661ddcb7235f39"
+  }
+]

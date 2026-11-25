@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ApiError } from "./auth";
 import { learningPathApi, learningPathMessage } from "./api/learningPath";
-import type { LearningPath } from "./api/learningPath";
+import type { LearningAvailability, LearningPath } from "./api/learningPath";
 import type { TutorSnapshot } from "./api/tutorSession";
 
 const phaseLabels: Record<string, string> = {
@@ -24,6 +24,7 @@ function needsLogin(error: unknown, loginUrl: string) {
 
 export function LearningPathPanel({ snapshot, disabled, loginUrl }: { snapshot: TutorSnapshot; disabled: boolean; loginUrl: string }) {
   const [path, setPath] = useState<LearningPath | null>(null);
+  const [availability, setAvailability] = useState<LearningAvailability | null>(null);
   const [loading, setLoading] = useState(true);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
@@ -39,13 +40,24 @@ export function LearningPathPanel({ snapshot, disabled, loginUrl }: { snapshot: 
   }, []);
   useEffect(() => {
     const controller = new AbortController();
-    setLoading(true); setError("");
+    setLoading(true); setError(""); setAvailability(null);
     learningPathApi.forSession(snapshot.id, controller.signal).then((value) => {
       if (!controller.signal.aborted) setPath(value);
-    }).catch((reason) => {
+    }).catch(async (reason) => {
       if (needsLogin(reason, loginUrl) || controller.signal.aborted) return;
-      if (reason instanceof ApiError && reason.status === 404) setPath(null);
-      else setError(learningPathMessage(reason));
+      if (!(reason instanceof ApiError) || reason.status !== 404) {
+        setError(learningPathMessage(reason));
+        return;
+      }
+      setPath(null);
+      try {
+        const result = await learningPathApi.availability(snapshot.id, controller.signal);
+        if (!controller.signal.aborted) setAvailability(result);
+      } catch (availabilityError) {
+        if (!controller.signal.aborted && !needsLogin(availabilityError, loginUrl)) {
+          setError(learningPathMessage(availabilityError));
+        }
+      }
     }).finally(() => { if (!controller.signal.aborted) setLoading(false); });
     return () => controller.abort();
   }, [snapshot.id, snapshot.revision, refresh, loginUrl]);
@@ -86,7 +98,14 @@ export function LearningPathPanel({ snapshot, disabled, loginUrl }: { snapshot: 
       {snapshot.type_match?.selected_type?.source_topic_code && snapshot.type_match.selected_type.source_topic_code !== path.type.code &&
         <p className="solution-help">이번에 선택한 식에 맞는 연습 유형으로 이어가요. 원문의 참고 유형과 다를 수 있어요.</p>}
       <p className="solution-help">{path.next_action.reason}</p>
-      {path.remediation && <div className="tutor-remediation"><h3>{path.remediation.title}</h3><p>{path.remediation.text}</p></div>}
+      {path.remediation && <div className="tutor-remediation">
+        <h3>{path.remediation.title}</h3><p>{path.remediation.text}</p>
+        {path.remediation.concept_cards?.map((card) => <details key={card.concept_id} className="tutor-details">
+          <summary>{card.title}</summary>
+          <p>{card.definition}</p>
+          {!!card.rules?.length && <ul>{card.rules.map((rule) => <li key={rule}>{rule}</li>)}</ul>}
+        </details>)}
+      </div>}
       {due && <p className="solution-help">복습 예정: {due}</p>}
       {path.source_session_id !== snapshot.id && <a className="solution-inline-link" href={`#tutor/${path.source_session_id}`}>처음 문제와 학습 경로 보기 →</a>}
       {path.active_session_id && path.active_session_id !== snapshot.id && <a className="solution-button is-secondary" href={`#tutor/${path.active_session_id}`}>진행 중인 학습 열기</a>}
@@ -98,14 +117,14 @@ export function LearningPathPanel({ snapshot, disabled, loginUrl }: { snapshot: 
           <p>{item.question_text}</p>{item.selection_reason && <p className="solution-help">{item.selection_reason}</p>}
         </li>)}</ol></details>}
       <p className="solution-help">독립 풀이와 복습은 이번 문제에서의 수행 기록이에요. 개념 전체의 숙달 여부는 더 많은 학습으로 확인해요.</p>
-    </> : !loading && <>
+    </> : !loading && availability && (availability.available ? <>
       {eligible ? <><p className="solution-help">현재 문제의 결과를 바탕으로 지원되는 유형의 다음 학습을 확인할 수 있어요.</p>
         <button type="button" className="solution-button" disabled={blocked} onClick={() => void advance()}>{pending ? "학습을 준비하고 있어요…" : "다음 학습 시작하기"}</button></> :
         <details className="tutor-details"><summary>막힌 개념부터 보충할래요</summary>
           <p className="solution-help">현재 문제가 어렵다면 지원되는 유형에서 개념을 보충하고 다른 유사 문제로 연습할 수 있어요.</p>
           <button type="button" className="solution-button is-secondary" disabled={blocked} onClick={() => void advance()}>{pending ? "학습을 준비하고 있어요…" : "보충 학습 시작하기"}</button>
         </details>}
-    </>}
+    </> : <p className="solution-help" role="status">{availability.reason}</p>)}
   </section>;
 }
 

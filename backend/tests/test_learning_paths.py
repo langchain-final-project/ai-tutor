@@ -169,6 +169,35 @@ def test_independent_help_is_not_a_pass_and_delayed_review_can_reuse(learner):
     assert path['history'][-1]['session_id'] != path['history'][0]['session_id']
 
 
+def test_fraction_uses_bank_questions_and_concept_cards(learner):
+    _, _, client, _, clock = learner
+    source = new_tutor(client, r'\frac{x+3}{2}=x-1')
+    assert source['target_text'] == '(x+3)/2=x-1'
+    availability = f"/tutor-sessions/{source['id']}/learning-availability"
+    assert client.get(availability).json()['available'] is True
+    assert client.get(f"/tutor-sessions/{source['id']}/learning-path").status_code == 404
+    path = start(client, source)
+    assert path['type']['code'] == '7103050'
+    assert any(card['concept_id'] == 'm1.s1.u03.c021' for card in path['remediation']['concept_cards'])
+    path = next_activity(client, path)
+    assert path['history'][-1]['target_text'] == '(1/2)*x-2/3=-7/6'
+    turn(client, path['active_session_id'], 'x=-1')
+    path = next_activity(client, read(client, path))
+    assert path['phase'] == 'independent' and path['history'][-1]['is_new_question'] is True
+    assert path['history'][-1]['target_text'] == '(x+1)/2-(4x+1)/3=5/4'
+    correct, _ = turn(client, path['active_session_id'], 'x=-13/10')
+    assert correct['state']['independent_verified'] is True
+    path = read(client, path)
+    assert path['status'] == 'review_scheduled'
+    clock['now'] += timedelta(days=1)
+    assert next_activity(client, read(client, path))['phase'] == 'review'
+
+    unsupported = new_tutor(client, '0.5x=4')
+    assert client.get(f"/tutor-sessions/{unsupported['id']}/learning-availability").json() == {
+        'available': False, 'reason': '이 풀이 유형의 추가 학습 문항은 아직 준비되지 않았어요.',
+    }
+
+
 def test_cookie_ownership_and_duplicate_next_are_enforced(learner):
     _, app, client, source, _ = learner
     path = start(client, source)
@@ -184,6 +213,7 @@ def test_cookie_ownership_and_duplicate_next_are_enforced(learner):
         assert second.get(f"/learning-paths/{path['id']}").status_code == 404
         assert second.post(f"/learning-paths/{path['id']}/next", json=body).status_code == 404
         assert second.get(f"/tutor-sessions/{source['id']}/learning-path").status_code == 404
+        assert second.get(f"/tutor-sessions/{source['id']}/learning-availability").status_code == 404
         assert second.post(f"/tutor-sessions/{source['id']}/learning-path", json={}).status_code == 404
 
 
@@ -233,8 +263,8 @@ def test_changed_source_or_activity_blocks_next_and_tutor_turn(learner, edit_ori
 def test_catalog_is_bounded_and_missing_bank_is_unavailable(learner, tmp_path, monkeypatch):
     _, _, client, source, _ = learner
     items, error = learning_catalog.load_catalog()
-    assert error is None and len(items) == 8
-    assert {item['type_code'] for item in items} == {'7103047', '7103048'}
+    assert error is None and len(items) >= 14
+    assert {item['type_code'] for item in items} == {'7103047', '7103048', '7103050'}
     assert all('answer' not in item for item in items)
     # 곱셈 기호·변수 표기만 바꾼 원문을 새 독립 문항으로 내지 않는다.
     selected, fresh, _ = learning_catalog.choose(items, type_code='7103047',
@@ -244,6 +274,9 @@ def test_catalog_is_bounded_and_missing_bank_is_unavailable(learner, tmp_path, m
     available, reason = learning_catalog.load_catalog(missing)
     assert available == [] and reason and not missing.exists()
     monkeypatch.setattr(learning_catalog, 'load_catalog', lambda _bank: (available, reason))
+    assert client.get(f"/tutor-sessions/{source['id']}/learning-availability").json() == {
+        'available': False, 'reason': reason,
+    }
     path = start(client, source)
     assert path['status'] == 'unavailable' and path['next_action']['available'] is False
     assert '문제은행' in path['next_action']['reason']

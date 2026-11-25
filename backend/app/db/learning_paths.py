@@ -113,13 +113,19 @@ def snapshot(connection, *, path_id, owner_id, bank_database=DEFAULT_BANK, now=N
         'is_new_question': bool(item['is_new_question']), 'selection_reason': item['selection_reason'],
         'outcome': json.loads(item['outcome_json']), 'created_at': item['created_at'], 'completed_at': item['completed_at'],
     } for item in activities]
+    remediation = None
+    if path['phase'] == 'remediation':
+        remediation = {
+            'title': path['type_name'] + ' 다시 보기',
+            'text': catalog.TYPES[path['type_code']][1],
+            'concept_cards': catalog.concept_cards(path['type_code']),
+        }
     return {
         'id': path['id'], 'revision': path['revision'], 'source_session_id': path['source_session_id'],
         'type': {'code': path['type_code'], 'name': path['type_name']},
         'phase': path['phase'], 'status': status, 'next_action': next_action,
         'active_session_id': active['session_id'] if active and path['phase'] in {'practice', 'independent', 'review'} else None,
-        'history': history, 'remediation': {'title': path['type_name'] + ' 다시 보기', 'text': catalog.TYPES[path['type_code']][1]}
-        if path['phase'] == 'remediation' else None,
+        'history': history, 'remediation': remediation,
         'review_due_at': path['review_due_at'], 'review_count': path['review_count'],
         'policy_version': path['policy_version'], 'mastery_claim': False,
         'created_at': path['created_at'], 'updated_at': path['updated_at'],
@@ -138,18 +144,12 @@ def get_for_session(connection, *, session_id, owner_id, bank_database=DEFAULT_B
     return snapshot(connection, path_id=row['id'], owner_id=owner_id, bank_database=bank_database, now=now)
 
 
-def create(connection, *, source_session_id, owner_id, bank_database=DEFAULT_BANK, now=None):
-    source = tutor_sessions.snapshot(connection, session_id=source_session_id, owner_id=owner_id)
-    try:
-        return get_for_session(connection, session_id=source_session_id, owner_id=owner_id,
-                               bank_database=bank_database, now=now)
-    except LookupError:
-        pass
+def _new_path_type(source):
     if not source['is_current']:
         raise ConflictError('확인한 최신 문제에서 학습 경로를 시작해 주세요.')
     letters = set(re.findall(r'[A-Za-z]', source['target_text']))
     if source['subject'] != 'mathematics' or len(letters) != 1:
-        raise ValueError('이번 학습 경로는 문자와 식의 유일해가 있는 일차방정식 두 유형을 지원해요.')
+        raise ValueError('이번 학습 경로는 해가 하나인 일차방정식을 지원해요.')
     try:
         if _equation(source['target_text'], next(iter(letters)))['root'] is None:
             raise ValueError
@@ -159,8 +159,32 @@ def create(connection, *, source_session_id, owner_id, bank_database=DEFAULT_BAN
     # 본문 전체의 잠정 참고 유형 대신 학생이 확인한 단일 등식을 기존 분류 규칙에 전달한다.
     # 원래 제출의 유형 저장값은 그대로 두고 이번 학습 목표만 정한다.
     code = equation_focus('방정식 ' + source['target_text'] + ' 풀어라')[0] or selected.get('source_topic_code')
+    # 선택한 식은 이미 평문으로 확인됐다. (x+1)/2 같은 수 분모도 분수 계수 유형이다.
+    if code in {'7103047', '7103048'} and '/' in source['target_text']:
+        code = '7103050'
     if code not in catalog.TYPES:
-        raise ValueError('현재 학습 문항은 간단한 일차방정식과 괄호가 있는 일차방정식에 준비되어 있어요.')
+        raise ValueError('이 풀이 유형의 추가 학습 문항은 아직 준비되지 않았어요.')
+    return code
+
+
+def availability(connection, *, session_id, owner_id, bank_database=DEFAULT_BANK):
+    source = tutor_sessions.snapshot(connection, session_id=session_id, owner_id=owner_id)
+    try:
+        code = _new_path_type(source)
+    except (ValueError, ConflictError) as error:
+        return {'available': False, 'reason': str(error)}
+    item, _, reason = _candidate(connection, {'type_code': code}, source, 'practice', bank_database, owner_id)
+    return {'available': item is not None, 'reason': reason}
+
+
+def create(connection, *, source_session_id, owner_id, bank_database=DEFAULT_BANK, now=None):
+    source = tutor_sessions.snapshot(connection, session_id=source_session_id, owner_id=owner_id)
+    try:
+        return get_for_session(connection, session_id=source_session_id, owner_id=owner_id,
+                               bank_database=bank_database, now=now)
+    except LookupError:
+        pass
+    code = _new_path_type(source)
     cursor = connection.execute('''INSERT INTO learning_paths(source_session_id,type_code,type_name,policy_version)
         VALUES(?,?,?,?)''', (source_session_id, code, catalog.TYPES[code][0], catalog.POLICY_VERSION))
     return snapshot(connection, path_id=cursor.lastrowid, owner_id=owner_id, bank_database=bank_database, now=now)

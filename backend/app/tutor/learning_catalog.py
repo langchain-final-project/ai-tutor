@@ -1,61 +1,113 @@
-"""문제은행을 고치지 않고 두 기존 유형의 검수한 등식만 작은 학습 후보로 읽는다."""
+"""검수한 문제은행 등식과 팀 개념 카드를 학생 학습에 연결한다."""
 
 from contextlib import closing
+from fractions import Fraction
+from functools import lru_cache
 import hashlib
+import json
+import os
 from pathlib import Path
 import re
 import sqlite3
 
+from scripts.lookup_problem_concepts import DEFAULT_CONCEPTS, load_index
+
 from .guided_feedback import _sides
+from .problem_target import analyze_target
 from .step_verifier import _equation
 from .unit_type_matcher import DEFAULT_BANK, canonical
 
 
-POLICY_VERSION = 'didgo-learning-cycle-v1'
+POLICY_VERSION = 'didgo-learning-cycle-v2'
 TYPES = {
     '7103047': ('간단한 일차방정식의 풀이', '양변에 같은 계산을 해도 해가 유지되는지 확인해 보세요. 문자가 있는 항과 상수항을 정리한 다음 원래 등식에 대입해 확인해요.'),
     '7103048': ('괄호가 있는 일차방정식의 풀이', '괄호 앞의 수를 괄호 안의 각 항에 곱해 보세요. 부호를 확인하고 양변에 같은 계산을 하며 문자를 혼자 남겨요.'),
+    '7103050': ('계수에 분수가 있는 일차방정식의 풀이', '양변에 분모의 최소공배수를 곱해 분수를 없앤 뒤 식을 정리해 보세요.'),
 }
-# 원문과 해설을 대조한 단일 등식만 고정한다. 은행 전체의 검수 완료를 뜻하지 않는다.
-ITEMS = (
-    ('45910', '7103047', '2x-3=-5', '5f5d95d4c16b59b6f904901624d05d2287564970e8cb27b68fc5718a23bbb09c'),
-    ('45911', '7103047', '-3x+4=-2', '39b8f3401bb03d964c11a346e95acdc1befc2c98fff9d881dc68e2fb302672d9'),
-    ('45912', '7103047', 'x=3x-8', 'e45910372ec71e52d13411cc2ecee520bf2405b564af60cbb8ff318d17a0643a'),
-    ('45913', '7103047', '-3x=2x-10', '760e83e65ead650d8f683a2f00d1779f4fb9a83537e936ae62adf1127f0ec98a'),
-    ('45918', '7103048', '2x-3=3(x+1)', '60899e84432bfe21164ab2c7ad4f87ba5aa32a439aa67d81ce1783eefa30e318'),
-    ('45967', '7103048', '4x-2(x+2)=-2(x-2)', 'c1fb379e4dc869fb4d9962f8bfb62d79a8f34a9e33b6e30aa9e3e05b3809bef9'),
-    ('45968', '7103048', '-3(x-1)+4=-2(x-3)', '4b1566d8c2ac49ab61905ab4ddd9b1c77148022e6d90f4f74ade82b8d6ddda4d'),
-    ('45969', '7103048', '-3(2x-1)+2x=-x-6', '5df9787ac582a8fafaf63d6ec2623707c61aad02f745692f2c661ddcb7235f39'),
-)
+UNIT = (1, 1, '03')
+CURATED_DATA = Path(__file__).with_name('learning_curated.json')
+
+
+def _item(row, equation):
+    return {
+        'id': row['id'] + ':equation', 'source_question_id': row['id'],
+        'source_id': row['source_id'], 'question_filename': row['question_filename'],
+        'source_question_text': row['question_text'], 'type_code': row['source_topic_code'],
+        'type_name': row['source_topic_name'], 'target_text': equation,
+        'question_text': '다음 일차방정식을 풀어보세요.\n' + equation,
+    }
+
+
+def _verified_equation(row):
+    equation = analyze_target(row['equation_latex'])['normalized_text']
+    answer = re.fullmatch(r'\s*(?:([A-Za-z])\s*=\s*)?([+-]?\d+(?:/\d+|\.\d+)?)\s*', row['answer'] or '')
+    if not equation or answer is None:
+        return None
+    variable = re.search(r'[A-Za-z]', equation).group()
+    if answer[1] is not None and answer[1] != variable:
+        return None
+    try:
+        return equation if _equation(equation, variable)['root'] == Fraction(answer[2]) else None
+    except (ValueError, ZeroDivisionError):
+        return None
 
 
 def load_catalog(bank_database=DEFAULT_BANK):
-    """누락·변경된 은행은 추천을 보류하며 빈 DB나 새 문제를 만들지 않는다."""
+    """기존 검수 목록을 보존하고 식과 답이 일치하는 검수 문항을 이어 붙인다."""
     items = []
     try:
+        curated = json.loads(CURATED_DATA.read_text(encoding='utf-8'))
         with closing(sqlite3.connect(Path(bank_database).resolve().as_uri() + '?mode=ro', uri=True)) as connection:
             connection.row_factory = sqlite3.Row
-            for number, code, equation, digest in ITEMS:
-                ident = f'M1_1_03_00041_{number}.png'
-                row = connection.execute('''SELECT q.id,q.question_text,q.source_id,q.question_filename,
-                    q.source_topic_code,q.figure_text,t.source_topic_name FROM questions q
-                    JOIN topics t USING(source_topic_code)
-                    WHERE q.id=? AND q.grade=1 AND q.semester=1 AND q.unit_code='03' ''', (ident,)).fetchone()
-                if (row is None or row['source_topic_code'] != code or row['figure_text']
-                        or hashlib.sha256(canonical(row['question_text']).encode()).hexdigest() != digest
+            scope = '''SELECT q.* FROM questions q
+                WHERE (q.grade,q.semester,q.unit_code)=(?,?,?)
+                AND NOT EXISTS (SELECT 1 FROM benchmark_items b WHERE b.question_id=q.id)
+                AND coalesce(trim(q.figure_text),'')='' '''
+            for entry in curated:
+                row = connection.execute(scope + 'AND q.id=?', (*UNIT, entry['question_id'])).fetchone()
+                equation = entry['target_text']
+                if (row is None or row['source_topic_code'] != entry['type_code']
+                        or hashlib.sha256(canonical(row['question_text']).encode()).hexdigest() != entry['source_text_sha256']
                         or canonical(equation) not in canonical(row['question_text'])
-                        or _equation(equation, 'x')['root'] is None):
+                        or analyze_target(equation)['normalized_text'] is None):
                     continue
-                items.append({
-                    'id': ident + ':equation', 'source_question_id': ident,
-                    'source_id': row['source_id'], 'question_filename': row['question_filename'],
-                    'source_question_text': row['question_text'], 'type_code': code,
-                    'type_name': row['source_topic_name'], 'target_text': equation,
-                    'question_text': '다음 일차방정식을 풀어보세요.\n' + equation,
-                })
-    except (sqlite3.Error, OSError, ValueError):
+                items.append(_item(row, equation))
+            used_ids = {item['source_question_id'] for item in items}
+            signatures = {_equation_key(item['target_text']) for item in items}
+            placeholders = ','.join('?' for _ in TYPES)
+            rows = connection.execute(scope + f'''AND q.source_topic_code IN ({placeholders})
+                AND q.review_status='verified' AND q.question_type='단답형'
+                AND q.subquestion_number IS NULL ORDER BY q.id''', (*UNIT, *TYPES))
+            for row in rows:
+                if row['id'] in used_ids:
+                    continue
+                equation = _verified_equation(row)
+                if equation is not None:
+                    signature = _equation_key(equation)
+                    if signature is not None and signature not in signatures:
+                        items.append(_item(row, equation))
+                        signatures.add(signature)
+    except (sqlite3.Error, OSError, KeyError, ValueError):
         return [], '문제은행을 읽지 못했어요. 학습 기록은 보존했으니 문제은행 설정을 확인한 뒤 다시 시도해 주세요.'
     return items, None
+
+
+@lru_cache(maxsize=4)
+def _concept_index(root):
+    return load_index(root)
+
+
+def concept_cards(type_code):
+    root = Path(os.getenv('DIDGO_CONCEPT_BANK_DIR', str(DEFAULT_CONCEPTS))).resolve()
+    try:
+        _, by_id, mapping, _ = _concept_index(root)
+        match = mapping.get((*UNIT, type_code), {})
+        cards = [by_id[ident][1] for ident in match.get('concept_ids', [])]
+    except (OSError, KeyError, TypeError, ValueError):
+        return []
+    # 연습에 앞서 필요한 정의와 규칙부터 보여준다. 문제은행의 답과 해설은 전달하지 않는다.
+    return [{key: card[key] for key in ('concept_id', 'title', 'definition', 'rules') if key in card}
+            for card in cards]
 
 
 def _equation_key(text):

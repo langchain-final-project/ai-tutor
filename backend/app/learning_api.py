@@ -45,6 +45,10 @@ def create_learning_router(database, current_owner, *, bank_database=DEFAULT_BAN
               owner_id: Annotated[str, Depends(current_owner)]):
         return call(records.create, owner_id, write=True, source_session_id=session_id)
 
+    @router.get('/tutor-sessions/{session_id}/learning-availability')
+    def availability(session_id: Annotated[int, Path(ge=1)], owner_id: Annotated[str, Depends(current_owner)]):
+        return call(records.availability, owner_id, session_id=session_id)
+
     @router.get('/learning-paths')
     def listing(owner_id: Annotated[str, Depends(current_owner)], limit: Annotated[int, Query(ge=1, le=100)] = 50):
         return call(records.list_paths, owner_id, limit=limit)

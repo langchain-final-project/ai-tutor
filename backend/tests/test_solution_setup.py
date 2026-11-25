@@ -127,14 +127,15 @@ def test_upgrade_previous_solution_schema_preserves_checksum_and_records(tmp_pat
                                   (setup.SOURCE_MIGRATION_ID,)).fetchone() == (setup._digest(setup._schema(setup.SOURCE_SCHEMA_FILE)),)
 
 
-def test_learning_upgrade_preserves_tutor_history_and_repeats(tmp_path):
-    target = tmp_path / "before-learning.sqlite3"
+def test_learning_type_upgrade_preserves_linked_review_and_repeats(tmp_path):
+    target = tmp_path / "before-learning-types.sqlite3"
     create_base(target)
     for schema_file, migration_id in (
         (setup.SCHEMA_FILE, setup.MIGRATION_ID),
         (setup.SOURCE_SCHEMA_FILE, setup.SOURCE_MIGRATION_ID),
         (setup.TYPE_SCHEMA_FILE, setup.TYPE_MIGRATION_ID),
         (setup.TUTOR_SCHEMA_FILE, setup.TUTOR_MIGRATION_ID),
+        (setup.LEARNING_SCHEMA_FILE, setup.LEARNING_MIGRATION_ID),
     ):
         with closing(sqlite3.connect(target)) as connection:
             connection.executescript(setup._schema(schema_file))
@@ -142,18 +143,35 @@ def test_learning_upgrade_preserves_tutor_history_and_repeats(tmp_path):
                                (migration_id, setup._digest(setup._schema(schema_file))))
             connection.commit()
     with closing(sqlite3.connect(target)) as connection:
-        connection.execute("""INSERT INTO tutor_sessions
+        connection.execute("PRAGMA foreign_keys=ON")
+        connection.executemany("""INSERT INTO tutor_sessions
             (submission_id,input_version_id,subject,target_text,target_sha256,problem_json,state_json)
-            VALUES (1,1,'mathematics','x=2','existing-hash','{}','{}')""")
+            VALUES (1,1,'mathematics',?,?,'{}','{}')""", [('x=2', 'existing-hash'), ('x=3', 'activity-hash')])
+        connection.execute("""INSERT INTO learning_paths
+            (source_session_id,type_code,type_name,phase,review_due_at,policy_version)
+            VALUES (1,'7103047','일차방정식','review_due','2026-11-24T00:00:00Z','v1')""")
+        connection.execute("""INSERT INTO learning_activities
+            (path_id,catalog_item_id,source_question_id,question_text,target_text,mode,status,
+             is_new_question,selection_reason,outcome_json)
+            VALUES (1,'item:equation','item','x=3','x=3','independent','completed',1,'새 문항','{}')""")
+        connection.execute("UPDATE learning_activities SET session_id=2 WHERE id=1")
+        connection.execute("UPDATE learning_paths SET current_activity_id=1 WHERE id=1")
         connection.commit()
     setup.prepare(target)
     setup.prepare(target)
     with closing(sqlite3.connect(target)) as connection:
-        assert connection.execute("SELECT target_text FROM tutor_sessions").fetchall() == [('x=2',)]
-        assert connection.execute("SELECT COUNT(*) FROM learning_paths").fetchone() == (0,)
+        assert connection.execute("SELECT target_text FROM tutor_sessions ORDER BY id").fetchall() == [('x=2',), ('x=3',)]
+        assert connection.execute("""SELECT p.id,p.phase,p.review_due_at,a.id,a.session_id
+            FROM learning_paths p JOIN learning_activities a ON a.id=p.current_activity_id""").fetchall() == [
+                (1, 'review_due', '2026-11-24T00:00:00Z', 1, 2)]
         assert connection.execute("SELECT schema_sha256 FROM problem_schema_migrations WHERE id=?",
                                   (setup.LEARNING_MIGRATION_ID,)).fetchone() == (
                                       setup._digest(setup._schema(setup.LEARNING_SCHEMA_FILE)),)
+        assert connection.execute("SELECT schema_sha256 FROM problem_schema_migrations WHERE id=?",
+                                  (setup.LEARNING_TYPES_ID,)).fetchone() == (
+                                      setup._digest(setup._schema(setup.LEARNING_TYPES_FILE)),)
+        with pytest.raises(sqlite3.IntegrityError, match="belongs to another path"):
+            connection.execute("UPDATE learning_paths SET current_activity_id=99 WHERE id=1")
         assert connection.execute("PRAGMA foreign_key_check").fetchall() == []
 
 

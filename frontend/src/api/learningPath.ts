@@ -1,5 +1,7 @@
 import { ApiError } from "../auth";
 
+export type LearningAvailability = { available: boolean; reason: string };
+
 export type LearningPath = {
   id: number;
   revision: number;
@@ -18,11 +20,15 @@ export type LearningPath = {
     is_new_question?: boolean;
     selection_reason?: string;
   }[];
-  remediation: { title: string; text: string } | null;
+  remediation: {
+    title: string;
+    text: string;
+    concept_cards: { concept_id: string; title: string; definition: string; rules?: string[] }[];
+  } | null;
   mastery_claim: false;
 };
 
-async function request(path: string, signal?: AbortSignal, body?: unknown): Promise<LearningPath> {
+async function request<T = LearningPath>(path: string, signal?: AbortSignal, body?: unknown): Promise<T> {
   const response = await fetch(`/api${path}`, {
     signal, credentials: "same-origin",
     ...(body !== undefined && { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }),
@@ -30,7 +36,7 @@ async function request(path: string, signal?: AbortSignal, body?: unknown): Prom
   const payload = await response.json().catch(() => null);
   if (!response.ok) throw new ApiError(response.status, payload?.detail);
   if (!payload) throw new Error("학습 경로를 읽을 수 없어요. 다시 확인해 주세요.");
-  return payload as LearningPath;
+  return payload as T;
 }
 
 export const learningPathApi = {
@@ -42,6 +48,8 @@ export const learningPathApi = {
     return payload as LearningPath[];
   },
   forSession: (sessionId: number, signal?: AbortSignal) => request(`/tutor-sessions/${sessionId}/learning-path`, signal),
+  availability: (sessionId: number, signal?: AbortSignal) =>
+    request<LearningAvailability>(`/tutor-sessions/${sessionId}/learning-availability`, signal),
   start: (sessionId: number, signal?: AbortSignal) => request(`/tutor-sessions/${sessionId}/learning-path`, signal, {}),
   get: (id: number, signal?: AbortSignal) => request(`/learning-paths/${id}`, signal),
   next: (id: number, revision: number, signal?: AbortSignal) => request(`/learning-paths/${id}/next`, signal, { expected_revision: revision }),

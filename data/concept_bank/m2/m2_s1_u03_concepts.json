@@ -1,0 +1,304 @@
+{
+  "grade": 2,
+  "semester": 1,
+  "unit_code": "03",
+  "unit_name": "일차부등식",
+  "chapter_name": "부등식과 연립방정식",
+  "sections": [
+    {
+      "title": "일차부등식",
+      "subsections": [
+        {
+          "title": "부등식의 해와 그 성질",
+          "concepts": [
+            {
+              "concept_id": "m2.s1.u03.c001",
+              "title": "부등식의 뜻과 표현",
+              "definition": "부등호를 써서 두 수나 두 식의 크기 관계를 나타낸 식을 부등식이라고 한다.",
+              "rules": [
+                "부등호 왼쪽은 좌변, 오른쪽은 우변이고 둘을 합쳐 양변이라고 한다.",
+                "이상과 이하는 기준값을 포함한다. 초과와 미만은 기준값을 포함하지 않는다.",
+                "양변의 위치를 서로 바꾸어 나타낼 때에는 부등호의 방향도 반대로 쓴다."
+              ],
+              "examples": [
+                {
+                  "description": "예시의 좌변은 3x−1이고 우변은 32이다.",
+                  "latex": "3x-1\\ge 32"
+                },
+                {
+                  "description": "b 이상, b 이하, b 초과, b 미만을 순서대로 나타낸다.",
+                  "latex": "a\\ge b,\\quad a\\le b,\\quad a>b,\\quad a<b"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s1.u03.c002",
+              "title": "부등식의 해",
+              "definition": "미지수에 대입했을 때 부등식을 참이 되게 하는 값을 그 부등식의 해라고 한다.",
+              "rules": [
+                "양변의 값을 구하고 부등호가 나타내는 관계가 맞는지 확인한다.",
+                "부등식을 푼다는 것은 조건을 만족하는 값을 모두 구한다는 뜻이다. 해는 흔히 범위로 나타낸다."
+              ],
+              "examples": [
+                {
+                  "description": "3x−2>1에서 x=1은 해가 아니고 x=2는 해이다.",
+                  "latex": "3(1)-2=1,\\quad 1\\not>1;\\qquad 3(2)-2=4,\\quad 4>1"
+                },
+                {
+                  "description": "같은 수끼리 비교할 때 등호를 포함하는 관계만 참이다.",
+                  "latex": "4\\ge4,\\qquad 4\\le4"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s1.u03.c003",
+              "title": "부등식의 성질",
+              "definition": "양변에 같은 연산을 할 때, 곱하거나 나누는 수의 부호에 따라 부등호의 방향이 달라진다.",
+              "rules": [
+                "양변에 같은 수를 더하거나 빼면 부등호의 방향이 유지된다. 이 성질을 이용해 이항할 수 있다.",
+                "양변에 같은 양수를 곱하거나 같은 양수로 나누면 부등호의 방향이 유지된다.",
+                "양변에 같은 음수를 곱하거나 같은 음수로 나누면 부등호의 방향이 반대로 바뀐다.",
+                "네 종류의 부등호에 같은 성질이 적용된다. 부등호에 등호가 포함되어 있는지는 그대로 유지된다."
+              ],
+              "examples": [
+                {
+                  "description": "a<b일 때 양변에 같은 수 c를 더하거나 뺀다.",
+                  "latex": "a+c<b+c,\\quad a-c<b-c"
+                },
+                {
+                  "description": "a<b이고 c>0일 때 양변에 c를 곱하거나 c로 나눈다.",
+                  "latex": "ac<bc,\\quad \\frac ac<\\frac bc"
+                },
+                {
+                  "description": "a<b이고 c<0일 때 양변에 c를 곱하거나 c로 나눈다.",
+                  "latex": "ac>bc,\\quad \\frac ac>\\frac bc"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "일차부등식의 풀이",
+          "concepts": [
+            {
+              "concept_id": "m2.s1.u03.c004",
+              "title": "일차부등식의 뜻",
+              "definition": "모든 항을 한쪽으로 이항해 정리했을 때, 일차식과 0의 대소 관계로 나타나는 부등식이다.",
+              "rules": [
+                "일차항의 계수 a는 0이 아니어야 한다."
+              ],
+              "examples": [
+                {
+                  "description": "정리한 일차식이 ax+b일 때 가능한 네 형태이다.",
+                  "latex": "ax+b>0,\\quad ax+b<0,\\quad ax+b\\ge0,\\quad ax+b\\le0"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s1.u03.c005",
+              "title": "일차부등식 풀기",
+              "definition": "식을 간단히 고쳐 일차항은 좌변에, 상수항은 우변에 모은 뒤 x의 계수로 양변을 나눈다.",
+              "rules": [
+                "괄호가 있으면 분배법칙으로 푼다. 분수 형태의 항이 있으면 양변에 분모의 최소공배수를 곱한다.",
+                "유한소수가 있으면 양변에 알맞은 10의 거듭제곱을 곱해 계수와 상수항을 정수로 만든다.",
+                "ax와 상수 b를 비교하는 형태로 정리한 뒤 a로 양변을 나눈다. a가 음수이면 부등호의 방향을 반대로 바꾼다."
+              ],
+              "examples": [
+                {
+                  "description": "ax>b에서 a의 부호에 따라 해의 방향이 달라진다.",
+                  "latex": "a>0:\\ x>\\frac ba,\\qquad a<0:\\ x<\\frac ba"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s1.u03.c006",
+              "title": "부등식의 해를 수직선에 나타내기",
+              "definition": "기준값에서 해에 해당하는 방향으로 선을 그어 부등식의 해를 나타낸다.",
+              "rules": [
+                "기준값보다 큰 방향은 오른쪽, 작은 방향은 왼쪽이다.",
+                "기준값을 포함하면 점을 채우고, 포함하지 않으면 빈 점으로 표시한다."
+              ],
+              "visuals": [
+                {
+                  "type": "number_line",
+                  "caption": "x가 a 이상이면 a를 포함하여 오른쪽으로 표시한다.",
+                  "x_range": [
+                    -3,
+                    3
+                  ],
+                  "arrow_directions": [
+                    "negative",
+                    "positive"
+                  ],
+                  "show_numeric_ticks": false,
+                  "points": [
+                    {
+                      "position": 0,
+                      "label": "a"
+                    }
+                  ],
+                  "solution_ray": {
+                    "from": 0,
+                    "direction": "positive",
+                    "include_endpoint": true
+                  }
+                },
+                {
+                  "type": "number_line",
+                  "caption": "x가 a 초과이면 a를 제외하고 오른쪽으로 표시한다.",
+                  "x_range": [
+                    -3,
+                    3
+                  ],
+                  "arrow_directions": [
+                    "negative",
+                    "positive"
+                  ],
+                  "show_numeric_ticks": false,
+                  "points": [
+                    {
+                      "position": 0,
+                      "label": "a"
+                    }
+                  ],
+                  "solution_ray": {
+                    "from": 0,
+                    "direction": "positive",
+                    "include_endpoint": false
+                  }
+                },
+                {
+                  "type": "number_line",
+                  "caption": "x가 a 이하이면 a를 포함하여 왼쪽으로 표시한다.",
+                  "x_range": [
+                    -3,
+                    3
+                  ],
+                  "arrow_directions": [
+                    "negative",
+                    "positive"
+                  ],
+                  "show_numeric_ticks": false,
+                  "points": [
+                    {
+                      "position": 0,
+                      "label": "a"
+                    }
+                  ],
+                  "solution_ray": {
+                    "from": 0,
+                    "direction": "negative",
+                    "include_endpoint": true
+                  }
+                },
+                {
+                  "type": "number_line",
+                  "caption": "x가 a 미만이면 a를 제외하고 왼쪽으로 표시한다.",
+                  "x_range": [
+                    -3,
+                    3
+                  ],
+                  "arrow_directions": [
+                    "negative",
+                    "positive"
+                  ],
+                  "show_numeric_ticks": false,
+                  "points": [
+                    {
+                      "position": 0,
+                      "label": "a"
+                    }
+                  ],
+                  "solution_ray": {
+                    "from": 0,
+                    "direction": "negative",
+                    "include_endpoint": false
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "일차부등식의 활용",
+          "concepts": [
+            {
+              "concept_id": "m2.s1.u03.c007",
+              "title": "일차부등식 활용 문제의 풀이 순서",
+              "definition": "문제에 나오는 대소 관계를 부등식으로 세우고, 구한 해가 상황에 맞는지 확인한다.",
+              "rules": [
+                "구하는 값이나 관련된 양을 x로 놓는다.",
+                "문제의 관계를 부등식으로 나타내고 풀어 해의 범위를 구한다.",
+                "답이 인원이나 물건의 개수라면 해의 범위 안에서 조건에 맞는 정수만 골라낸다."
+              ]
+            },
+            {
+              "concept_id": "m2.s1.u03.c008",
+              "title": "연속하는 정수",
+              "definition": "하나의 문자를 기준으로 연속하는 정수들을 나타낸 뒤 주어진 조건에 맞춰 부등식을 세운다.",
+              "rules": [],
+              "examples": [
+                {
+                  "description": "연속하는 두 정수와 연속하는 세 정수이다.",
+                  "latex": "x,\\ x+1;\\qquad x-1,\\ x,\\ x+1"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s1.u03.c009",
+              "title": "유리한 방법의 선택",
+              "definition": "선택지마다 비용을 식으로 나타낸 뒤, 어느 조건에서 한쪽이 더 유리한지 비교한다.",
+              "rules": [
+                "입장료 문제에서는 개별 입장과 단체 입장에 드는 총비용을 비교한다. 단체 할인을 받기 위해 최소 인원분을 결제할 수 있는 경우 그 비용을 사용한다.",
+                "상점 비교에서는 교통비와 구매 수량에 따른 물건값을 더해 각 상점의 총비용을 구한다."
+              ]
+            },
+            {
+              "concept_id": "m2.s1.u03.c010",
+              "title": "정가, 원가, 할인가",
+              "definition": "이익률이나 할인율을 100으로 나누어 비율로 바꾼 뒤 기준 금액에 적용한다.",
+              "rules": [
+                "원가에 이익을 더해 정가를 구한다. 정가에서 할인액을 빼 할인가를 구한다."
+              ],
+              "examples": [
+                {
+                  "description": "원가 A원에 a%를 붙인 정가와 정가 B원에서 b% 할인한 가격이다.",
+                  "latex": "A\\left(1+\\frac a{100}\\right),\\qquad B\\left(1-\\frac b{100}\\right)"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s1.u03.c011",
+              "title": "거리, 시간, 속력",
+              "definition": "거리와 속력, 시간의 관계로 비교할 양을 구한다.",
+              "rules": [
+                "수량을 식으로 나타내기 전에 거리 단위와 시간 단위를 맞춘다.",
+                "왕복에 a시간 이내가 걸린다면 갈 때와 올 때 걸린 시간의 합을 a 이하로 둔다."
+              ],
+              "examples": [
+                {
+                  "description": "관련 공식과 왕복 시간 조건이다.",
+                  "latex": "\\text{거리}=\\text{속력}\\times\\text{시간},\\quad \\text{시간}=\\frac{\\text{거리}}{\\text{속력}},\\quad \\text{속력}=\\frac{\\text{거리}}{\\text{시간}},\\quad t_{\\text{갈 때}}+t_{\\text{올 때}}\\le a"
+                }
+              ]
+            },
+            {
+              "concept_id": "m2.s1.u03.c012",
+              "title": "소금물의 농도",
+              "definition": "소금물 전체에서 소금이 차지하는 비율을 이용해 농도 조건을 부등식으로 나타낸다.",
+              "rules": [
+                "농도나 소금의 양이 어떻게 변하는지 확인하여 주어진 대소 관계를 식으로 쓴다."
+              ],
+              "examples": [
+                {
+                  "description": "농도(%)와 소금의 양을 구하는 공식이다.",
+                  "latex": "\\text{농도}=\\frac{\\text{소금의 양}}{\\text{소금물의 양}}\\times100,\\qquad \\text{소금의 양}=\\text{소금물의 양}\\times\\frac{\\text{농도}}{100}"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

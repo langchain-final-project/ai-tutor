@@ -1,0 +1,2437 @@
+{
+  "grade": 3,
+  "semester": 2,
+  "unit_code": "06",
+  "unit_name": "원의 성질",
+  "chapter_name": "원의 성질",
+  "sections": [
+    {
+      "title": "원의 성질",
+      "subsections": [
+        {
+          "title": "원과 직선",
+          "concepts": [
+            {
+              "concept_id": "m3.s2.u06.c001",
+              "title": "현과 현의 수직이등분선",
+              "definition": "원 위의 두 점을 이은 선분을 현이라 한다. 원의 중심에서 현에 내린 수선은 현을 이등분하고, 현의 수직이등분선은 원의 중심을 지난다.",
+              "rules": [
+                "중심 O에서 현 AB에 내린 수선의 발을 H라 하면, OA와 OB는 반지름이므로 같고 OH는 두 직각삼각형의 공통 변이다. RHS 합동으로 AH=BH를 얻는다.",
+                "OA=OB이므로 O는 A와 B에서 같은 거리에 있는 점이다. 따라서 AB의 수직이등분선 위에 놓인다.",
+                "원 위에 C를 잡으면 이 원은 삼각형 ABC의 외접원이다. O가 삼각형의 외심이라는 사실로도 현의 수직이등분선이 O를 지남을 설명할 수 있다."
+              ],
+              "examples": [
+                {
+                  "description": "현 AB가 지름이 아니면 두 직각삼각형의 합동으로 현의 중점임을 확인할 수 있다.",
+                  "latex": "\\triangle AOH\\cong\\triangle BOH\\quad(\\mathrm{RHS}),\\qquad AH=BH"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "원의 중심 O에서 현 AB에 내린 수선의 발 H는 현의 중점이다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -4,
+                      -3
+                    ],
+                    "B": [
+                      4,
+                      -3
+                    ],
+                    "H": [
+                      0,
+                      -3
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "H": "H"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "H"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "H",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "H"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "B"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "H",
+                      "arms": [
+                        "O",
+                        "B"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "현 AB의 수직이등분선 ℓ 위에 중심 O가 있다. OA=OB=OC이므로 O는 삼각형 ABC의 외심이다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -4,
+                      -3
+                    ],
+                    "B": [
+                      4,
+                      -3
+                    ],
+                    "C": [
+                      3,
+                      4
+                    ],
+                    "H": [
+                      0,
+                      -3
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "H": "H"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "line",
+                      "through": [
+                        "O",
+                        "H"
+                      ],
+                      "label": "ℓ"
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "H",
+                      "arms": [
+                        "O",
+                        "B"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c002",
+              "title": "중심에서 현까지의 거리와 현의 길이",
+              "definition": "한 원에서 중심으로부터 같은 거리에 있는 두 현의 길이는 같다. 반대로 길이가 같은 두 현은 중심에서 같은 거리에 있다.",
+              "rules": [
+                "중심에서 현까지의 거리는 중심에서 현에 내린 수선의 길이로 잰다.",
+                "원의 중심 O에서 현 AB, CD에 내린 수선의 발 M, N은 각각 현의 중점이다.",
+                "반지름 OA=OC와 직각을 이용해 삼각형 AOM과 CON의 RHS 합동을 확인한다. 수선 길이가 같으면 반쪽 현의 길이가 같고, 반쪽 현의 길이가 같으면 수선 길이가 같다."
+              ],
+              "examples": [
+                {
+                  "description": "각 현의 절반 길이와 중심에서의 거리를 대응해 비교한다.",
+                  "latex": "OM=ON\\ \\Longleftrightarrow\\ AM=CN\\ \\Longleftrightarrow\\ AB=CD"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "중심에서 두 현으로 내린 수선의 발 M, N을 표시했다. OM=ON이면 현 AB와 CD의 길이가 같다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -3,
+                      4
+                    ],
+                    "B": [
+                      -3,
+                      -4
+                    ],
+                    "C": [
+                      3,
+                      4
+                    ],
+                    "D": [
+                      3,
+                      -4
+                    ],
+                    "M": [
+                      -3,
+                      0
+                    ],
+                    "N": [
+                      3,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "M": "M",
+                    "N": "N"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "M"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "N"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "C"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "M",
+                      "arms": [
+                        "A",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "N",
+                      "arms": [
+                        "C",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c003",
+              "title": "원과 직선, 접선과 반지름",
+              "definition": "한 평면에서 원과 직선이 한 점에서만 만나면 그 직선은 원의 접선이고, 만나는 점은 접점이다.",
+              "rules": [
+                "원과 직선은 두 점에서 만나거나, 한 점에서 만나거나, 만나지 않는다.",
+                "접점 T를 지나는 반지름 OT와 접선은 서로 수직이다."
+              ],
+              "examples": [
+                {
+                  "description": "T가 접점일 때 반지름과 접선이 이루는 각은 직각이다.",
+                  "latex": "OT\\perp\\ell"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "직선 ℓ은 원 O와 점 T 한 곳에서 만난다. 반지름 OT는 접선 ℓ과 수직이다.",
+                  "points": {
+                    "O": [
+                      0,
+                      3
+                    ],
+                    "T": [
+                      0,
+                      0
+                    ],
+                    "D": [
+                      4,
+                      0
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "T": "T"
+                  },
+                  "lines": [
+                    {
+                      "kind": "line",
+                      "through": [
+                        "T",
+                        "D"
+                      ],
+                      "label": "ℓ"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "T"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "T",
+                      "arms": [
+                        "O",
+                        "D"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "T",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c004",
+              "title": "원 밖의 한 점에서 그은 두 접선의 길이",
+              "definition": "원 밖의 한 점 P에서 그을 수 있는 두 접선에서, P부터 각각의 접점까지의 길이는 같다.",
+              "rules": [
+                "접선의 길이는 원 밖의 점에서 접점까지의 선분 길이이다.",
+                "두 접점을 A, B라 하면 반지름 OA와 OB가 같고, 삼각형 OAP와 OBP는 빗변 OP를 공유한다. RHS 합동이므로 PA=PB이다."
+              ],
+              "examples": [
+                {
+                  "description": "두 접선에 반지름을 이으면 직각삼각형 두 개가 생긴다.",
+                  "latex": "\\triangle OAP\\cong\\triangle OBP\\quad(\\mathrm{RHS}),\\qquad PA=PB"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "원 밖의 P에서 그은 두 접선이 원과 A, B에서 만난다. OA와 PA, OB와 PB는 각각 수직이다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "P": [
+                      -5,
+                      0
+                    ],
+                    "A": [
+                      -1.8,
+                      2.4
+                    ],
+                    "B": [
+                      -1.8,
+                      -2.4
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "P": "P",
+                    "A": "A",
+                    "B": "B"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "P"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "A",
+                      "arms": [
+                        "P",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "B",
+                      "arms": [
+                        "P",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c005",
+              "title": "삼각형의 내접원과 접선의 길이",
+              "definition": "삼각형의 세 변에 접하는 원이 내접원이다. 같은 꼭짓점에서 양쪽 접점으로 그은 선분의 길이는 같다.",
+              "rules": [
+                "삼각형 ABC에서 변 AB, BC, CA 위의 접점을 각각 D, E, F라고 한다.",
+                "각 꼭짓점에서 만나는 두 변은 원에 대한 접선이다. 꼭짓점마다 같은 길이를 찾아 둘레를 정리한다."
+              ],
+              "examples": [
+                {
+                  "description": "A, B, C에서 각각 두 접선 길이가 같다.",
+                  "latex": "AD=AF,\\qquad BD=BE,\\qquad CE=CF"
+                },
+                {
+                  "description": "세 변의 길이를 접점에서 나눈 뒤 같은 항을 모은다.",
+                  "latex": "AB+BC+CA=2(AD+BE+CF)"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "직각삼각형 ABC 안에 내접원을 그렸다. D, E, F는 각각 AB, BC, CA의 접점이다. 네 점 O, E, C, F는 정사각형을 이룬다.",
+                  "points": {
+                    "A": [
+                      4,
+                      3
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      4,
+                      0
+                    ],
+                    "O": [
+                      3,
+                      1
+                    ],
+                    "D": [
+                      2.4,
+                      1.8
+                    ],
+                    "E": [
+                      3,
+                      0
+                    ],
+                    "F": [
+                      4,
+                      1
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "O": "O",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "D"
+                      ],
+                      "label": "r"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "E"
+                      ],
+                      "label": "r"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "F"
+                      ],
+                      "label": "r"
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "D",
+                      "arms": [
+                        "B",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "E",
+                      "arms": [
+                        "C",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "F",
+                      "arms": [
+                        "A",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "C",
+                      "arms": [
+                        "B",
+                        "A"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "E",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c006",
+              "title": "내심의 각, 내접원의 반지름과 삼각형의 넓이",
+              "definition": "삼각형의 내심 O는 내각의 이등분선이 만나는 점이다. O에서 세 변에 내린 수선의 길이는 내접원의 반지름 r과 같다.",
+              "rules": [
+                "삼각형 BOC에서 ∠OBC와 ∠OCB는 각각 ∠B와 ∠C의 절반이다. 두 각과 ∠BOC의 합이 180°임을 이용한다.",
+                "O와 세 꼭짓점을 이으면 높이가 모두 r인 삼각형 세 개의 넓이 합으로 삼각형 ABC의 넓이를 구할 수 있다.",
+                "C가 직각이라면 그 두 변의 접점 E, F와 내심 O는 C와 함께 한 변이 r인 정사각형 OECF를 이룬다."
+              ],
+              "examples": [
+                {
+                  "description": "내심과 두 꼭짓점이 이루는 각을 구한다.",
+                  "latex": "\\angle BOC=90^\\circ+\\frac12\\angle A"
+                },
+                {
+                  "description": "세 변을 각각 밑변으로 두고 넓이를 더한다.",
+                  "latex": "[\\triangle ABC]=\\frac12r(AB+BC+CA)"
+                },
+                {
+                  "description": "∠C가 직각이면 두 직각변을 이용한 넓이와 같다.",
+                  "latex": "\\frac12r(AB+BC+CA)=\\frac12\\,BC\\cdot CA"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "내심 O에서 B와 C를 이었다. ∠OBC와 ∠OCB는 각각 ∠B와 ∠C의 절반이다. 접점으로 이은 세 반지름은 각 변에 수직이다.",
+                  "points": {
+                    "A": [
+                      4,
+                      3
+                    ],
+                    "B": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      4,
+                      0
+                    ],
+                    "O": [
+                      3,
+                      1
+                    ],
+                    "D": [
+                      2.4,
+                      1.8
+                    ],
+                    "E": [
+                      3,
+                      0
+                    ],
+                    "F": [
+                      4,
+                      1
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "O": "O",
+                    "D": "D",
+                    "E": "E",
+                    "F": "F"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "D"
+                      ],
+                      "label": "r"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "E"
+                      ],
+                      "label": "r"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "F"
+                      ],
+                      "label": "r"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "C"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "D",
+                      "arms": [
+                        "B",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "E",
+                      "arms": [
+                        "C",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "F",
+                      "arms": [
+                        "A",
+                        "O"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "C",
+                      "arms": [
+                        "B",
+                        "A"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    },
+                    {
+                      "vertex": "O",
+                      "arms": [
+                        "B",
+                        "C"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "∠BOC"
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "E",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c007",
+              "title": "원에 외접하는 사각형",
+              "definition": "볼록사각형의 네 변이 한 원에 접하면, 마주 보는 두 변의 길이의 합이 다른 한 쌍의 합과 같다.",
+              "rules": [
+                "사각형 ABCD에서 같은 꼭짓점으로부터 양쪽 접점까지의 길이를 각각 x, y, z, w라고 놓으면 양쪽 대변의 합은 모두 x+y+z+w이다.",
+                "볼록사각형에서 대변의 길이의 합이 서로 같으면 그 사각형은 원에 외접한다."
+              ],
+              "examples": [
+                {
+                  "description": "대변은 마주 보는 변이다.",
+                  "latex": "AB+CD=AD+BC=x+y+z+w"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "사각형 ABCD의 네 변 AB, BC, CD, DA가 원 O에 각각 P, Q, R, S에서 접한다.",
+                  "points": {
+                    "A": [
+                      -1,
+                      2
+                    ],
+                    "B": [
+                      -4,
+                      -2
+                    ],
+                    "C": [
+                      4,
+                      -2
+                    ],
+                    "D": [
+                      1,
+                      2
+                    ],
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "P": [
+                      -1.6,
+                      1.2
+                    ],
+                    "Q": [
+                      0,
+                      -2
+                    ],
+                    "R": [
+                      1.6,
+                      1.2
+                    ],
+                    "S": [
+                      0,
+                      2
+                    ]
+                  },
+                  "point_labels": {
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "O": "O",
+                    "P": "P",
+                    "Q": "Q",
+                    "R": "R",
+                    "S": "S"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "P"
+                      ],
+                      "label": "x"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ],
+                      "label": "y"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "Q"
+                      ],
+                      "label": "y"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "Q",
+                        "C"
+                      ],
+                      "label": "z"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "R"
+                      ],
+                      "label": "z"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "R",
+                        "D"
+                      ],
+                      "label": "w"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "S"
+                      ],
+                      "label": "w"
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "S",
+                        "A"
+                      ],
+                      "label": "x"
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "Q",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "title": "원주각",
+          "concepts": [
+            {
+              "concept_id": "m3.s2.u06.c008",
+              "title": "원주각의 뜻과 중심각과의 관계",
+              "definition": "원 위의 점 P와 원 위의 두 점 A, B를 이어 만든 ∠APB를 P를 포함하지 않는 호 AB에 대한 원주각이라고 한다.",
+              "rules": [
+                "원주각의 꼭짓점은 원 위의 P에, 대응하는 중심각의 꼭짓점은 중심 O에 있다.",
+                "한 호에 대한 원주각은 같은 호에 대한 중심각의 절반이다.",
+                "P에서 O를 지나도록 선을 그으면, 개념서 그림처럼 이등변삼각형의 밑각과 외각을 이용해 꼭짓점 쪽의 각 x, y가 중심에서 각각 2x, 2y에 해당함을 확인할 수 있다."
+              ],
+              "examples": [
+                {
+                  "description": "같은 호를 보는 원주각과 중심각을 비교한다.",
+                  "latex": "\\angle APB=\\frac12\\angle AOB"
+                },
+                {
+                  "description": "중심이 원주각 안쪽에 있는 그림의 경우이다.",
+                  "latex": "\\angle APB=x+y,\\qquad \\angle AOB=2x+2y"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "P는 아래쪽 호 AB 위에 있지 않다. 호 AB에 대한 두 각 ∠AOB와 ∠APB의 크기 비는 2:1이다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -2.828427125,
+                      -2.828427125
+                    ],
+                    "B": [
+                      2.828427125,
+                      -2.828427125
+                    ],
+                    "P": [
+                      -1.368080573,
+                      3.758770483
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "P": "P"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "P"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "B"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "P",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "45°",
+                      "degrees": 45
+                    },
+                    {
+                      "vertex": "O",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "90°",
+                      "degrees": 90
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "P에서 O를 잇고 연장하면 ∠APB가 x, y로 나뉜다. 중심각의 두 부분은 각각 2x, 2y이다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -2.828427125,
+                      -2.828427125
+                    ],
+                    "B": [
+                      2.828427125,
+                      -2.828427125
+                    ],
+                    "P": [
+                      -1.03527618,
+                      3.863703305
+                    ],
+                    "T": [
+                      1.03527618,
+                      -3.863703305
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "P": "P",
+                    "T": "T"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "P"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "T"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "P",
+                      "arms": [
+                        "A",
+                        "O"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "x"
+                    },
+                    {
+                      "vertex": "P",
+                      "arms": [
+                        "O",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "y"
+                    },
+                    {
+                      "vertex": "O",
+                      "arms": [
+                        "A",
+                        "T"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "2x"
+                    },
+                    {
+                      "vertex": "O",
+                      "arms": [
+                        "T",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "2y"
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c009",
+              "title": "큰 호에 대한 원주각",
+              "definition": "한 원에서 반원보다 긴 호를 보는 원주각은 둔각이 될 수 있다.",
+              "rules": [
+                "원주각의 꼭짓점 P가 들어 있지 않은 쪽의 호가 어느 쪽인지 먼저 찾는다.",
+                "대응하는 호가 한 바퀴의 절반보다 길면, 대응하는 중심각은 180°보다 큰 쪽을 사용한다."
+              ],
+              "examples": [
+                {
+                  "description": "큰 호에 대한 중심각이 240°이면 원주각은 120°이다.",
+                  "latex": "\\angle APB=\\frac12\\cdot240^\\circ=120^\\circ"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "P가 작은 호 위에 있으므로 원주각 ∠APB는 반대쪽의 큰 호 AQB를 본다. 대응하는 중심각은 240°이고 원주각은 120°이다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -3.464101615,
+                      -2
+                    ],
+                    "B": [
+                      3.464101615,
+                      -2
+                    ],
+                    "P": [
+                      0,
+                      -4
+                    ],
+                    "Q": [
+                      0,
+                      4
+                    ],
+                    "U": [
+                      0.866025404,
+                      -0.5
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "P": "P",
+                    "Q": "Q"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "P"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "B"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "P",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "120°",
+                      "degrees": 120
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    },
+                    {
+                      "center": "O",
+                      "through": "U",
+                      "sweep_offsets_degrees": [
+                        0,
+                        240
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c010",
+              "title": "같은 호와 반원에 대한 원주각",
+              "definition": "한 호에 대응하는 원주각들은 모두 같은 크기이고, 반원에 대한 원주각은 90°이다.",
+              "rules": [
+                "같은 호에 대응하는 중심각은 하나이므로, 그 호를 바라보는 모든 원주각의 크기는 같다.",
+                "지름의 양 끝과 원 위의 다른 점을 잇는 각은 반원에 대한 원주각이다. 중심각이 180°이므로 원주각은 90°이다."
+              ],
+              "examples": [
+                {
+                  "description": "P, Q, R이 모두 같은 호 AB에 대한 원주각의 꼭짓점이다.",
+                  "latex": "\\angle APB=\\angle AQB=\\angle ARB"
+                },
+                {
+                  "description": "AB가 지름이면 삼각형 APB는 P에서 직각이다.",
+                  "latex": "\\angle APB=\\frac12\\cdot 180^\\circ=90^\\circ"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "원 위 P, Q, R에서 아래쪽의 같은 호 AB를 바라본다. 세 원주각의 크기는 모두 같다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -2.828427125,
+                      -2.828427125
+                    ],
+                    "B": [
+                      2.828427125,
+                      -2.828427125
+                    ],
+                    "P": [
+                      -0.348622971,
+                      3.984778792
+                    ],
+                    "Q": [
+                      -3.276608177,
+                      2.294305745
+                    ],
+                    "R": [
+                      3.863703305,
+                      1.03527618
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "P": "P",
+                    "Q": "Q",
+                    "R": "R"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "P"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "Q"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "Q",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "R"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "R",
+                        "B"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "P",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "θ"
+                    },
+                    {
+                      "vertex": "Q",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "θ"
+                    },
+                    {
+                      "vertex": "R",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "θ"
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "AB는 원의 지름이고 P는 위쪽 반원 위에 있다. 아래쪽 반원 AQB에 대한 원주각 ∠APB는 직각이다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -4,
+                      0
+                    ],
+                    "B": [
+                      4,
+                      0
+                    ],
+                    "Q": [
+                      0,
+                      -4
+                    ],
+                    "P": [
+                      1.690473047,
+                      3.625231148
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "Q": "Q",
+                    "P": "P"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "P"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "P",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "B",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c011",
+              "title": "호의 길이와 원주각의 크기",
+              "definition": "한 원이나 합동인 두 원에서 호의 길이는 그 호에 대응하는 원주각의 크기에 정비례한다.",
+              "rules": [
+                "호의 길이가 중심각에 정비례하고, 중심각이 원주각의 2배라는 두 관계를 연결한다.",
+                "길이가 같은 호에 대한 원주각은 크기가 같고, 같은 크기의 원주각에 대응하는 호의 길이도 같다.",
+                "호의 길이가 k배이면 원주각도 k배이다. 이때 호를 재는 원들의 반지름이 같아야 한다."
+              ],
+              "examples": [
+                {
+                  "description": "호 길이의 비와 원주각 크기의 비를 비교한다.",
+                  "latex": "\\text{호의 길이}\\ k\\ell:\\ell = k:1,\\qquad \\text{원주각의 크기}\\ k\\theta:\\theta = k:1"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "작은 호 AB와 CD에 대응하는 중심각의 크기가 모두 60°이다. 따라서 두 호의 길이가 같고 원주각도 각각 30°이다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -4,
+                      0
+                    ],
+                    "B": [
+                      -2,
+                      -3.464101615
+                    ],
+                    "C": [
+                      2,
+                      -3.464101615
+                    ],
+                    "D": [
+                      4,
+                      0
+                    ],
+                    "P": [
+                      -1.03527618,
+                      3.863703305
+                    ],
+                    "Q": [
+                      1.368080573,
+                      3.758770483
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "P": "P",
+                    "Q": "Q"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "P"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "Q"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "Q",
+                        "D"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "P",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "30°",
+                      "degrees": 30
+                    },
+                    {
+                      "vertex": "Q",
+                      "arms": [
+                        "C",
+                        "D"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "30°",
+                      "degrees": 30
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "같은 원에서 작은 호 AB의 중심각은 120°, 작은 호 CD의 중심각은 60°이다. 두 호의 길이와 두 원주각은 모두 2:1이다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -3.464101615,
+                      -2
+                    ],
+                    "B": [
+                      3.464101615,
+                      -2
+                    ],
+                    "C": [
+                      4,
+                      0
+                    ],
+                    "D": [
+                      2,
+                      3.464101615
+                    ],
+                    "P": [
+                      -0.694592711,
+                      3.939231012
+                    ],
+                    "Q": [
+                      -3.625231148,
+                      1.690473047
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "P": "P",
+                    "Q": "Q"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "P"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "P",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "Q"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "Q",
+                        "D"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "P",
+                      "arms": [
+                        "A",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "60°",
+                      "degrees": 60
+                    },
+                    {
+                      "vertex": "Q",
+                      "arms": [
+                        "C",
+                        "D"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "30°",
+                      "degrees": 30
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "A",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c012",
+              "title": "호의 길이와 현의 길이 구별하기",
+              "definition": "호는 원 둘레의 일부이고, 현은 두 끝점을 잇는 곧은 선분이다.",
+              "rules": [
+                "호의 길이는 대응하는 중심각과 원주각에 정비례한다. 현의 길이는 대응하는 각의 크기에 정비례하지 않는다.",
+                "한 원 또는 합동인 두 원에서 현의 길이가 같으면 대응하는 작은 호끼리, 또는 큰 호끼리의 길이와 각의 크기는 같다.",
+                "같은 현이라도 바라보는 호가 서로 달라지면 원주각이 달라질 수 있으므로 꼭짓점의 위치를 확인한다."
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c013",
+              "title": "네 점이 한 원 위에 있을 조건",
+              "definition": "서로 다른 두 점 A, B가 직선 CD의 같은 쪽에 있고 ∠CAD와 ∠CBD의 크기가 같으면 네 점 A, B, C, D는 한 원 위에 있다.",
+              "rules": [
+                "두 원주각이 같은 호 CD를 바라보는 위치인지 확인한다.",
+                "개념서의 비교 그림에서 C에서 B로 향하는 반직선 위에 원 내부의 B′와 원 외부의 B″를 잡으면, 삼각형의 외각 성질로 각의 크기가 달라짐을 확인할 수 있다."
+              ],
+              "examples": [
+                {
+                  "description": "비교 그림에서 C, B′, B, B″는 이 순서대로 놓인다.",
+                  "latex": "\\angle CB'D>\\angle CBD=\\angle CAD>\\angle CB''D"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "A와 B는 직선 CD의 같은 쪽에 있고, ∠CAD와 ∠CBD는 같은 호 CD를 본다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      -3.276608177,
+                      -2.294305745
+                    ],
+                    "D": [
+                      3.276608177,
+                      -2.294305745
+                    ],
+                    "A": [
+                      -3.276608177,
+                      2.294305745
+                    ],
+                    "B": [
+                      0.694592711,
+                      3.939231012
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "C": "C",
+                    "D": "D",
+                    "A": "A",
+                    "B": "B"
+                  },
+                  "lines": [
+                    {
+                      "kind": "line",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "D"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "A",
+                      "arms": [
+                        "C",
+                        "D"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "θ"
+                    },
+                    {
+                      "vertex": "B",
+                      "arms": [
+                        "C",
+                        "D"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "θ"
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "C",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "geometry_2d",
+                  "caption": "C에서 B로 향하는 반직선 위에서 B′는 원 내부, B″는 원 외부에 있다. 보는 각은 ∠CB′D, ∠CBD, ∠CB″D 순으로 작아진다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "C": [
+                      -3.276608177,
+                      -2.294305745
+                    ],
+                    "D": [
+                      3.276608177,
+                      -2.294305745
+                    ],
+                    "B": [
+                      0.694592711,
+                      3.939231012
+                    ],
+                    "U": [
+                      -0.099647467,
+                      2.692523661
+                    ],
+                    "V": [
+                      1.647680924,
+                      5.435279834
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "C": "C",
+                    "D": "D",
+                    "B": "B",
+                    "U": "B′",
+                    "V": "B″"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "V"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "U"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "V"
+                      ]
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "C",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c014",
+              "title": "원에 내접하는 사각형의 대각",
+              "definition": "원에 내접하는 사각형에서 마주 보는 한 쌍의 내각 크기의 합은 180°이다.",
+              "rules": [
+                "두 대각이 각각 바라보는 호를 합하면 원의 둘레 한 바퀴가 된다.",
+                "두 호의 중심각의 합은 360°이므로, 각각의 절반인 두 원주각의 합은 180°이다."
+              ],
+              "examples": [
+                {
+                  "description": "사각형 ABCD의 두 쌍의 대각에 적용한다.",
+                  "latex": "\\angle A+\\angle C=\\angle B+\\angle D=180^\\circ"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "사각형 ABCD의 대각 ∠BAD와 ∠BCD가 보는 두 호를 합하면 한 바퀴가 된다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -3.064177772,
+                      2.571150439
+                    ],
+                    "B": [
+                      -3.464101615,
+                      -2
+                    ],
+                    "C": [
+                      3.064177772,
+                      -2.571150439
+                    ],
+                    "D": [
+                      2.828427125,
+                      2.828427125
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "A",
+                      "arms": [
+                        "B",
+                        "D"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "∠A"
+                    },
+                    {
+                      "vertex": "C",
+                      "arms": [
+                        "B",
+                        "D"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "∠C"
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "D",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c015",
+              "title": "원에 내접하는 사각형의 외각과 내대각",
+              "definition": "원에 내접하는 사각형의 한 외각은 그 외각과 이웃하는 내각의 대각과 크기가 같다.",
+              "rules": [
+                "외각과 그에 이웃하는 내각의 합은 180°이다.",
+                "이웃하는 내각과 그 내대각의 합도 180°이므로, 외각과 내대각은 크기가 같다."
+              ],
+              "examples": [
+                {
+                  "description": "E가 변 BC를 C 너머로 연장한 위의 점일 때이다.",
+                  "latex": "\\angle DCE+\\angle BCD=180^\\circ,\\qquad \\angle BAD+\\angle BCD=180^\\circ,\\qquad \\angle DCE=\\angle BAD"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "변 BC를 C 너머로 연장하면 한 외각 ∠DCE의 크기는 맞은편 내각 ∠BAD와 같다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -3.064177772,
+                      2.571150439
+                    ],
+                    "B": [
+                      -3.464101615,
+                      -2
+                    ],
+                    "C": [
+                      3.064177772,
+                      -2.571150439
+                    ],
+                    "D": [
+                      2.828427125,
+                      2.828427125
+                    ],
+                    "E": [
+                      5.675489527,
+                      -2.799610615
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D",
+                    "E": "E"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "D",
+                        "A"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "C",
+                        "E"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "A",
+                      "arms": [
+                        "B",
+                        "D"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "θ"
+                    },
+                    {
+                      "vertex": "C",
+                      "arms": [
+                        "D",
+                        "E"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "θ"
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "D",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c016",
+              "title": "사각형이 원에 내접하는 조건",
+              "definition": "볼록사각형에서 한 쌍의 대각의 크기 합이 180°이면 원에 내접한다.",
+              "rules": [
+                "한 외각의 크기가 그 외각에 이웃하는 내각의 대각과 같아도 원에 내접한다.",
+                "외각과 이웃하는 내각의 합이 180°이므로, 두 조건 중 주어진 관계를 사용한다.",
+                "삼각형에는 외접원이 항상 존재하지만 사각형이 원에 내접하려면 이 조건을 만족해야 한다."
+              ]
+            },
+            {
+              "concept_id": "m3.s2.u06.c017",
+              "title": "접선과 현이 이루는 각",
+              "definition": "접점에서 그은 현과 접선이 이루는 각의 크기는 같은 호를 보는 원주각의 크기와 같다.",
+              "rules": [
+                "접점 C에서 반지름 OC는 접선 CD와 수직이다.",
+                "개념서 그림에서 ∠BAC=a, ∠OBC=b이면 호 BC의 중심각은 2a이다. 이등변삼각형 OBC에서 2a+2b=180°이므로 ∠BCD=90°−b=a이다.",
+                "점 D가 현 BC를 포함하는 직선에 대해 A의 반대쪽에 있고 ∠BCD=∠BAC이면, 직선 CD는 C에서 원에 접한다."
+              ],
+              "examples": [
+                {
+                  "description": "각의 두 변이 놓이는 방향을 확인하고 대응하는 원주각과 연결한다.",
+                  "latex": "\\angle BCD=\\angle BAC"
+                },
+                {
+                  "description": "반지름과 접선이 직각을 이루는 성질을 이용한다.",
+                  "latex": "2a+2b=180^\\circ,\\qquad \\angle BCD=90^\\circ-b=a"
+                }
+              ],
+              "visuals": [
+                {
+                  "type": "geometry_2d",
+                  "caption": "C에서의 접선 CD와 현 CB가 이루는 각은 호 BC를 보는 원주각 ∠BAC와 같다.",
+                  "points": {
+                    "O": [
+                      0,
+                      0
+                    ],
+                    "A": [
+                      -3.064177772,
+                      2.571150439
+                    ],
+                    "B": [
+                      3.758770483,
+                      -1.368080573
+                    ],
+                    "C": [
+                      0,
+                      -4
+                    ],
+                    "D": [
+                      5,
+                      -4
+                    ]
+                  },
+                  "point_labels": {
+                    "O": "O",
+                    "A": "A",
+                    "B": "B",
+                    "C": "C",
+                    "D": "D"
+                  },
+                  "lines": [
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "A",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "B",
+                        "C"
+                      ]
+                    },
+                    {
+                      "kind": "line",
+                      "through": [
+                        "C",
+                        "D"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "B"
+                      ]
+                    },
+                    {
+                      "kind": "segment",
+                      "through": [
+                        "O",
+                        "C"
+                      ]
+                    }
+                  ],
+                  "angles": [
+                    {
+                      "vertex": "A",
+                      "arms": [
+                        "B",
+                        "C"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "35°",
+                      "degrees": 35
+                    },
+                    {
+                      "vertex": "C",
+                      "arms": [
+                        "D",
+                        "B"
+                      ],
+                      "mark": "arc",
+                      "arc_marks": 1,
+                      "label": "35°",
+                      "degrees": 35
+                    },
+                    {
+                      "vertex": "C",
+                      "arms": [
+                        "O",
+                        "D"
+                      ],
+                      "mark": "right_angle",
+                      "degrees": 90
+                    }
+                  ],
+                  "arcs": [
+                    {
+                      "center": "O",
+                      "through": "C",
+                      "sweep_offsets_degrees": [
+                        0,
+                        360
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -9,7 +9,10 @@ MAX_SOURCE = 24000
 MAX_CHOICES = 10
 MAX_CHOICE_TEXT = 2000
 _NUMBER = r'[+-]?(?:\d{1,32}(?:\.\d{0,32})?|\.\d{1,32})'
-_FRACTION = re.compile(r'\\(?:dfrac|tfrac|frac)\s*\{\s*(' + _NUMBER + r')\s*\}\s*\{\s*(' + _NUMBER + r')\s*\}')
+_FRACTION = re.compile(
+    r'\\(?:dfrac|tfrac|frac)\s*\{\s*([A-Za-z0-9.()+*/\-\s]+?)\s*\}'
+    r'\s*\{\s*(' + _NUMBER + r')\s*\}'
+)
 _MARKER = re.compile(r'(?<![A-Za-z0-9\\])\(([1-9]\d?)\)')
 _HEADER = re.compile(
     r'\s*(?:\d{1,3}[.)]\s*)?(?:(?:다음|각)\s*)?(?:일차\s*)?방정식(?:들)?\s*'
@@ -23,7 +26,7 @@ def _open(message='이번에 풀 부분을 확인해 주세요. 이 문제는 �
 
 
 def _normalize(text):
-    """숫자 분수와 수식 표식만 제한 변환하고 뜻이 모호한 나눗셈은 고치지 않는다."""
+    """숫자 분모의 분수와 수식 표식만 변환하며 모호한 평문 나눗셈은 보류한다."""
     if len(text) > MAX_CHOICE_TEXT:
         return None
     value = text.strip().translate(str.maketrans({
@@ -43,6 +46,9 @@ def _normalize(text):
 
     def fraction(match):
         numerator, denominator = match.groups()
+        if not re.fullmatch(_NUMBER, numerator):
+            # 분자 전체를 묶어 x+1/2와 (x+1)/2를 구분한다.
+            numerator = '(' + numerator + ')'
         before, after = value[:match.start()].rstrip(), value[match.end():].lstrip()
         grouped = '(' + numerator + '/' + denominator + ')'
         # LaTeX의 분수 계수만 명시 곱셈으로 옮긴다. 평문 4/3x는 그대로 보류한다.
