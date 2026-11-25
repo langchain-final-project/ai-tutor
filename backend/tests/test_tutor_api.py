@@ -185,9 +185,21 @@ def test_confirmed_photo_can_start_without_creating_equation_submission(tutor):
         "content_text": QUESTION, "expected_version_number": 1,
     })
     assert confirmed.status_code == 200, confirmed.text
+    targets_url = f"/submissions/{ident}/tutor-targets"
+    assert client.get(targets_url).json()["saved_sessions"] == []
     session = start(client, ident)
     assert session["submission_id"] == ident and session["input_kind"] == "photo"
+    assert client.get(targets_url).json()["saved_sessions"] == [
+        {"id": session["id"], "target_text": session["target_text"]},
+    ]
     assert len(client.get("/submissions").json()) == 1
+    updated = client.post(f"/submissions/{ident}/confirm", json={
+        "content_text": "5x=10", "expected_version_number": 1,
+    })
+    assert updated.status_code == 200, updated.text
+    targets = client.get(targets_url).json()
+    assert targets["input_version_number"] == 2 and targets["saved_sessions"] == []
+    assert client.get(f"/tutor-sessions/{session['id']}").json()["is_current"] is False
     assert runner.calls == []
 
 

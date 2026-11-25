@@ -73,8 +73,15 @@ def target_options(connection, *, owner_id, submission_id):
     latest = source['latest_input']
     if not latest:
         raise ConflictError('문제 내용을 먼저 입력하거나 인식을 완료해 주세요.')
+    saved_sessions = []
+    if latest['confirmed_at'] and source['input_kind'] == 'photo':
+        # 확인한 같은 사진 입력 버전에서 시작한 풀이만 이어갈 수 있게 표시한다.
+        saved_sessions = _rows(connection, '''SELECT id,target_text FROM tutor_sessions
+            WHERE submission_id=? AND input_version_id=? AND subject='mathematics'
+            ORDER BY updated_at DESC,id DESC''', (submission_id, latest['id']))
     return {'submission_id': submission_id, 'input_version_number': latest['version_number'],
             'input_confirmed': bool(latest['confirmed_at']),
+            'saved_sessions': saved_sessions,
             **analyze_target(latest['content_text'])}
 
 

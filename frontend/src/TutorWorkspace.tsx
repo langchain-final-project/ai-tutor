@@ -71,7 +71,9 @@ async function readSource(id: number, signal?: AbortSignal) {
 }
 function verdict(event: TutorEvent) {
   const value = event.response.verification;
-  if (!value || value.action === "unsupported") return { label: "자동 판정 범위 밖 · 모델 안내", tone: "is-warning" };
+  if (!value || value.action === "unsupported") return {
+    label: event.response.model ? "판정 보류 · 모델 안내" : "판정 보류", tone: "is-warning",
+  };
   if (value.action === "ask_confirmation") return { label: "입력 확인 필요", tone: "is-warning" };
   if (value.completion === "no_work") return { label: "첫 풀이를 위한 도움", tone: "" };
   if (value.judgement === "incorrect") return { label: "다시 확인할 풀이가 있어요", tone: "is-error" };
@@ -91,6 +93,7 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
   const [selectedSource, setSelectedSource] = useState(sourceId === null ? "" : String(sourceId));
   const [sourceLoading, setSourceLoading] = useState(false);
   const [targetPreview, setTargetPreview] = useState<TutorTargetPreview | null>(null);
+  const [choosingNewTarget, setChoosingNewTarget] = useState(false);
   const [question, setQuestion] = useState("");
   const [target, setTarget] = useState("");
   const [confirmed, setConfirmed] = useState(false);
@@ -191,7 +194,7 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
 
   async function begin(event: FormEvent) {
     event.preventDefault();
-    if (busy.current || sourceLoading || selectedSource && !source || !confirmed || !startTarget) return;
+    if (busy.current || sourceLoading || selectedSource && !source || !showTargetForm || !confirmed || !startTarget) return;
     busy.current = true; setPending("문제를 확인하고 튜터를 준비하고 있어요…"); setError("");
     try {
       const signal = controller.current?.signal;
@@ -229,6 +232,7 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
   async function chooseSource(value: string) {
     const request = ++sourceRequest.current;
     setSelectedSource(value); setSource(null); setTargetPreview(null); setTarget(""); setError(""); setConfirmed(false);
+    setChoosingNewTarget(false);
     setSourceLoading(!!value);
     if (!value) return;
     try {
@@ -283,6 +287,10 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
   const running = snapshot?.pending_request?.status === "running" &&
     (snapshot.pending_request.lease_expires_at === undefined || snapshot.pending_request.lease_expires_at * 1000 > clock);
   const sourceUnconfirmed = source?.input_kind === "photo" && !source.latest_input?.confirmed_at;
+  const savedForSource = sourceUnconfirmed ? [] : targetPreview?.saved_sessions ?? [];
+  const showTargetForm = !savedForSource.length || choosingNewTarget;
+  const confirmedPhotoText = source?.input_kind === "photo" && source.latest_input?.confirmed_at
+    && targetPreview?.status === "open_problem" ? source.latest_input.content_text : "";
   const independentAttempt = snapshot?.attempt_mode === "independent" || snapshot?.attempt_mode === "review";
   const requiresTarget = snapshot?.target_selection?.status === "selection_required";
   const canSubmit = snapshot?.is_current === true && snapshot.can_submit !== false && !requiresTarget;
@@ -321,21 +329,39 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
             </> : selectedSource ? <p className="solution-help" role="status">{sourceLoading ? "선택한 문제를 불러오고 있어요…" : "문제를 불러오지 못했어요. 저장한 문제를 다시 선택해 주세요."}</p> : <label className="solution-label" htmlFor="tutor-question">문제의 본문·식
               <textarea id="tutor-question" className="solution-input" rows={4} value={question} maxLength={10000} required disabled={disabled}
                 placeholder="예: 일차방정식 2(x+2)=3(x-1)을 풀어라." onChange={(event) => { setQuestion(event.target.value); setConfirmed(false); }} /></label>}
-            {targetPreview && <div className={`tutor-target-preview ${targetPreview.status === "selection_required" ? "is-selection-required" : ""}`}>
-              <p><strong>{targetPreview.status === "selection_required" ? "이번에 풀 소문항을 선택해 주세요" : "이번에 풀 대상 확인"}</strong></p>
-              <p className="solution-help">{targetPreview.message}</p>
-              <TargetChoices choices={targetPreview.choices} selected={target} disabled={disabled || sourceLoading}
-                onSelect={(choice) => { setTarget(choice.target_text); setConfirmed(false); }} />
-            </div>}
-            <label className="solution-label" htmlFor="tutor-target">이번에 풀 부분 또는 식
-              <textarea id="tutor-target" className="solution-input" rows={3} value={target} maxLength={10000} disabled={disabled || sourceLoading || !!selectedSource && !source}
-                placeholder={source?.input_kind === "photo" ? "위에서 소문항을 선택하거나, 이번에 풀 한 문제·식을 직접 적어 주세요." : "한 문제 전체 또는 선택한 소문항·식을 적어 주세요."}
-                onChange={(event) => { setTarget(event.target.value); setConfirmed(false); }} /></label>
-            <p className="solution-help">사진에 여러 문제가 있으면 이번에 풀 소문항을 명확히 적어 주세요. 식 검증을 받으려면 2(x+2)=3(x-1)처럼 평문 등식을 사용할 수 있어요.</p>
-            <label className="tutor-confirm"><input type="checkbox" checked={confirmed} disabled={disabled || sourceLoading || !!selectedSource && !source || sourceUnconfirmed || !startTarget}
-              onChange={(event) => setConfirmed(event.target.checked)} />문제 내용과 이번에 풀 대상을 확인했어요.</label>
-            {sourceUnconfirmed && <p className="solution-notice is-warning">사진 확인 화면에서 인식한 문제를 먼저 확인해 주세요.</p>}
-            <button className="solution-button" disabled={disabled || sourceLoading || !!selectedSource && !source || !confirmed || sourceUnconfirmed || !startTarget}>이 문제로 튜터 시작</button>
+            {savedForSource.length > 0 && <section className="tutor-target-preview" aria-labelledby="tutor-saved-source-title">
+              <h3 id="tutor-saved-source-title">이 사진으로 풀던 기록</h3>
+              <ul className="solution-list">{savedForSource.map((item) => <li key={item.id}>
+                <a className="solution-list-item" href={`#tutor/${item.id}`}>
+                  <span>이어서 풀기</span><TutorText text={item.target_text} />
+                </a>
+              </li>)}</ul>
+              <button type="button" className="solution-button is-secondary" aria-expanded={choosingNewTarget}
+                onClick={() => setChoosingNewTarget(!choosingNewTarget)}>
+                {choosingNewTarget ? "새 풀이 입력 닫기" : "이 사진에서 다른 부분 풀기"}
+              </button>
+            </section>}
+            {showTargetForm && <>
+              {targetPreview && <div className={`tutor-target-preview ${targetPreview.status === "selection_required" ? "is-selection-required" : ""}`}>
+                <p><strong>{targetPreview.status === "selection_required" ? "이번에 풀 소문항을 선택해 주세요" : "이번에 풀 대상 확인"}</strong></p>
+                <p className="solution-help">{targetPreview.message}</p>
+                <TargetChoices choices={targetPreview.choices} selected={target} disabled={disabled || sourceLoading}
+                  onSelect={(choice) => { setTarget(choice.target_text); setConfirmed(false); }} />
+                {confirmedPhotoText && <button type="button" className="solution-button is-secondary" disabled={disabled || sourceLoading}
+                  onClick={() => { setTarget(confirmedPhotoText); setConfirmed(true); }}>
+                  확인한 문제 전체 사용
+                </button>}
+              </div>}
+              <label className="solution-label" htmlFor="tutor-target">이번에 풀 부분 또는 식
+                <textarea id="tutor-target" className="solution-input" rows={3} value={target} maxLength={24000} disabled={disabled || sourceLoading || !!selectedSource && !source}
+                  placeholder={source?.input_kind === "photo" ? "위에서 소문항을 선택하거나, 이번에 풀 한 문제·식을 직접 적어 주세요." : "한 문제 전체 또는 선택한 소문항·식을 적어 주세요."}
+                  onChange={(event) => { setTarget(event.target.value); setConfirmed(false); }} /></label>
+              <p className="solution-help">사진에 여러 문제가 있으면 이번에 풀 소문항을 명확히 적어 주세요. 식 검증을 받으려면 2(x+2)=3(x-1)처럼 평문 등식을 사용할 수 있어요.</p>
+              <label className="tutor-confirm"><input type="checkbox" checked={confirmed} disabled={disabled || sourceLoading || !!selectedSource && !source || sourceUnconfirmed || !startTarget}
+                onChange={(event) => setConfirmed(event.target.checked)} />문제 내용과 이번에 풀 대상을 확인했어요.</label>
+              {sourceUnconfirmed && <p className="solution-notice is-warning">사진 확인 화면에서 인식한 문제를 먼저 확인해 주세요.</p>}
+              <button className="solution-button" disabled={disabled || sourceLoading || !!selectedSource && !source || !confirmed || sourceUnconfirmed || !startTarget}>이 문제로 튜터 시작</button>
+            </>}
           </form>
         </section>
         <div><LearningPathList loginUrl={loginUrl} />
@@ -393,7 +419,10 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
                 value={studentText} disabled={disabled || !canSubmit || !!retry} onChange={(event) => setStudentText(event.target.value)} placeholder="어디에서 막혔는지 자유롭게 적어 주세요." /></label>
               <p className="solution-help">도움을 요청하거나 제출하면 입력한 풀이를 확인한 것으로 기록해요. 읽기 어려운 줄은 ‘확인 필요’로 표시해 주세요.</p>
               <div className="tutor-actions">
-                <button className="solution-button" disabled={disabled || !canSubmit || !!retry}>{independentAttempt ? "풀이 확인 (자동 힌트 없음)" : "풀이 제출하고 도움받기"}</button>
+                <button className="solution-button" disabled={disabled || !canSubmit || !!retry}>{
+                  independentAttempt ? "풀이 확인 (자동 힌트 없음)" :
+                  snapshot.target_selection?.status === "open_problem" ? "풀이 제출" : "풀이 제출하고 도움받기"
+                }</button>
                 <button className="solution-button is-secondary" type="button" disabled={disabled || !canSubmit || !!retry} onClick={() => void send("hint")}>첫 힌트 보기</button>
                 <button className="solution-button is-secondary" type="button" disabled={disabled || !canSubmit || !!retry} onClick={() => void send("more_help")}>조금 더 도와주세요</button>
               </div>
@@ -425,7 +454,7 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
           </section>}
           <section className="solution-card"><h2>받은 도움과 시도</h2>
             {!snapshot.events?.length && <p className="solution-empty">직접 풀어보거나 첫 힌트를 요청해 보세요.</p>}
-            <ol className="tutor-event-list">{(snapshot.events ?? []).map((event) => {
+            <ol className="tutor-event-list">{[...(snapshot.events ?? [])].reverse().map((event) => {
               const summary = verdict(event);
               const metrics = Object.entries(event.response.usage ?? {}).filter(([, value]) => typeof value === "number");
               return <li key={event.id} className="tutor-event" ref={event.id === last?.id ? responseAnchor : null} aria-live={event.id === last?.id ? "polite" : "off"}><div className="solution-meta">{timeLabel(event.created_at)} · {event.intent === "submit" && independentAttempt ? "풀이 확인" : intentLabel[event.intent]}</div>

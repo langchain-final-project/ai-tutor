@@ -177,11 +177,37 @@ class TutorPolicyTests(unittest.TestCase):
         self.assertEqual(result["response"]["verification"]["first_error_step_id"], "s2")
         self.assertEqual(model.calls, 0)
 
-    def test_confirmed_unsupported_work_is_not_an_ocr_confirmation_request(self):
-        result = run_turn(PROBLEM, initial_state(), [], request("submit", "양변에서 같은 수를 뺐어요."), model_client=Model())
-        self.assertEqual(result["response"]["action"], "guide")
+    def test_confirmed_unsupported_work_is_recorded_without_using_a_model(self):
+        model = Model()
+        result = run_turn(PROBLEM, initial_state(), [], request("submit", "양변에서 같은 수를 뺐어요."), model_client=model)
+        self.assertEqual(result["response"]["action"], "undetermined")
         self.assertEqual(result["response"]["verification"]["reason_code"], "unsupported_observation")
         self.assertFalse(result["response"]["tool_supported"])
+        self.assertEqual(model.calls, 0)
+
+    def test_variable_denominator_explains_pending_verdict_for_plain_and_ocr_targets(self):
+        ocr = "\n".join((r"방정식 \(\frac{1}{2-\frac{1}{x}}=\frac{2}{3}\)를 풀면?",
+                         r"① \(x=1\)", r"② \(x=2\)"))
+        for target in ("1/(2-1/x)=2/3", ocr):
+            for answer in ("x=2", "x=-2"):
+                with self.subTest(target=target, answer=answer):
+                    problem = dict(PROBLEM, source_text=ocr, target_text=target)
+                    model = Model()
+                    work = request("submit", "x/(2x-1)=2/3", "3x=4x-2", answer)
+                    result = run_turn(problem, initial_state(), [], work, model_client=model)
+                    response, state = result["response"], result["state"]
+                    self.assertEqual(response["action"], "undetermined")
+                    self.assertEqual(response["verification"]["judgement"], "undetermined")
+                    self.assertEqual(response["verification"]["reason_code"], "variable_denominator")
+                    self.assertIn("분모에 문자가 있어", response["message"])
+                    self.assertEqual(model.calls, 0)
+                    self.assertEqual(state["last_steps"], work["steps"])
+                    self.assertEqual(state["attempts"], 1)
+                    self.assertEqual(state["hint_count"], 0)
+                    self.assertFalse(state["solved"])
+                    help_result = run_turn(problem, state, [], request("more_help"), model_client=model)
+                    self.assertEqual(help_result["response"]["action"], "scaffold")
+                    self.assertEqual(model.calls, 1)
 
     def test_direct_answer_request_records_exposure_without_solving_for_student(self):
         model = Model("양변을 정리하면 x=7이에요.")

@@ -63,7 +63,11 @@ export type TutorTargetSelection = {
   choices: TutorTargetChoice[];
   message: string;
 };
-export type TutorTargetPreview = TutorTargetSelection & { submission_id: number; input_version_number: number };
+export type TutorTargetPreview = TutorTargetSelection & {
+  submission_id: number;
+  input_version_number: number;
+  saved_sessions?: { id: number; target_text: string }[];
+};
 export type TutorSnapshot = {
   id: number;
   submission_id: number;

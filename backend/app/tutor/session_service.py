@@ -14,7 +14,7 @@ from .problem_target import analyze_target
 from .session_model import create_tutor_client, TutorModelError, _student_message
 
 
-POLICY_VERSION = "didgo-tutor-policy-v3"
+POLICY_VERSION = "didgo-tutor-policy-v4"
 
 
 def initial_state():
@@ -109,7 +109,8 @@ def _evidence(turn):
     if not steps and request["intent"] == "submit" and inline_equation:
         steps = [{"id": "response", "text": student_text, "state": "active"}]
     raw_target = problem["target_text"].strip()
-    target_analysis = analyze_target(raw_target) if problem.get("subject", "mathematics") == "mathematics" else {
+    is_math = problem.get("subject", "mathematics") == "mathematics"
+    target_analysis = analyze_target(raw_target) if is_math else {
         "status": "open_problem", "normalized_text": None, "choices": [], "message": "",
     }
     # 확인한 원문은 보존하고 선택된 한 등식의 명확한 표기만 계산 관찰에 사용한다.
@@ -118,7 +119,7 @@ def _evidence(turn):
     verification = _generic_verification()
     evidence, source, observed, solution = {}, None, None, None
     supported = False
-    if (target_analysis["status"] != "selection_required" and problem.get("subject", "mathematics") == "mathematics"
+    if (target_analysis["status"] != "selection_required" and is_math
             and len(letters) == 1 and len(target) <= 512):
         source = {
             "schema_version": "verification-problem-v1", "id": str(problem.get("id", "tutor")),
@@ -138,9 +139,14 @@ def _evidence(turn):
                 solution = step_verifier._equation(target, source["variable"])["root"]
             else:
                 # 정상적인 다른 종류의 문제를 등호 누락 등 입력 오류로 안내하지 않는다.
-                verification = _generic_verification("unsupported_problem")
+                code = verification["reason_code"]
+                verification = _generic_verification(code if code == "variable_denominator" else "unsupported_problem")
         except ValueError:
             verification = _generic_verification("unsupported_observation")
+    if (is_math and target_analysis["status"] == "open_problem"
+            and verification["reason_code"] in {"unsupported_scope", "unsupported_problem"}
+            and _variable_denominator_in_stem(raw_target)):
+        verification["reason_code"] = "variable_denominator"
     uncertain = any(step["state"] == "uncertain" for step in steps)
     if supported and not uncertain and verification["action"] == "ask_confirmation":
         # 학생이 확인한 표현을 도구가 읽지 못하는 경우와 OCR 확인 필요를 구분한다.
@@ -168,9 +174,9 @@ def _policy(turn):
     verification = observed["verification"]
     active = [step for step in observed["steps"] if step["state"] != "deleted" and step["text"].strip()]
     needs_selection = observed["target_analysis"]["status"] == "selection_required"
-    new_attempt = (request["intent"] == "submit" and bool(active or observed["student_text"])
-                   and not needs_selection
-                   and not (observed["help_comment"] and not request.get("steps"))
+    has_work = bool(active or observed["student_text"]) and not (
+        observed["help_comment"] and not request.get("steps"))
+    new_attempt = (request["intent"] == "submit" and has_work and not needs_selection
                    and observed["fingerprint"] != state.get("last_work_fingerprint"))
     if new_attempt:
         state["attempts"] += 1
@@ -215,6 +221,14 @@ def _policy(turn):
         action, reason, needs_model = "complete", "verified_current_work", False
         message = "입력한 활성 풀이와 마지막 답이 확인한 등식의 해를 유지해요. 다른 문제를 도움 없이 푸는 독립 확인은 별도로 진행해요."
         state.update(help_level=0, needs_independent_check=True)
+    elif request["intent"] == "submit" and verification["action"] == "unsupported" and has_work:
+        # 풀이를 자동 확인할 수 없으면 저장 사실을 알리고 도움 요청은 학생에게 맡긴다.
+        action, reason, needs_model = "undetermined", "submitted_work_not_verified", False
+        detail = {
+            "variable_denominator": "원래 식의 분모에 문자가 있어 현재 자동 채점할 수 없어요.",
+            "unsupported_observation": "입력한 풀이 표현을 현재 자동 채점으로 확인하기 어려워요.",
+        }.get(verification["reason_code"], "이 문제는 현재 자동 채점 범위 밖이에요.")
+        message = detail + " 풀이를 저장했어요. 도움이 필요하면 막힌 부분을 적고 ‘조금 더 도와주세요’를 눌러 주세요."
     elif request["intent"] == "more_help":
         action, reason, message, needs_model = "scaffold", "additional_help_requested", "", True
         state["help_level"] = min(2, max(1, state["help_level"] + 1))
@@ -301,7 +315,7 @@ def _policy(turn):
 
 
 def _output_math(message):
-    """생성된 표시 수식만 좁게 읽으며 학생 입력과 저장 원문은 바꾸지 않는다."""
+    """표시된 수식과 수치 주장을 좁게 읽으며 원문은 바꾸지 않는다."""
     value = message.translate(str.maketrans({"−": "-", "＝": "=", "×": "*", "÷": "/"}))
     value = re.sub(r"\\(?:left|right|displaystyle|textstyle)\b", "", value)
     for old, new in ((r"\times", "*"), (r"\cdot", "*"), (r"\div", "/")):
@@ -324,6 +338,25 @@ def _output_math(message):
         r"((?:정답|답|해|[A-Za-z]의\s*값)\s*(?:은|는|이|가)?|[A-Za-z](?:은|는|이|가))\s*[:：=]?\s*([+\-]?\s*(?:\d|\()[0-9()+*/. \t-]*)", value)]
     expansions = re.findall(r"([A-Za-z0-9()+*/.\-]+)\s*(?:을|를)?\s*전개하면\s*([A-Za-z0-9()+*/.\-]+)", value)
     return equations, claims, expansions
+
+
+def _variable_denominator_in_stem(text):
+    """객관식 보기 앞의 단일 등식에서 채점 보류 이유만 확인한다."""
+    stem = re.split(r"[①-⑳]", text, maxsplit=1)[0]
+    if len(stem) > step_verifier.MAX_TEXT:
+        return False
+    equations, _, _ = _output_math(stem)
+    if len(equations) != 1:
+        return False
+    equation = equations[0]
+    letters = set(re.findall(r"[A-Za-z]", equation))
+    if len(letters) != 1:
+        return False
+    try:
+        step_verifier._equation(equation, next(iter(letters)))
+    except step_verifier._ExpressionIssue as error:
+        return error.code == "variable_denominator"
+    return False
 
 
 def _linear_expression_value(text, variable):
