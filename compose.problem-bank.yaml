@@ -1,0 +1,25 @@
+# 기존 compose.yaml과 함께 사용하면 공유 DB를 개인 Docker 볼륨에 초기 복사한다.
+# docker compose -f compose.yaml -f compose.problem-bank.yaml up --build --wait
+services:
+  problem-bank-init:
+    image: python:3.12-slim
+    command:
+      - python
+      - -B
+      - /tools/prepare_problem_bank.py
+      - --seed
+      - /seed/problem_bank.seed.sqlite3
+      - --manifest
+      - /seed/problem_bank.seed.json
+      - --database
+      - /var/lib/didgo/dev.db
+    volumes:
+      - ./data/problem_bank:/seed:ro
+      - ./backend/scripts/prepare_problem_bank.py:/tools/prepare_problem_bank.py:ro
+      - sqlite_data:/var/lib/didgo
+    restart: "no"
+
+  api:
+    depends_on:
+      problem-bank-init:
+        condition: service_completed_successfully

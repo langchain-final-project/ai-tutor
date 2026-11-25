@@ -1,0 +1,101 @@
+{
+  "version": "unit03-review-v1",
+  "status": "frozen_development_v1",
+  "purpose": "development_evaluation_not_independent_final_test",
+  "scope": {
+    "grade": 1,
+    "semester": 1,
+    "unit_code": "03"
+  },
+  "candidate_count": 435,
+  "initial_search_count": 1600,
+  "excluded_previous_development_count": 9,
+  "selection": "unit03-pilot-v1-seed42; per-topic numeric-template group holdout, ceil(20%), retain >=1 group per topic",
+  "bank_sha256": "7ed034723c9e12ff2d6cc242395646cffcfb7418fc840709cc81fcad6a3ee8df",
+  "classifier_sha256": "7d5aaff29fafd27ed29978aaf7be5d37ff305baf18bc3f2b92d656857b9fc205",
+  "selection_does_not_use_prediction_results": true,
+  "note": "Candidate IDs fixed before visual review. No model predictions shown in review sheets. Pending/ambiguous records excluded from scored frozen subset.",
+  "review": {
+    "scope": "all 435 original candidate images inspected; mathematical transcription compared with image and source label checked for compatibility",
+    "reviewer": "Codex single-agent visual first pass",
+    "human_expert_signed_off": false,
+    "no_classifier_predictions_used_in_admission": true,
+    "incorrect printed choices preserved": true,
+    "no_answer_or_solution_assets_used": true
+  },
+  "counts": {
+    "reviewed": 435,
+    "included": 404,
+    "quarantined": 31,
+    "corrected_transcriptions": 22,
+    "included_types": 78,
+    "search_pool": 1598,
+    "search_removed": 2,
+    "quarantine_reasons": {
+      "visual_condition_missing_from_text": 17,
+      "structured_table_input_not_supported": 5,
+      "label_requires_adjudication": 9
+    }
+  },
+  "duplicate_policy": {
+    "exact_and_numeric_template_cross_overlap": 0,
+    "signed_numbers_and_math_braces_normalized": true,
+    "near_numeric_template_char_3_4_tfidf_cosine_threshold": 0.95,
+    "paraphrased_semantic_duplicates_guaranteed_absent": false
+  },
+  "usage": {
+    "classification_input": "input.question_text only; input.has_visuals passed as the existing visual flag",
+    "ground_truth": "label.source_topic_code; never pass labels/review/source filenames to classifier",
+    "search": "rebuild UnitTypeMatcher with search_pool.jsonl; do not load the full 2044-question bank for this evaluation",
+    "quarantine": "exclude quarantine.jsonl from reported in-scope accuracy; preserve reasons and IDs",
+    "future_changes": "do not overwrite v1; create v2 and retain v1 hashes",
+    "independent_test": "not an untouched external or human-expert-certified final test"
+  },
+  "unsupported_included_types": [],
+  "files": {
+    "candidates.jsonl": {
+      "sha256": "ed807e540830b3f8a2c429ad98efbb703cca7f0a93691a02f1e3c0e3fb87bce7",
+      "bytes": 630651
+    },
+    "search_pool.initial.jsonl": {
+      "sha256": "3c9064ebeca9f0cf5e882f69e88078214b5b79c1174acca8f07c7d0bb3472c9b",
+      "bytes": 741035
+    },
+    "review_findings.json": {
+      "sha256": "9fcd8174a12fc9a77d41e3e119f79c1ca91af54483bdedcffaaceb8166477176",
+      "bytes": 10105
+    },
+    "whole_text_corrections.json": {
+      "sha256": "62a9b253829de45101a7a2aceecb9089970f2449ff48a4666f1eee95be51698d",
+      "bytes": 2993
+    },
+    "reviewed.jsonl": {
+      "sha256": "84fdb58fcc77ec8bb7f5df2b36b99bd7edbe45f1cc0e13bfef2b866005126cb7",
+      "bytes": 794889
+    },
+    "evaluation.jsonl": {
+      "sha256": "e485526b7b8600182f2742bad6355959d53752c896c3e1ac1c3ff75375d32ef8",
+      "bytes": 729259
+    },
+    "quarantine.jsonl": {
+      "sha256": "9aa2cc02b1e435a102f9c22d738000f077d97d3878773641d344f678925cb971",
+      "bytes": 65630
+    },
+    "search_pool.jsonl": {
+      "sha256": "9d8991bb31ecd531395750ee50be56ede039da6445ad1114822ffa41708e95ed",
+      "bytes": 740089
+    },
+    "search_exclusions.jsonl": {
+      "sha256": "e693411d6fc4a9df6cba730ac26d9ddff6b509293bfc59e2092ae9fc047e2278",
+      "bytes": 1150
+    },
+    "review.csv": {
+      "sha256": "acdc5e43be6bd69aa10516f0ad0af33381640031b59b38d2dfb2129bf57165a1",
+      "bytes": 300452
+    },
+    "review_packet.json": {
+      "sha256": "f2a13dcad1ac9e0833c7c6bc4ba0d9dc139546c8c7d86a559005230beafba5ca",
+      "bytes": 9176016
+    }
+  }
+}

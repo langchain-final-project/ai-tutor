@@ -1,0 +1,2 @@
+# SQLite 파일을 줄바꿈 변환 없이 바이너리로 공유한다.
+problem_bank.seed.sqlite3 binary

@@ -1,0 +1,836 @@
+.review-page {
+  width: 100%;
+  max-width: 1280px;
+  min-height: 100dvh;
+  margin-inline: auto;
+  background: var(--paper);
+  color: var(--navy);
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.review-brand {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.review-badge {
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--tint);
+  color: var(--blue);
+  font-size: 12px;
+}
+
+.review-main {
+  display: grid;
+  gap: 24px;
+  padding: 24px 20px;
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+}
+
+.review-steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0 0 20px;
+  border-bottom: 1px solid var(--border);
+  list-style: none;
+}
+
+.review-steps li {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.review-step-number {
+  display: grid;
+  place-items: center;
+  flex: 0 0 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--subtle);
+}
+
+.review-steps [aria-current="step"] {
+  color: var(--navy);
+  font-weight: 700;
+}
+
+.review-steps [aria-current="step"] .review-step-number {
+  background: var(--navy);
+  color: var(--paper);
+}
+
+.review-steps .is-complete .review-step-number {
+  background: var(--tint);
+  color: var(--blue);
+}
+
+.review-step-description {
+  display: none;
+}
+
+.review-workspace,
+.review-result-panel,
+.review-photo-status {
+  display: grid;
+  align-content: start;
+  gap: 24px;
+  min-width: 0;
+}
+
+.review-photo-status { gap: 8px; }
+
+.review-page--prepare .review-main {
+  max-width: 960px;
+  margin-inline: auto;
+}
+
+.review-photo-panel {
+  align-content: start;
+}
+
+.review-heading {
+  display: grid;
+  gap: 8px;
+}
+
+.review-heading h1 {
+  font-size: 24px;
+  line-height: 1.4;
+}
+
+.review-heading p,
+.review-section-heading p,
+.review-photo-placeholder p,
+.review-selection-empty {
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.review-section,
+.review-section-heading {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.review-section h2 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.review-section-heading {
+  gap: 4px;
+}
+
+.review-photo-placeholder {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  min-height: 220px;
+  padding: 20px;
+  border-radius: 16px;
+  background: var(--subtle);
+  text-align: center;
+}
+
+.review-content {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+}
+
+.review-paragraph {
+  margin: 0;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.review-live-preview {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.review-live-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--blue);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.review-live-spinner {
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: review-live-spin 1s linear infinite;
+}
+
+.review-live-notice {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.review-live-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.review-live-text p {
+  margin: 0;
+  line-height: 1.8;
+}
+
+.review-stream-math-pending {
+  color: var(--muted);
+}
+
+@keyframes review-live-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .review-live-spinner { animation: none; }
+}
+
+.review-part {
+  display: inline-block;
+  max-width: 100%;
+  min-height: 40px;
+  margin: 2px 0;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  vertical-align: middle;
+  white-space: pre-wrap;
+  text-align: left;
+  cursor: pointer;
+}
+
+.review-part[aria-pressed="true"] {
+  border-color: var(--blue);
+  background: var(--tint);
+}
+
+/* 여러 줄 본문이 수식 옆에서도 원래 읽기 순서대로 흐르게 합니다. */
+.review-text-part {
+  display: inline;
+  vertical-align: baseline;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.review-formula {
+  display: inline-block;
+  max-width: 100%;
+  overflow-x: auto;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.review-selection {
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.review-completion {
+  display: grid;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.review-completion button {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--navy);
+  font: inherit;
+  cursor: pointer;
+}
+
+.review-completion .review-confirm {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: var(--paper);
+}
+
+.review-completion button:disabled {
+  opacity: .5;
+  cursor: default;
+}
+
+.review-part:disabled,
+.review-part[aria-disabled="true"] {
+  cursor: wait;
+}
+
+.review-selection-kind {
+  margin-bottom: 8px;
+  color: var(--blue);
+  font-size: 13px;
+}
+
+.review-selected-content {
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.review-editor {
+  width: 100%;
+  max-width: 680px;
+  max-height: calc(var(--review-visible-height, 100dvh) - 16px);
+  margin: auto auto var(--review-keyboard-inset, 0px);
+  padding: 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--border);
+  border-radius: 20px 20px 0 0;
+  background: var(--paper);
+  color: var(--navy);
+}
+
+.review-editor::backdrop {
+  background: rgb(18 37 76 / 45%);
+}
+
+.review-editor form {
+  display: grid;
+  gap: 16px;
+}
+
+.review-editor h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.review-editor label {
+  font-size: 14px;
+}
+
+.review-editor textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--navy);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.review-editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.review-editor-actions button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--navy);
+  cursor: pointer;
+}
+
+.review-editor-actions .review-apply {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: var(--paper);
+}
+
+.review-help {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.review-error {
+  color: #b42318;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.review-photo-picker {
+  position: relative;
+  display: grid;
+  gap: 12px;
+}
+
+.review-photo-placeholder > span { font-size: 18px; font-weight: 700; }
+
+.review-photo-picker.is-dragging {
+  outline: 2px dashed var(--blue);
+  outline-offset: 6px;
+  border-radius: 16px;
+}
+
+.review-drop-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  border: 2px dashed var(--blue);
+  border-radius: 16px;
+  background: var(--tint);
+  color: var(--navy);
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.review-photo-viewer {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.review-photo-frame {
+  position: relative;
+  width: 100%;
+  height: clamp(260px, 42svh, 360px);
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--subtle);
+}
+
+.review-photo-image {
+  display: block;
+  max-width: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.review-photo-controls {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--paper);
+}
+
+.review-photo-controls button {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--subtle);
+  color: var(--navy);
+  cursor: pointer;
+}
+
+.review-photo-controls button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.review-photo-controls output {
+  min-width: 48px;
+  text-align: center;
+  font-size: 13px;
+}
+
+.review-photo-touch-help {
+  display: none;
+}
+
+/* 터치 중심 기기에서는 버튼 대신 손가락으로 조작합니다. */
+@media (hover: none) and (pointer: coarse) {
+  .review-photo-controls,
+  .review-photo-mouse-help,
+  .review-photo-drop-help {
+    display: none;
+  }
+
+  .review-photo-touch-help {
+    display: block;
+  }
+}
+
+.review-photo-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.review-photo-actions button,
+.review-math-shortcuts button {
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--navy);
+  cursor: pointer;
+}
+
+.review-photo-actions button:disabled {
+  opacity: .55;
+  cursor: wait;
+}
+
+.review-photo-actions .review-retake-primary {
+  order: -1;
+  border-color: var(--navy);
+  background: var(--navy);
+  color: white;
+}
+
+.review-editor.review-math-editor {
+  width: 100%;
+  max-width: 680px;
+  padding: 0;
+  border: 0;
+}
+
+.review-math-pad {
+  display: flex;
+  flex-direction: column;
+  max-height: calc(var(--review-visible-height, 100dvh) - 16px);
+  min-height: 0;
+}
+
+.review-math-body {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.review-math-pad > .review-editor-actions {
+  padding: 12px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.review-editor:not(.review-math-editor) .review-editor-actions {
+  position: sticky;
+  bottom: 0;
+  padding-top: 12px;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--paper);
+}
+
+.review-math-field {
+  min-width: 0;
+}
+
+.review-math-field math-field {
+  display: block;
+  width: 100%;
+  min-height: 64px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--navy);
+  font-size: 24px;
+}
+
+.review-math-field math-field::part(virtual-keyboard-toggle),
+.review-math-field math-field::part(menu-toggle) {
+  display: none;
+}
+
+.review-math-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.review-math-keyboard {
+  position: relative;
+  width: 100%;
+  flex-shrink: 0;
+}
+
+.review-quality-warning {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #e6bf59;
+  border-radius: 16px;
+  background: #fff8e5;
+}
+
+.review-quality-warning h3,
+.review-quality-warning p,
+.review-quality-warning ul {
+  margin: 0;
+}
+
+.review-quality-warning ul {
+  padding-left: 20px;
+}
+
+.review-quality-warning p,
+.review-quality-warning li {
+  line-height: 1.7;
+}
+
+.review-quality-warning button {
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--navy);
+  color: white;
+  font: inherit;
+  cursor: pointer;
+}
+
+.review-quality-warning button:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.review-unreadable {
+  padding: 1px 3px;
+  border-radius: 3px;
+  background: #fff0b3;
+  color: #8a3100;
+}
+
+.review-candidate-text {
+  margin: 8px 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: inherit;
+}
+
+
+.review-region-selector,
+.review-region-preview,
+.review-region-actions {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+}
+
+.review-region-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.review-region-selector h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.review-region-heading button,
+.review-region-actions button {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--paper);
+  color: var(--navy);
+  font: inherit;
+  cursor: pointer;
+}
+
+.review-region-actions button {
+  background: var(--navy);
+  color: white;
+}
+
+.review-region-heading button:disabled,
+.review-region-actions button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.review-region-stage {
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+  padding: 24px;
+  border-radius: 16px;
+  background: var(--subtle);
+}
+
+.review-region-stage .ReactCrop {
+  max-height: min(55svh, 440px);
+  --rc-drag-handle-size: 24px;
+  --rc-drag-handle-mobile-size: 44px;
+  --rc-drag-handle-bg-colour: var(--navy);
+  --rc-focus-color: var(--blue);
+}
+
+.review-region-image {
+  image-orientation: from-image;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.review-region-preview {
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.review-region-preview canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 320px;
+  width: auto;
+  height: auto;
+  margin-inline: auto;
+}
+
+
+.review-condition-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-condition-card {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.review-condition-label {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.review-condition-value {
+  min-width: 0;
+  overflow-x: auto;
+  overflow-wrap: anywhere;
+  font-size: 17px;
+  line-height: 1.8;
+}
+
+@media (max-width: 359px) {
+  .review-header { padding-inline: 16px; }
+  .review-main { padding-inline: 16px; }
+  .review-steps li { gap: 4px; font-size: 12px; }
+  .review-region-stage { padding: 12px; }
+  .review-photo-actions { gap: 8px; }
+  .review-math-shortcuts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (min-width: 768px) {
+  .review-header { min-height: 76px; padding-inline: 32px; }
+  .review-main { gap: 28px; padding: 32px; }
+  .review-heading h1 { font-size: 28px; }
+  .review-steps { gap: 24px; }
+  .review-steps li { gap: 12px; font-size: 15px; }
+  .review-step-number { flex-basis: 36px; height: 36px; }
+  .review-step-description { display: block; margin-top: 4px; font-size: 13px; font-weight: 400; }
+  .review-photo-placeholder { min-height: 300px; border: 1px dashed var(--border); }
+  .review-photo-frame { height: clamp(360px, 52svh, 520px); }
+  .review-region-stage .ReactCrop { max-height: min(65svh, 600px); }
+  .review-region-image { max-height: min(65svh, 600px); }
+  .review-editor,
+  .review-editor.review-math-editor {
+    width: calc(100% - 48px);
+    max-width: 640px;
+    margin: auto;
+    border-radius: 20px;
+  }
+  .review-completion { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .review-completion > p,
+  .review-completion > .review-reload { grid-column: 1 / -1; }
+}
+
+@media (min-width: 1024px) {
+  .review-page { border-inline: 1px solid var(--border); }
+  .review-page--compare .review-workspace {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: 32px;
+  }
+  .review-page--compare .review-photo-panel {
+    position: sticky;
+    top: 24px;
+  }
+  .review-page--compare .review-photo-frame { height: clamp(360px, 60svh, 680px); }
+  .review-page--compare .review-editor {
+    width: min(560px, calc(50vw - 48px));
+    margin-left: auto;
+    margin-right: max(24px, calc((100vw - 1280px) / 2 + 32px));
+  }
+  .review-page--compare .review-editor::backdrop { background: rgb(18 37 76 / 18%); }
+}
+
+@media (min-width: 1024px) and (max-height: 700px) {
+  .review-page--compare .review-photo-panel { position: static; }
+}
+
+/* 가로로 돌린 휴대폰에서는 수식과 키보드를 함께 볼 수 있게 나눕니다. */
+@media (min-width: 640px) and (max-height: 600px) {
+  .review-editor.review-math-editor {
+    width: calc(100% - 24px);
+    max-width: 960px;
+    margin: auto;
+    border-radius: 16px;
+  }
+  .review-math-pad {
+    display: grid;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  .review-math-body { grid-column: 1; grid-row: 1; gap: 12px; padding: 16px; }
+  .review-math-pad > .review-editor-actions { grid-column: 1; grid-row: 2; padding: 12px 16px; }
+  .review-math-keyboard { grid-column: 2; grid-row: 1 / 3; align-self: center; min-width: 0; }
+  .review-math-shortcuts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

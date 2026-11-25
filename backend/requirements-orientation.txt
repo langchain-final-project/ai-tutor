@@ -1,0 +1,5 @@
+# CPU 방향 분류. 본문·수식 OCR은 기존 Qwen 서버를 사용합니다.
+paddlepaddle==3.3.1
+paddleocr==3.7.0
+paddlex==3.7.2
+numpy==2.3.5

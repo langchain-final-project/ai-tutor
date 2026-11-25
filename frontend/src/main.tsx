@@ -5,6 +5,7 @@ import "@fontsource-variable/noto-sans-kr";
 import { ApiError, auth, authMessage } from "./auth";
 import { AdminPage } from "./AdminPage";
 import { HomePage } from "./HomePage";
+import { ProblemReviewPage } from "./ProblemReviewPage"
 import logo from "./assets/didgo.svg";
 import "./styles.css";
 
@@ -199,6 +200,10 @@ function AuthPage({ signup }: { signup: boolean }) {
 }
 
 function App() {
+  if (import.meta.env.DEV && location.pathname === "/review-preview") {
+    return <ProblemReviewPage />
+  }
+
   switch (location.pathname) {
     case adminUrl: return <AdminPage loginUrl={loginUrl} homeUrl={homeUrl} />;
     case homeUrl: return <HomePage loginUrl={loginUrl} adminUrl={adminUrl} />;

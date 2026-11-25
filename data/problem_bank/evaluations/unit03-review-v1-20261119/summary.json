@@ -1,0 +1,69 @@
+{
+  "version": "unit03-review-v1",
+  "status": "frozen_development_v1",
+  "reviewed_candidates": 435,
+  "evaluation_questions": 404,
+  "evaluation_types": 78,
+  "original_catalog_types": 81,
+  "unrepresented_types": [
+    {
+      "code": "7103026",
+      "name": "일차식과 수와의 곱셈, 나눗셈의 활용"
+    },
+    {
+      "code": "7103054",
+      "name": "규칙을 찾아 일차방정식 세우기"
+    },
+    {
+      "code": "7103088",
+      "name": "규칙을 찾는 문제"
+    }
+  ],
+  "corrected_transcriptions": 22,
+  "quarantined_questions": 31,
+  "quarantined_label_ambiguities": 9,
+  "quarantined_missing_visual_or_table_conditions": 22,
+  "search_questions": 1598,
+  "baseline": {
+    "dataset_version": "unit03-review-v1",
+    "dataset_manifest_sha256": "e5376486ece50829265f7af34249864adb7d66b300a9cc191b6b86a51bb51f2e",
+    "purpose": "development_evaluation_not_independent_final_test",
+    "classifier_version": "middle1-1-03-retrieval-v1",
+    "classifier_data_version": "da7f14098843ed29c222a0cf5ed405fee6d4220f85f774c9bc6e71309d1e741c",
+    "search_count": 1598,
+    "evaluation_count": 404,
+    "types": 78,
+    "top1_correct": 294,
+    "top3_correct": 365,
+    "top1_percent": 72.77,
+    "top3_percent": 90.35,
+    "macro_top1_percent": 67.23,
+    "statuses": {
+      "candidates": 404
+    },
+    "seconds": 29.73,
+    "notes": [
+      "Single-agent AI visual first pass; no human expert sign-off.",
+      "Development evaluation, not a blind external final test.",
+      "Quarantine and missing-only types excluded; coverage 78/81 source types.",
+      "Compare future runs against this exact dataset and search pool, not the earlier 435-question pilot."
+    ]
+  },
+  "rules": [
+    "AI visual first-pass review only; human expert adjudication is not claimed.",
+    "Only evaluation.jsonl is scored; quarantine.jsonl must remain excluded.",
+    "Use exactly search_pool.jsonl, rebuilding the existing UnitTypeMatcher in memory.",
+    "Pass only input.question_text and input.has_visuals to predict; never pass ground-truth labels, filenames or review notes.",
+    "Do not modify frozen v1 files. Corrections or adjudications require a new version.",
+    "Do not call changes from the old 435-question pilot an accuracy improvement; sample and search pool changed."
+  ],
+  "primary_files": [
+    "review.csv",
+    "evaluation.jsonl",
+    "quarantine.jsonl",
+    "manifest.json",
+    "baseline_results.json",
+    "misclassifications.csv",
+    "per_type_results.csv"
+  ]
+}
