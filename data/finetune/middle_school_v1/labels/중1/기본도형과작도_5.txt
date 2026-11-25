@@ -1,0 +1,10 @@
+[본문과 선택지]
+오른쪽 그림에서 $l \parallel m$일 때, $\angle x - \angle y$의 크기는?
+
+① $38^\circ$ ② $39^\circ$ ③ $40^\circ$ ④ $41^\circ$ ⑤ $42^\circ$
+
+[그림에 표시된 정보]
+$l$  $m$  $36^\circ$  $95^\circ$  $\angle x$  $\angle y$
+
+[판독 불가]
+없음

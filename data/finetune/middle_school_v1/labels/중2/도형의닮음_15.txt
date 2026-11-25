@@ -1,0 +1,21 @@
+[본문과 선택지]
+15
+오른쪽 그림과 같이 ∠A=90°인
+직각삼각형 ABC에서 $\overrightarrow{AB}=4$,
+$\overrightarrow{BC}=5$, $\overrightarrow{CA}=3$이다. 점 B를
+나고 $\overrightarrow{BC}$에 수직인 직선 $l$에 대하여
+△ABC의 부재중심 G와 직선
+$l$ 사이의 거리를 구하라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, G
+$\overrightarrow{AB}=4$
+$\overrightarrow{BC}=5$
+$\overrightarrow{CA}=3$
+$l$
+
+[판독 불가]
+없음

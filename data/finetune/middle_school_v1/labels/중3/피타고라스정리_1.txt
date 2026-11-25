@@ -1,0 +1,21 @@
+[본문과 선택지]
+01
+오른쪽 그림과 같이 $\overrightarrow{AB} = \overrightarrow{AC}$인
+$\triangle ABC$에서 $\overrightarrow{BD} = 7$, $\overrightarrow{CD} = 3$이
+다. $\overrightarrow{AB}$와 $\overrightarrow{AD}$의 길이가 모두 자
+연수일 때, $\triangle ABC$의 둘레의 길이
+를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A
+B
+D
+C
+$\overrightarrow{BD} = 7$
+$\overrightarrow{CD} = 3$
+
+[판독 불가]
+없음

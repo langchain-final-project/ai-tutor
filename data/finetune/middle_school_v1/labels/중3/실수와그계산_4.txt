@@ -1,0 +1,13 @@
+[본문과 선택지]
+0 < a < b < 1일 때, 다음 p, q, r, s를 근적부다 차례로 나열하여라.
+
+p = \sqrt{ab}, \quad q = \sqrt{\frac{b}{a}}, \quad r = a\sqrt{b}, \quad s = b\sqrt{a}
+
+[표]
+없음
+
+[그림에 표시된 정보]
+없음
+
+[판독 불가]
+없음

@@ -1,0 +1,20 @@
+[본문과 선택지]
+15
+오른쪽 그림과 같이 △ABC에서 ∠A의 이등분선과 $\overrightarrow{BC}$의 교점을 D라고 하고, 점 C에서 ∠A의 이등분선에 내린 수선의 발을 M이라 하자. $\overrightarrow{AD} = \overrightarrow{AB} = 3$, $\overrightarrow{AC} = 5$일 때, $\overrightarrow{AM}$의 길이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, M
+$\overrightarrow{AB} = 3$
+$\overrightarrow{AD} = 3$
+$\overrightarrow{AC} = 5$
+$\overrightarrow{AD} = \overrightarrow{AB} = 3$
+$\overrightarrow{AC} = 5$
+D는 $\overrightarrow{BC}$와 $\overrightarrow{AD}$의 교점
+M은 C에서 $\overrightarrow{AD}$에 내린 수선의 발
+D에서 M로의 선분은 수선
+
+[판독 불가]
+없음

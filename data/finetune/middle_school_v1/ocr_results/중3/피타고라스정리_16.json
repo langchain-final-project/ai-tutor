@@ -1,0 +1,30 @@
+{
+  "id": "ms_2d722ed5a7e123ef",
+  "image": "파인튜닝 작업/중3/피타고라스정리_16.jpg",
+  "image_sha256": "3aa681149bdbd9c0723fd7239f54354d8f84129378f2007b888048582af341fe",
+  "purpose": "unreviewed_ocr_label_draft",
+  "review_status": "pending_user_review",
+  "training_eligible": false,
+  "model_id": "Qwen/Qwen3-VL-4B-Instruct",
+  "model_revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+  "adapter_used": false,
+  "prompt": "사진에 인쇄된 수학 문제를 그대로 전사하세요.\n풀이, 정답, 요약, 문장 교정은 하지 마세요.\n수식은 LaTeX로 표현하세요.\n\n다음 네 항목으로 출력하세요.\n\n[본문과 선택지]\n사진에 보이는 문장을 읽는 순서대로 옮기세요.\n\n[표]\n실제 표가 있을 때만 행과 열의 대응을 유지하여 옮기세요.\n[빈칸]은 표 안에 실제로 비어 있는 칸에만 사용하세요.\n표가 없으면 '없음'이라고 적으세요.\n\n[그림에 표시된 정보]\n도형·그래프에 실제로 표시된 문자, 수치, 단위, 기호와\n명시적으로 표시된 관계만 적으세요.\n서로 다른 도형의 표시는 구분하세요.\n같은 도형의 같은 표시에 대한 설명은 한 번만 작성하세요.\n표시가 없는 항목을 새로 만들거나 [빈칸]으로 채우지 마세요.\n모양만 보고 수치나 기하 관계를 추측하지 마세요.\n\n[판독 불가]\n실제로 표시가 있지만 읽을 수 없는 부분만 적으세요.\n그 부분은 본문이나 그림 정보에서도 [판독 불가]로 표시하세요.\n해당하는 부분이 없으면 '없음'이라고 적으세요.\n\n네 항목을 작성한 뒤 출력을 마치세요.",
+  "processor_size": {
+    "shortest_edge": 65536,
+    "longest_edge": 2097152
+  },
+  "generation": {
+    "max_new_tokens": 1024,
+    "do_sample": false,
+    "use_cache": true
+  },
+  "image_tokens": 1230,
+  "generation_seconds": 17.808509399998,
+  "generated_tokens": 301,
+  "ended_with_eos": true,
+  "length_limit_reached": false,
+  "gpu_peak_allocated_gib": 3.83516788482666,
+  "quality_flags": [],
+  "ocr_text": "[본문과 선택지]\n16\n오른쪽 그림과 같이 일본의 동래의\n길이가 24이고, 높이가 8인 원기둥\n보양의 둥이 있다. 두 보선 PR, QS\n에 대하여 둥의 안쪽 면에 점 P로부터 2만큼 떨어진 PR 위의 점 A,\n둥의 바깥쪽 면에 점 Q로부터 4만큼 떨어진 QS 위의 점 B라 할 때, 원기둥의 면을 따라 점 A에서 점 B로 가는 최단 거리를 구하여라.\n(단, PQ는 빛면의 지름이고, 둥의 두께는 무시한다.)\n\n[표]\n없음\n\n[그림에 표시된 정보]\nPQ는 빛면의 지름이고, 둥의 두께는 무시한다.\nPR, QS는 둥의 안쪽 면과 바깥쪽 면에 각각 표시된 선분.\nP로부터 2만큼 떨어진 PR 위의 점 A.\nQ로부터 4만큼 떨어진 QS 위의 점 B.\nP, Q, R, S, A, B는 각각 그림에 표시된 점.\n\n[판독 불가]\n없음",
+  "draft_label_sha256": "6866a17a280cd650a8290f64f67fe833e0420482ff3cd8419c532adf1136a295"
+}

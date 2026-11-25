@@ -1,0 +1,11 @@
+[본문과 선택지]
+다음 그림과 같이 $\overrightarrow{AB} : \overrightarrow{AC} = 1 : 4$인 $\triangle ABC$에서 $\angle A$의 이등분선이 $\overline{BC}$와 만나는 점을 $D$라 하고, 점 $C$에서 $\angle A$의 이등분선에 내린 수선의 발을 $E$라 할 때, $\triangle ABD$와 $\triangle CDE$의 넓이의 비를 가장 간단한 자연수의 비로 나타내어라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+$\triangle ABC$, $D$, $E$, $\overrightarrow{AB}$, $\overrightarrow{AC}$, $\angle A$, $\angle A$의 이등분선, $\overline{BC}$, $\overline{CD}$, $\overline{CE} \perp \angle A$의 이등분선
+
+[판독 불가]
+없음

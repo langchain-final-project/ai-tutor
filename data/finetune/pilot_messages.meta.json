@@ -1,0 +1,48 @@
+{
+  "format_version": 1,
+  "format_name": "vision_conversation_v1",
+  "purpose": "training_smoke_test_only",
+  "created_at": "2026-11-24T03:44:58.643512+00:00",
+  "source_manifest": "data/finetune/manifest.json",
+  "source_manifest_sha256": "4d1ce28480775fffdf8a14ca3b46b9bdd0dabc337d3a300a4653731c74693eb7",
+  "jsonl_sha256": "55dc7715f230bb9e098ec4d745f0833568d64df72ac5bc684d2f5d568e776a28",
+  "sample_count": 5,
+  "group_count": 5,
+  "model_id": "Qwen/Qwen3-VL-4B-Instruct",
+  "model_revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+  "prompt_sha256": "fee84dc4a6f3da0934e96c5e909e8890bb36548148612006cedfc18b2029acd1",
+  "baseline_processor_size": {
+    "shortest_edge": 65536,
+    "longest_edge": 2097152
+  },
+  "image_loading": "Read the image field, apply EXIF orientation and RGB conversion, and fill the user image content item before applying the processor chat template.",
+  "target": "The assistant text is the user-reviewed transcription, not the baseline OCR prediction.",
+  "evaluation_note": "These are development examples already inspected. They are not an untouched final test set.",
+  "sample_sources": [
+    {
+      "id": "radicals_12_crop",
+      "label": "data/finetune/labels/루트_12.txt",
+      "baseline_result": ".venv/finetune-results/20261124_121543_917648.json"
+    },
+    {
+      "id": "simultaneous_07_crop",
+      "label": "data/finetune/labels/연립방정식_07.txt",
+      "baseline_result": ".venv/finetune-results/20261124_121746_164294.json"
+    },
+    {
+      "id": "relative_frequency_08",
+      "label": "data/finetune/labels/상대도수_표.txt",
+      "baseline_result": ".venv/finetune-results/20261123_224811_111793.json"
+    },
+    {
+      "id": "polygon_06_crop",
+      "label": "data/finetune/labels/다각형_06.txt",
+      "baseline_result": ".venv/finetune-results/20261124_094832_583409.json"
+    },
+    {
+      "id": "quadratic_graph_11",
+      "label": "data/finetune/labels/이차방정식_그래프_11.txt",
+      "baseline_result": ".venv/finetune-results/20261124_094201_929079.json"
+    }
+  ]
+}

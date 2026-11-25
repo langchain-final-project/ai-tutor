@@ -1,0 +1,17 @@
+[본문과 선택지]
+04
+오르쪽 그림과 같이
+∠A=90°인 직각삼각형
+ABC에서 $\overrightarrow{AB}$, $\overrightarrow{BC}$, $\overrightarrow{CA}$의
+중점을 각각 D, E, F라 하
+고 세 중선의 교점을 G라 한다. $\overrightarrow{BG}^2 + \overrightarrow{CG}^2 = 5$일 때,
+$\overrightarrow{AG}$의 길이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, E, F, G
+
+[판독 불가]
+없음

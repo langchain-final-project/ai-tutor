@@ -1,0 +1,17 @@
+[본문과 선택지]
+16
+오른쪽 그림과 같이 정사각형
+ABCD에서 $\overrightarrow{BC}$ 의 한 점 E에 대
+하여 $\angle EAD$의 이등분선과 $\overrightarrow{CD}$의
+교점을 F라고 하자. $\overrightarrow{BE}=3$, $\overrightarrow{DF}=6$
+일 때, $\overrightarrow{AE}$의 길이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, E, F
+$\overrightarrow{BE}=3$, $\overrightarrow{DF}=6$
+
+[판독 불가]
+없음

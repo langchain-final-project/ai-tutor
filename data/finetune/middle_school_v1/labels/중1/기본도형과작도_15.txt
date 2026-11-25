@@ -1,0 +1,20 @@
+[본문과 선택지]
+15
+오른쪽 그림의
+직각삼각형 ABC에 대하여
+다음 중 옳지 않은 것은?
+
+① ∠B의 대변은 $\overrightarrow{AC}$이다.
+② ∠C의 대변은 $\overrightarrow{AB}$이다.
+③ $\overrightarrow{AB}$의 대각은 예각이다.
+④ $\overrightarrow{AC}$의 대각은 직각이다.
+⑤ ∠A + ∠C = 80°이다.
+
+[그림에 표시된 정보]
+A
+B
+C
+∠B = 90°
+
+[판독 불가]
+없음

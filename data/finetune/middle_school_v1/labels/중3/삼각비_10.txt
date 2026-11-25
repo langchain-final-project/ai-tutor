@@ -1,0 +1,21 @@
+[본문과 선택지]
+10
+오른쪽 그림과 같이 $\overrightarrow{AB}=6$,
+$\overrightarrow{BC}=8$, $\overrightarrow{AC}=10$인 직각삼각형
+$ABC$에서 $\overrightarrow{BC}$, $\overrightarrow{AC}$ 위에 각각
+점 $D$, $E$가 있다.
+$\triangle CDE=\frac{1}{2}\triangle ABC$일 때, $\overrightarrow{DE}$
+의 길이의 최솟값을 구하라.
+
+[그림에 표시된 정보]
+A
+6
+B
+D
+8
+C
+E
+10
+
+[판독 불가]
+없음

@@ -1,0 +1,20 @@
+[본문과 선택지]
+20
+오른쪽 그림과 같은 △ABC
+에서 $\overrightarrow{BC} = 8$이고 $\overrightarrow{PQ} \parallel \overrightarrow{BA}$,
+$\overrightarrow{PR} \parallel \overrightarrow{CA}$일 때, □PQAR의
+넓이는 △ABC의 넓이의 $\frac{3}{8}$
+이다. 이때 $\overrightarrow{BP}$의 길이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, P, Q, R, S
+$\overrightarrow{BC} = 8$
+$\overrightarrow{PQ} \parallel \overrightarrow{BA}$
+$\overrightarrow{PR} \parallel \overrightarrow{CA}$
+□PQAR
+
+[판독 불가]
+없음

@@ -1,0 +1,18 @@
+[본문과 선택지]
+04
+오른쪽 그림과 같은 직사각형
+ABCD를 $\overrightarrow{CD}$의 중점 M에 대하여 $\overrightarrow{BM}$을 접하는 선으로 하여 점 C가
+점 F에 오도록 접었다. 점 F에서
+$\overrightarrow{AD}$에 내린 수선의 발을 F라 할 때,
+$\triangle DEF$의 넓이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, F, E, M
+$\overrightarrow{CD}$, $\overrightarrow{BM}$, $\overrightarrow{AD}$, $\overrightarrow{EF}$
+4, 5, 6
+
+[판독 불가]
+없음

@@ -1,0 +1,11 @@
+[본문과 선택지]
+오른쪽 그림에서 □ABCD는 평행사변형이다. $\overrightarrow{BC}$의 연장선 위에 $\overrightarrow{BC} = \overrightarrow{CE}$가 되는 점 E를 잡고, 점 E에서 $\overrightarrow{AB}$에 수선 $\overrightarrow{EF}$를 그어 $\overrightarrow{CD}$의 만나는 점을 G라 하자. $\overrightarrow{DC} = \overrightarrow{DE}$, $\angle BEF = 20^\circ$일 때, $\angle AFD$의 크기를 구하라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, E, F, G, $\angle BEF = 20^\circ$, $\overrightarrow{BC} = \overrightarrow{CE}$, $\overrightarrow{DC} = \overrightarrow{DE}$, $\overrightarrow{EF} \perp \overrightarrow{AB}$, $\overrightarrow{EF}$와 $\overrightarrow{CD}$의 교점은 G
+
+[판독 불가]
+없음

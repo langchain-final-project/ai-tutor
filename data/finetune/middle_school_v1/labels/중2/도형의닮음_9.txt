@@ -1,0 +1,11 @@
+[본문과 선택지]
+다음 그림과 같이 $\overline{AB} = \overline{AC}$인 이등변삼각형 $ABC$의 변 $AB$와 $AC$ 위에 각각 $\overline{AD} = 3\,\mathrm{cm}$, $\overline{AE} = 2\,\mathrm{cm}$인 점 $D$와 $E$를 잡자. 또 점 $B$를 지나고 $\overline{AC}$에 평행한 직선이 직선 $DE$와 만나는 점을 $F$라고 하고, 점 $C$를 지나고 $\overline{AB}$에 평행한 직선이 직선 $DE$와 만나는 점을 $G$라고 하자. $\square BCEF = 24\,\mathrm{cm}^2$일 때, $\square BCGD$의 넓이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+$\overline{AB} = \overline{AC}$, $\overline{AD} = 3\,\mathrm{cm}$, $\overline{AE} = 2\,\mathrm{cm}$, $\square BCEF = 24\,\mathrm{cm}^2$, $\square BCGD$, $F$, $G$, $D$, $E$
+
+[판독 불가]
+없음

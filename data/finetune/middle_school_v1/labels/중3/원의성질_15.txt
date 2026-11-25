@@ -1,0 +1,19 @@
+[본문과 선택지]
+15
+오른쪽 그림과 같이 $\overline{AB}$를 지
+름으로 하는 원 O에서 $\overline{AB}$가
+$\overline{CD}$와 만나는 점을 E라 한다.
+$\angle DEB = 60^\circ$이고
+$\overline{AE} = 3\,\text{cm}, \overline{CE} = 5\,\text{cm}$일 때,
+원 O의 반지름의 길이를 구하여라.
+
+[그림에 표시된 정보]
+A, B, C, D, O, E
+$\angle DEB = 60^\circ$
+$\overline{AE} = 3\,\text{cm}$
+$\overline{CE} = 5\,\text{cm}$
+3cm
+5cm
+
+[판독 불가]
+없음

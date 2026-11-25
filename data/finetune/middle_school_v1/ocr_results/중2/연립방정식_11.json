@@ -1,0 +1,30 @@
+{
+  "id": "ms_dbf3b71ff1d9c544",
+  "image": "파인튜닝 작업/중2/연립방정식_11.jpg",
+  "image_sha256": "9fa29e0a89e854c9545cb437e0101f27745f6046e1542f8f5e045e5da5e30073",
+  "purpose": "unreviewed_ocr_label_draft",
+  "review_status": "pending_user_review",
+  "training_eligible": false,
+  "model_id": "Qwen/Qwen3-VL-4B-Instruct",
+  "model_revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+  "adapter_used": false,
+  "prompt": "사진에 인쇄된 수학 문제를 그대로 전사하세요.\n풀이, 정답, 요약, 문장 교정은 하지 마세요.\n수식은 LaTeX로 표현하세요.\n\n다음 네 항목으로 출력하세요.\n\n[본문과 선택지]\n사진에 보이는 문장을 읽는 순서대로 옮기세요.\n\n[표]\n실제 표가 있을 때만 행과 열의 대응을 유지하여 옮기세요.\n[빈칸]은 표 안에 실제로 비어 있는 칸에만 사용하세요.\n표가 없으면 '없음'이라고 적으세요.\n\n[그림에 표시된 정보]\n도형·그래프에 실제로 표시된 문자, 수치, 단위, 기호와\n명시적으로 표시된 관계만 적으세요.\n서로 다른 도형의 표시는 구분하세요.\n같은 도형의 같은 표시에 대한 설명은 한 번만 작성하세요.\n표시가 없는 항목을 새로 만들거나 [빈칸]으로 채우지 마세요.\n모양만 보고 수치나 기하 관계를 추측하지 마세요.\n\n[판독 불가]\n실제로 표시가 있지만 읽을 수 없는 부분만 적으세요.\n그 부분은 본문이나 그림 정보에서도 [판독 불가]로 표시하세요.\n해당하는 부분이 없으면 '없음'이라고 적으세요.\n\n네 항목을 작성한 뒤 출력을 마치세요.",
+  "processor_size": {
+    "shortest_edge": 65536,
+    "longest_edge": 2097152
+  },
+  "generation": {
+    "max_new_tokens": 1024,
+    "do_sample": false,
+    "use_cache": true
+  },
+  "image_tokens": 1564,
+  "generation_seconds": 18.16910690000077,
+  "generated_tokens": 263,
+  "ended_with_eos": true,
+  "length_limit_reached": false,
+  "gpu_peak_allocated_gib": 4.247272968292236,
+  "quality_flags": [],
+  "ocr_text": "[본문과 선택지]\n같은 종류의 만화책 A권과 만화책보다 두꺼운 같은 종류의 소설책 B권으로 가득 차 있는 책꽂이가 있다. 이 책꽂이는 만화책 C권, 소설책 D권을 꽂아도 가득 채워지고, 만화책 E권만으로도 가득 채워진다고 한다. A, B, C, D, E는 모두 자연수이며, 다음 중 E를 A, B, C, D에 관한 식으로 나타내는 것은? (단, A ≠ C, B ≠ D)\n\n① $\\frac{AB+CD}{B+D}$ ② $\\frac{AB^{\\ast}+CD^{\\ast}}{B^{\\ast}+D^{\\ast}}$ ③ $\\frac{BC-AD}{B-D}$\n\n④ $\\frac{AB-CD}{B-D}$ ⑤ $\\frac{AB^{\\ast}-CD^{\\ast}}{B^{\\ast}-D^{\\ast}}$\n\n[표]\n없음\n\n[그림에 표시된 정보]\n없음\n\n[판독 불가]\n없음",
+  "draft_label_sha256": "ea6d5eb88fabdd3362957e5580fa36ff55e19811785aed0e3cb906204984bdfa"
+}

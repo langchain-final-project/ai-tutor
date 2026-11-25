@@ -1,0 +1,17 @@
+[본문과 선택지]
+11
+오른쪽 그림과 같이
+$\overrightarrow{AB} = \overrightarrow{AC} = \overrightarrow{BD} = \overrightarrow{CD} = 3$
+이고, $\overrightarrow{AD} = \overrightarrow{BC} = 2$인 시점에
+A-BCD에 내접하는 구의 반
+지름의 길이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D
+$\overrightarrow{AB}, \overrightarrow{AC}, \overrightarrow{BD}, \overrightarrow{CD}, \overrightarrow{AD}, \overrightarrow{BC}$
+
+[판독 불가]
+없음

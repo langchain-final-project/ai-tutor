@@ -1,0 +1,18 @@
+[본문과 선택지]
+13 1강시 기출 유사
+오른쪽 그림과 같이 가로, 세로
+의 길이가 각각 8, 6인 직사각
+형 ABCD에서 $\overrightarrow{AC}$와 $\overrightarrow{BD}$의
+교점을 O라 한다. $\triangle ABO$를
+잘라내고, $\overrightarrow{OC}$, $\overrightarrow{OD}$를
+$\overrightarrow{AO}$, $\overrightarrow{BO}$가 맞닿도록 사변체 모양을
+만들 때, 이 사변체의
+부피를 구하라.
+
+[그림에 표시된 정보]
+A, B, C, D, O
+AO, BO, OC, OD
+8, 6
+
+[판독 불가]
+없음

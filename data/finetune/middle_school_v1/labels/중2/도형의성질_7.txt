@@ -1,0 +1,11 @@
+[본문과 선택지]
+다음 그림과 같이 직사각형 ABCD의 한 꼭짓점 B에서 $\overrightarrow{CD}$ 위의 한 점 E를 지나는 직선을 그어 $\overrightarrow{AD}$의 연장선과 만나는 점을 F라 하자. $\overrightarrow{EF}$의 중점 M에 대하여 $\overrightarrow{ED} = \overrightarrow{DM}$, $\angle BDC = 36^\circ$일 때, $\angle DEF$의 크기를 구하라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, E, F, M, $\angle BDC = 36^\circ$, $\overrightarrow{ED} = \overrightarrow{DM}$
+
+[판독 불가]
+없음

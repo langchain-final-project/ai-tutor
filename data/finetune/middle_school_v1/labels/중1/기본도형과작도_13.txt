@@ -1,0 +1,21 @@
+[본문과 선택지]
+13
+다음 그림은 ∠XOY와 크기가 같은 각을
+반직선 PQ를 한 번으로 하여 작도한 것이다.
+다음 중 옳지 않은 것은?
+
+① $\overline{OB} = \overline{PC}$
+
+② ∠AOB = ∠CPD
+
+③ $\overline{AB} = \overline{CD}$
+
+④ $\overline{OB} = \overline{AB}$
+
+⑤ $\overline{PC} = \overline{PD}$
+
+[그림에 표시된 정보]
+O, X, Y, A, B, P, C, D, Q
+
+[판독 불가]
+없음

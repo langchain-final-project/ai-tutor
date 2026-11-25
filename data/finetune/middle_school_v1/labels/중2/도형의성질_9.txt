@@ -1,0 +1,21 @@
+[본문과 선택지]
+다음 그림과 같은 △ABC에서 $\overline{AC} = \overline{BC} = 10$이고, $\angle C = 120^\circ$이다. $\overline{AC}$와 $\overline{AB}$의 연장선, $\overline{BC}$의 연장선에 접하는 원 $O$에 대하여 점 $O$에서 $\overline{BA}$, $\overline{BC}$의 연장선에 내린 수선의 발을 각각 $P$, $Q$라고 하고, $\angle A$의 외각의 이등분선이 $\overline{BC}$의 연장선과 만나는 점을 $D$라 할 때, $\overline{QD}$의 길이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- △ABC
+- $\angle C = 120^\circ$
+- $\overline{AC} = \overline{BC} = 10$
+- 원 $O$
+- 점 $P$: $\overline{BA}$의 연장선과 원 $O$의 접점
+- 점 $Q$: $\overline{BC}$의 연장선과 원 $O$의 접점
+- 점 $D$: $\angle A$의 외각의 이등분선과 $\overline{BC}$의 연장선의 교점
+- $O$에서 $\overline{BA}$에 내린 수선의 발은 $P$
+- $O$에서 $\overline{BC}$에 내린 수선의 발은 $Q$
+- $O$에서 $\overline{BC}$에 내린 수선의 발은 $Q$
+- $Q$에서 $\overline{BC}$에 수선을 내린 선은 $QD$
+
+[판독 불가]
+없음

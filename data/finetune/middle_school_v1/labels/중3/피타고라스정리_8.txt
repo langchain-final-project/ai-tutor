@@ -1,0 +1,18 @@
+[본문과 선택지]
+08 [경시 기출 유사]  
+다음 그림과 같이 직사각형 모양의 종이 ABCD를 $\overrightarrow{EF}$  
+와 $\overrightarrow{GH}$를 선으로 하여 $\overrightarrow{EA'}\parallel\overrightarrow{GD'}$이 되도록 각각  
+절었다. $\overline{AB}=1$, $\overline{EF}=3$일 때, $\triangle EFP$와 $\triangle CQH$의 넓  
+이의 比를 구하여라.
+
+[표]  
+없음
+
+[그림에 표시된 정보]  
+A, B, C, D, E, G, F, H, P, Q, D', A'  
+$\overline{AB}=1$, $\overline{EF}=3$  
+$\overrightarrow{EA'}\parallel\overrightarrow{GD'}$  
+$\triangle EFP$, $\triangle CQH$
+
+[판독 불가]  
+없음

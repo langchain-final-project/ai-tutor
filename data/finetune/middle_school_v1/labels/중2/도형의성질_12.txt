@@ -1,0 +1,13 @@
+[본문과 선택지]
+12
+오른쪽 그림과 같이 평행사변형 ABCD에서 $\overrightarrow{AB}$, $\overrightarrow{AD}$ 위에 $\overrightarrow{BF} = \overrightarrow{DE}$가 되도록 각각 E, F를 점고 $\overrightarrow{BF}$와 $\overrightarrow{DE}$의 교점을 P라 하자.
+$\angle BPD = 162^\circ$일 때, $\angle BPC$의 크기를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, E, F, P
+
+[판독 불가]
+없음

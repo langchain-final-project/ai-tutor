@@ -1,0 +1,22 @@
+[본문과 선택지]
+07
+오른쪽 그림과 같이 $\overline{AB}$, $\overline{CD}$를
+작각 지름으로 하는 두 원 $O$, $O'$
+이 점 $B$에서 내접하고 있다.
+$\overline{AB} \perp \overline{CD}$, $\overline{AF} = 8$, $\overline{CE} = 5$일
+때, 원 $O'$의 반지름의 길이를 구
+하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+$A$, $B$, $C$, $D$, $E$, $F$, $O$, $O'$
+$\overline{AF} = 8$
+$\overline{CE} = 5$
+$\overline{AB} \perp \overline{CD}$
+$F$, $O$, $O'$는 직선 위에 있음
+$E$, $O'$는 직선 위에 있음
+
+[판독 불가]
+없음

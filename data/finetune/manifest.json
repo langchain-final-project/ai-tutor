@@ -1,0 +1,116 @@
+{
+  "format_version": 1,
+  "samples": [
+    {
+      "id": "radicals_12_crop",
+      "group_id": "radicals_12",
+      "image": "C:/Users/gkoh/Desktop/수업/랭체인/최종프로젝트/data/InputData/루트.jpg",
+      "label": "data/finetune/labels/루트_12.txt",
+      "baseline_result": ".venv/finetune-results/20261124_121543_917648.json",
+      "image_sha256": "c67954d11d3a3a639e90827ecc777e6e6b63df1283ba8e8d15361985580698e8",
+      "label_sha256": "dc14e02c5e87e858f12499ddffa66b1c56fe56c456cee696c060748b9d2389c9",
+      "review_status": "user_verified",
+      "split": "train"
+    },
+    {
+      "id": "simultaneous_07_crop",
+      "group_id": "simultaneous_07",
+      "image": "C:/Users/gkoh/Desktop/수업/랭체인/최종프로젝트/data/InputData/연립방정식-07.jpg",
+      "label": "data/finetune/labels/연립방정식_07.txt",
+      "baseline_result": ".venv/finetune-results/20261124_121746_164294.json",
+      "image_sha256": "684c34ba2ac60eefcd003b5044f52747897d56247c8319aac7ba075a496118f9",
+      "label_sha256": "d40383d32bd5a1d18273dc392fb867eaf98a28eaf328cbd0afdb332a3882b0eb",
+      "review_status": "user_verified",
+      "split": "validation"
+    },
+    {
+      "id": "relative_frequency_08",
+      "group_id": "relative_frequency_08",
+      "image": "C:/Users/gkoh/Desktop/수업/랭체인/최종프로젝트/data/InputData/상대도수_표.jpg",
+      "label": "data/finetune/labels/상대도수_표.txt",
+      "baseline_result": ".venv/finetune-results/20261123_224811_111793.json",
+      "image_sha256": "bf1efac1ff617d9072b0e2fd1346cace15e1620b8fdf8d225ceefed18ebfaf7f",
+      "label_sha256": "955247caa5301064e006fce14223f8afcab66038b31ecb82532231a908d230d2",
+      "review_status": "user_verified",
+      "split": "validation"
+    },
+    {
+      "id": "polygon_06_crop",
+      "group_id": "polygon_06",
+      "image": "C:/Users/gkoh/Desktop/수업/랭체인/최종프로젝트/data/InputData/다각형.jpg",
+      "label": "data/finetune/labels/다각형_06.txt",
+      "baseline_result": ".venv/finetune-results/20261124_094832_583409.json",
+      "image_sha256": "b67f475fe7f5329c15d6854d1ce8cb1359a12271ba38ddd077d909d0ae131dac",
+      "label_sha256": "f287ff5b9c104ebb9e22aac1038c3ab2f6efebdf58788aef7a8a6eceba4d1ef3",
+      "review_status": "user_verified",
+      "split": "train"
+    },
+    {
+      "id": "quadratic_graph_11",
+      "group_id": "quadratic_graph_11",
+      "image": "C:/Users/gkoh/Desktop/수업/랭체인/최종프로젝트/data/InputData/이차방정식 그래프.jpg",
+      "label": "data/finetune/labels/이차방정식_그래프_11.txt",
+      "baseline_result": ".venv/finetune-results/20261124_094201_929079.json",
+      "image_sha256": "161d1da19d5da46bd160edc223fc175b12a48a58512b6efeb9bbc2d94d4408db",
+      "label_sha256": "993c7f1d1c73dd3b71054b8ffed8952c86793a067267751ac52242c47f9e25de",
+      "review_status": "user_verified",
+      "split": "train"
+    },
+    {
+      "id": "product_parts_24",
+      "group_id": "product_parts_24",
+      "image": "C:/Users/gkoh/Desktop/수업/랭체인/최종프로젝트/data/InputData/연립일차방정식활용.jpg",
+      "label": "data/finetune/labels/연립일차방정식활용_24.txt",
+      "baseline_result": ".venv/finetune-results/20261123_225733_432571.json",
+      "image_sha256": "6a8808f5d06ac55be3cfe1883b5c80c36f982e5a27f05a5388b7e0c6ce6cada7",
+      "label_sha256": "a6eb598d01a533a9885750c42c775227c623a09f8510c451c0ec41bdcc96765a",
+      "review_status": "user_verified",
+      "split": "train"
+    },
+    {
+      "id": "triangle_angles_07",
+      "group_id": "triangle_angles_07",
+      "image": "C:/Users/gkoh/Desktop/수업/랭체인/최종프로젝트/data/InputData/삼각형의각성질.jpg",
+      "label": "data/finetune/labels/삼각형의각성질_07.txt",
+      "baseline_result": ".venv/finetune-results/20261123_225952_496814.json",
+      "image_sha256": "22e6e2dfc3e9f9bbf043ae1dcf7edc1bc005adbb2403efb91c52e319a9bec0b2",
+      "label_sha256": "5304f5d58bba42413aecb8d8a6e92f9067d0d66ab9cb5d9001e2010f9708bbeb",
+      "review_status": "user_verified",
+      "split": "train"
+    },
+    {
+      "id": "linear_graph_07",
+      "group_id": "linear_graph_07",
+      "image": "C:/Users/gkoh/Desktop/수업/랭체인/최종프로젝트/data/InputData/일차함수.jpg",
+      "label": "data/finetune/labels/일차함수_07.txt",
+      "baseline_result": ".venv/finetune-results/20261123_224607_771882.json",
+      "image_sha256": "8a8a9ff84f7f96f522739dcf9ea45c96956a1bcafe7db9a0e54f167d71a55c13",
+      "label_sha256": "95f7fee68130084f7902696c1b715f4763f3cb735f4a508fd64722cba2f43156",
+      "review_status": "user_verified",
+      "split": "train"
+    },
+    {
+      "id": "congruence_21",
+      "group_id": "congruence_21",
+      "image": "C:/Users/gkoh/Desktop/수업/랭체인/최종프로젝트/data/InputData/합동조건.jpg",
+      "label": "data/finetune/labels/합동조건_21.txt",
+      "baseline_result": ".venv/finetune-results/20261124_091054_351594.json",
+      "image_sha256": "c2ef082866d0a7e670f0ca3905a6fbfb8893fc0114cb0906c375c21c7ed48512",
+      "label_sha256": "01b938d9c7ce6d42ee379976d427b805e1b7b474fd28fc36a069e855c60a1b34",
+      "review_status": "user_verified",
+      "split": "train"
+    },
+    {
+      "id": "linear_decimal_18_occluded",
+      "group_id": "linear_decimal_18",
+      "image": "C:/Users/gkoh/Desktop/수업/랭체인/최종프로젝트/data/InputData/문제를가린사진.jpg",
+      "label": "data/finetune/labels/문제를가린사진_일차방정식.txt",
+      "baseline_result": ".venv/finetune-results/20261124_095703_617430.json",
+      "image_sha256": "a413357f1eac53782f3f35a6258302abe7380dfc5ddec8f477d818bc444ddf57",
+      "label_sha256": "a206421fa94fc61077c5c0c65b52dd62a69e10a716d8ede5c1a437a2eeb8cca3",
+      "review_status": "user_verified",
+      "split": "train"
+    }
+  ],
+  "evaluation_note": "Development pilot only. Validation examples have already been inspected; they are not an untouched final test set. Keep all photos, crops, and numeric variants of a source problem in one group. linear_decimal_18 includes normal, blurred, occluded, margin-occluded, and cut-off photos of the same problem."
+}

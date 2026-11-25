@@ -1,0 +1,17 @@
+[본문과 선택지]
+7
+두 수 $2^2 \times 3^2 \times 5$, $2^2 \times 3 \times 7$의 최대공약수와 최소공배수를 차례로 쓰 것은?
+① $2 \times 3$, $2 \times 3 \times 5 \times 7$
+② $2 \times 3$, $2^2 \times 3^2 \times 5 \times 7$
+③ $2^2 \times 3$, $2^2 \times 3^2 \times 5 \times 7$
+④ $2^2 \times 3$, $2^1 \times 3^3 \times 5 \times 7$
+⑤ $2^1 \times 3^3$, $2^1 \times 3^3 \times 5 \times 7$
+
+[표]
+없음
+
+[그림에 표시된 정보]
+없음
+
+[판독 불가]
+없음

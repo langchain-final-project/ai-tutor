@@ -1,0 +1,17 @@
+[본문과 선택지]
+오른쪽 그림과 같이 $\overrightarrow{AD} \parallel \overrightarrow{BC}$인 등변사다리꼴 $ABCD$에서 $\overrightarrow{AD} = 4$, $\overrightarrow{AB} = 8$, $\overrightarrow{BC} = 9$일 때, $\overrightarrow{AC}$의 길이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- $A$, $B$, $C$, $D$ : 정점
+- $AD = 4$
+- $AB = 8$
+- $BC = 9$
+- $\overrightarrow{AD} \parallel \overrightarrow{BC}$
+- $A$에서 $D$로 가는 선분, $B$에서 $C$로 가는 선분, $A$에서 $C$로 가는 선분, $B$에서 $D$로 가는 선분이 그려져 있음
+- $A$와 $D$ 사이, $B$와 $C$ 사이에 점이 표시되어 있음
+
+[판독 불가]
+없음

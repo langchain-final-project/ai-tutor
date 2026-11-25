@@ -1,0 +1,13 @@
+[본문과 선택지]
+16 |독록 7출 문제|
+오른쪽 그림과 같은
+□ABCD에서 $\overrightarrow{AB} = \overrightarrow{AD} = 6$,
+$\overrightarrow{AE} = \overrightarrow{BE} = \overrightarrow{CE} = \overrightarrow{DE} = 5$일
+때, $\overrightarrow{CD}$의 길이를 구하여라.
+
+[그림에 표시된 정보]
+A, B, C, D, E, L
+AB = 6, AD = 6, AE = 5, BE = 5, CE = 5, DE = 5, AL = 5, DL = 5, BL = 5, CL = 6
+
+[판독 불가]
+없음

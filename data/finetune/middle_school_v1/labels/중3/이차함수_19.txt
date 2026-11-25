@@ -1,0 +1,27 @@
+[본문과 선택지]
+19
+오른쪽 그림과 같이 $\overrightarrow{AB}=4$,
+$\overrightarrow{BC}=3$, $\overrightarrow{AC}=5$인 직각삼각형
+ABC에 직사각형 DEFG가 내접
+하고 있다. 이때 $\square DEFG$의 넓이
+가 최대가 되도록 하는 $\overrightarrow{AG}$의 길이
+와 그때의 $\square DEFG$의 넓이를
+차례로 구하라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, E, F, G
+$\overrightarrow{AB}=4$, $\overrightarrow{BC}=3$, $\overrightarrow{AC}=5$
+$\square DEFG$
+D, E, F, G는 각각 AB, BC, AC, AB 위에 있음
+D는 AB 위, E는 BC 위, F는 AC 위, G는 AB 위
+D에서 E로, E에서 F로, F에서 G로, G에서 D로의 선분이 직각삼각형의 변과 평행하게 연결됨
+D에서 E로의 선분과 AB는 직각
+E에서 F로의 선분과 BC는 직각
+F에서 G로의 선분과 AC는 직각
+G에서 D로의 선분과 AB는 직각
+
+[판독 불가]
+없음

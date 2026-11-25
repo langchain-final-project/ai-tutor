@@ -1,0 +1,12 @@
+[본문과 선택지]
+09
+오른쪽 그림과 같이 사각형 ABCD에서 $\overrightarrow{AB} = \overrightarrow{AC} = \overrightarrow{AD}$, $\angle CAB = 90^\circ$이고, 두 대각선 AC와 BD의 교점 M에 대하여 $\overrightarrow{AM} = 2$, $\overrightarrow{MC} = 1$일 때, $13\overrightarrow{BD}^2$의 값을 구하라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, M, $\overrightarrow{AB}$, $\overrightarrow{AC}$, $\overrightarrow{AD}$, $\angle CAB$, $\overrightarrow{AM} = 2$, $\overrightarrow{MC} = 1$, 3, 2, 1
+
+[판독 불가]
+없음

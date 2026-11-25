@@ -1,0 +1,17 @@
+[본문과 선택지]
+다음 그림과 같은 △ABC에서 ∠A의 이등분선이 $\overline{BC}$와 만나는 점을 D, $\overline{AD}$의 수직이등분선과 $\overline{BC}$의 연장선이 만나는 점을 E라 한다. $\overline{BE}=14\,\text{cm}$, $\overline{CE}=6\,\text{cm}$일 때, $\overline{DE}$의 길이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- △ABC
+- $\overline{BC}$, $\overline{BE}$, $\overline{CE}$, $\overline{DE}$
+- $\overline{BE} = 14\,\text{cm}$
+- $\overline{CE} = 6\,\text{cm}$
+- $\overline{AD}$의 이등분선
+- $\overline{AD}$의 수직이등분선
+- 점 D, 점 E
+
+[판독 불가]
+없음

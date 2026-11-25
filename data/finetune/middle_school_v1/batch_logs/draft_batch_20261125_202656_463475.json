@@ -1,0 +1,2217 @@
+{
+  "status": "completed",
+  "purpose": "unreviewed_ocr_label_drafts",
+  "training_executed": false,
+  "adapter_used": false,
+  "manifest": "C:\\Users\\gkoh\\.vscode\\KDT\\ai-tutor\\data\\finetune\\middle_school_v1\\manifest.json",
+  "manifest_sha256": "499c962b75dcc6fddf576c8eca2ff00b5d3b3fd89432f47de8ab7b977916b0b8",
+  "model_id": "Qwen/Qwen3-VL-4B-Instruct",
+  "model_revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+  "processor_size": {
+    "shortest_edge": 65536,
+    "longest_edge": 2097152
+  },
+  "generation": {
+    "max_new_tokens": 1024,
+    "do_sample": false,
+    "use_cache": true
+  },
+  "quantization": {
+    "quant_method": "bitsandbytes",
+    "_load_in_8bit": false,
+    "_load_in_4bit": true,
+    "llm_int8_threshold": 6.0,
+    "llm_int8_skip_modules": null,
+    "llm_int8_enable_fp32_cpu_offload": false,
+    "llm_int8_has_fp16_weight": false,
+    "bnb_4bit_quant_type": "nf4",
+    "bnb_4bit_use_double_quant": true,
+    "bnb_4bit_compute_dtype": "bfloat16",
+    "bnb_4bit_quant_storage": "uint8",
+    "load_in_4bit": true,
+    "load_in_8bit": false
+  },
+  "planned_samples": [
+    "ms_0452cf809ca2ca6e",
+    "ms_fd2114139ec74505",
+    "ms_4d781b2d09442384",
+    "ms_732468200c6fdf52",
+    "ms_d21215cc6634632b",
+    "ms_1c8ab8a30114458d",
+    "ms_3360ce9c6eeaf11a",
+    "ms_8a06ea9e17c5d1f3",
+    "ms_b76ca23b2fcf557f",
+    "ms_94c6e23627f2a39c",
+    "ms_e2c23fbd03b614ca",
+    "ms_2e2aabb28850e891",
+    "ms_3559203d0a2eaf33",
+    "ms_084926eae6da587e",
+    "ms_5f47fe82e3094678",
+    "ms_1ae511d2487025fa",
+    "ms_f1c797ca4ddf7f01",
+    "ms_0244b30fa4c91c91",
+    "ms_90bfe3451171e1ff",
+    "ms_4246777a2c78b04e",
+    "ms_af486831981501e6",
+    "ms_4bc74b8851bda180",
+    "ms_89977896f02ea685",
+    "ms_42c5a7ce18ffa66c",
+    "ms_d2a036f9c4b0288a",
+    "ms_a9da55c3b53a9457",
+    "ms_b17d674c805a20cd",
+    "ms_ecb18afd3b16b75f",
+    "ms_772588c429f8552e",
+    "ms_df6737f0d5af6b9a",
+    "ms_b2e49a83348c6376",
+    "ms_569579a3cdb90faa",
+    "ms_3dca53506364f4a6",
+    "ms_54b25669ba085735",
+    "ms_72c9bde2567010a9",
+    "ms_07996e3ba6269b9b",
+    "ms_fbede1234c94eaa3",
+    "ms_786403fea00a85a0",
+    "ms_1f8923ea2eb7501e",
+    "ms_24e4a95268daa925",
+    "ms_485e1c49bd962b80",
+    "ms_ba158a2e40a06b37",
+    "ms_375276a62e6bd54d",
+    "ms_7bdbf2f40419cd75",
+    "ms_9e573c1768e14cf4",
+    "ms_e5eb86827ced6b06",
+    "ms_b5524d131324feae",
+    "ms_8da73ebb71c65805",
+    "ms_6d5e38658d28af08",
+    "ms_d15f9d5950046663",
+    "ms_64a9d546020a304e",
+    "ms_cd87b15b8cc5ad6a",
+    "ms_2e230f3d0e964044",
+    "ms_95ea4cd321f03b99",
+    "ms_3d2c622d9df976a3",
+    "ms_622d5ce7ba3e7366",
+    "ms_822b31100c93dd81",
+    "ms_4bce12bd20c2c6af",
+    "ms_6fcb1eba5799075d",
+    "ms_38a8d3286358f7a2",
+    "ms_a1805fcddb7c7815",
+    "ms_c4aec8c98fcd8776",
+    "ms_d077715e41f5b8cd",
+    "ms_c16e40ffe85fc66d",
+    "ms_fd68cffe19918121",
+    "ms_d844b2f64e5cddda",
+    "ms_58ad47ee466b5bd7",
+    "ms_4efdc941ab439671",
+    "ms_bded12f81f821b6f",
+    "ms_144e9cca2f0f82e2",
+    "ms_6fdff14268e36a55",
+    "ms_08d0122814ba8577",
+    "ms_dd2d90eaf9af741c",
+    "ms_097cb8a05eb23cc9",
+    "ms_b2b42370e8c549a7",
+    "ms_af916c51b753da49",
+    "ms_5fda7a2b1f7727cf",
+    "ms_2eb5987b1a6f409f",
+    "ms_bb1561668a69c714",
+    "ms_85ae0b7f42184169",
+    "ms_cd79be6102e5fb4d",
+    "ms_0df7c5ad49632e4f",
+    "ms_dce3d85cbe3dc296",
+    "ms_d3239a9b88acdefe",
+    "ms_a0a42f30275ff66c",
+    "ms_de8951c0edaa66e1",
+    "ms_29e577643547a6a7",
+    "ms_318fc6aba6d57787",
+    "ms_e17e65e594740dd9",
+    "ms_2440acc265bec521",
+    "ms_b1cf6e763c365854",
+    "ms_29f0e1ac91f187f2",
+    "ms_cde0ddc82b296996",
+    "ms_896491d1ea4553ff",
+    "ms_454e10687a68a818",
+    "ms_b9cdf03b59b51861",
+    "ms_b1cf95aa53524cf2",
+    "ms_b9358d5213ad1ab3",
+    "ms_f32776a67cdc0227",
+    "ms_6811737f2fb5a1e8",
+    "ms_f59e8ec7a00265d3",
+    "ms_2d68d305f5ce0f71",
+    "ms_7d571e3c5ba41de3",
+    "ms_e94bf4eee7ca7173",
+    "ms_7b842a925c7c1560",
+    "ms_e3b438fdcb9ccea5",
+    "ms_b30053b19259edd7",
+    "ms_c96fd3d71fae75ad",
+    "ms_3b670ae6f18641b9",
+    "ms_4f29d04923e51654",
+    "ms_310c8831f4cbf5f6",
+    "ms_42ed2c4f2253e1b0",
+    "ms_d281f11d177805a5",
+    "ms_3e77e29cee1ee3e3",
+    "ms_f58bbb2bde85d3da",
+    "ms_7cea7d76a915df33",
+    "ms_5b0ad124b2540b09",
+    "ms_70ed6671bcc3378e",
+    "ms_487f2572506ca4a6",
+    "ms_2056e345d2b93e16",
+    "ms_bf30c42f6a29ad33",
+    "ms_a6a24c0ec55a3f31",
+    "ms_853838fb5f21d879",
+    "ms_c6fa942bf6fa0e36",
+    "ms_541bb70fa2301dad",
+    "ms_5032f381ac5dfb97",
+    "ms_5cc1aec6ca2519c3",
+    "ms_b8bd02395f54f0d6",
+    "ms_9cc42c527ce3738c",
+    "ms_ebe853854645229b",
+    "ms_3a923f39dff6fda6",
+    "ms_9b0192db3c56e1d5",
+    "ms_cd18a14820fcaeee",
+    "ms_8ce7b9a60e7bb974",
+    "ms_7bbb2115a0be6c7a",
+    "ms_f1fd8c037a9bed70",
+    "ms_c2b6879d16262c7c",
+    "ms_1bf2ea85aafc02ad",
+    "ms_0826c9ee0abefafd",
+    "ms_c2936f663b0ac442",
+    "ms_89195f8562c29c89",
+    "ms_a37533cdb932e927",
+    "ms_003ce3b9f3f2e00d",
+    "ms_e359d6de320b566c",
+    "ms_6593acde96bf440c",
+    "ms_9b4906369d89f7b8",
+    "ms_62cdf640977fba4d",
+    "ms_cdecb3f1055b1858",
+    "ms_48ea5d207fb6ada0",
+    "ms_212e39b3ef205030",
+    "ms_2b02a6145bfd6d7f",
+    "ms_696b7e228bca9d71",
+    "ms_cdf6e6afdf6fbcc7",
+    "ms_a92e56a751f57a7d",
+    "ms_08c7274187f6f0e2",
+    "ms_2b6a830c3ba11221",
+    "ms_17d81381728b38b5",
+    "ms_f493a41622368533",
+    "ms_b9f434d61a286e9e",
+    "ms_298287aec37c22f6",
+    "ms_460437fcb5b406db",
+    "ms_8295b8bb2a2085d4",
+    "ms_ec61c842dd96e4de",
+    "ms_47d2c778196334e2",
+    "ms_4b97afd410858c20",
+    "ms_fc3f393a704cdfbf",
+    "ms_5133e9e24adba701",
+    "ms_7b06b5451a0151db",
+    "ms_c3dce74582983694",
+    "ms_0d5cdd60e7adcea3",
+    "ms_47d14a55c005cb6b",
+    "ms_dd09afed7f74f36b",
+    "ms_75cf05a51d17dd0c",
+    "ms_209e91309cebde36",
+    "ms_cb904f45a2bdca3d",
+    "ms_9386f18a3859267b",
+    "ms_dbf3b71ff1d9c544",
+    "ms_85d8d5124d4323a3",
+    "ms_a86e53969bef7817",
+    "ms_b5cb2f3342bba6df",
+    "ms_e59f2ca0e9b7d5a9",
+    "ms_3d84442ed8b486d1",
+    "ms_2dceacc61a79fbaa",
+    "ms_da170f98a721ef31",
+    "ms_f196afda35d2301d",
+    "ms_f10e38e0d4650bb2",
+    "ms_ddf2cbdff5c996e6",
+    "ms_cc08ce9dcfc145f5",
+    "ms_43d96ea0de9c7794",
+    "ms_e57b96d7aa3ebb9f",
+    "ms_fc37180cd141f775",
+    "ms_1a808b83af582518",
+    "ms_ad502089e5702334",
+    "ms_7c7ce5728f58d7e6",
+    "ms_43bb3d0f5296fb62",
+    "ms_060b116ecdc854e8",
+    "ms_4f800d932ddc567f",
+    "ms_89f4d7f51f4ccb84",
+    "ms_850952af916e19f9",
+    "ms_61c34dba9ae4c07d",
+    "ms_d34c5ecac5b40baa",
+    "ms_7c2e4ef72500c201",
+    "ms_7524e5841f1daa93",
+    "ms_4da2252ed0adcfc4",
+    "ms_0a0a908ec5c56fca",
+    "ms_7b1e81f81a1227f2",
+    "ms_ddc134e68209b43d",
+    "ms_d5b87f1bc6aa725c",
+    "ms_04dceefbfaf86d22",
+    "ms_e970c61933cbbc72",
+    "ms_433aece49b4d0d00",
+    "ms_4cb8c641abbf8c07",
+    "ms_04feaf85a64b0f5d",
+    "ms_54d4b0285a14d8ce",
+    "ms_db5d51b400c22922",
+    "ms_6f60dca15ff9bdc4",
+    "ms_413e4eda8e37c3b5",
+    "ms_f1fa9e31c0ad22dd",
+    "ms_f55a0b4e975f722e",
+    "ms_0d354ff840552181",
+    "ms_fec91626418e4494",
+    "ms_eea48ba0fb63981b",
+    "ms_ccd3131fa25ba5d5",
+    "ms_7a9ab4b6e55ead7e",
+    "ms_754c4e8a17e9b7a6",
+    "ms_f9e8927b65b8b27a",
+    "ms_00f68c9d355551bd",
+    "ms_835b023430225cdc",
+    "ms_33a11bcdcaca2dc9",
+    "ms_827aed97b1c28fb3",
+    "ms_12c0a7be14605818",
+    "ms_7647357127453277",
+    "ms_d6c125cdfe481659",
+    "ms_37b1daffe2e3e0b3",
+    "ms_abec6e0a5ccf4d05",
+    "ms_16d1e600dcc8b4cc",
+    "ms_7c10869f2b0e3baf",
+    "ms_e40e4b106edab654",
+    "ms_ccef6782c06c1757",
+    "ms_113169afe8057829",
+    "ms_d84bb71ea69dda53",
+    "ms_938ac860ebf42f1d",
+    "ms_c648063a485abd30",
+    "ms_dff66d8d002347ed",
+    "ms_74b16cbbb7bb52b6",
+    "ms_54c2698251821521",
+    "ms_6072829ac388fa75",
+    "ms_e6852060f4c06eec",
+    "ms_c8cc7b48f67fccb7",
+    "ms_abbefea3b87ac219",
+    "ms_55870b39250d1537",
+    "ms_b463c6cb5714ed55",
+    "ms_feab029ef4e8d01e",
+    "ms_03745bbccdebcaca",
+    "ms_69990e834fc94fa0",
+    "ms_c34d0c40345a58aa",
+    "ms_138fb5f7e010bf84",
+    "ms_72794785fd5b10d1",
+    "ms_3f49e2d90c38634f",
+    "ms_ecf56d916ac8ef7e",
+    "ms_f4b38c0a0b7eba9f",
+    "ms_9421f09d0ec66756",
+    "ms_8a8bcee4b5d7e250",
+    "ms_7f7b9baa19f08c8f",
+    "ms_cc948bb75cd5f9f6",
+    "ms_196e63b2207b380a",
+    "ms_e47ad11fc6adfc07",
+    "ms_6c671253b46d567b",
+    "ms_f289e987d9264ae3",
+    "ms_07db1f490b8f22b2",
+    "ms_9194731b72ea46f1",
+    "ms_45b51c0473517925",
+    "ms_4905923151c5ad54",
+    "ms_966c7c54b6d3bfc7",
+    "ms_b8f82306e21f8ee1",
+    "ms_4ffaf5fdbce688fe",
+    "ms_d0dafb97e8f5b259",
+    "ms_7a8ebf032903722b",
+    "ms_b14e201fd3a2090b",
+    "ms_3e3ed3a2232a6f20",
+    "ms_9ee4c740c062aa4f",
+    "ms_239126457ae3a6be",
+    "ms_76bfc658c23723ca",
+    "ms_1a1cbe4e76b15d03",
+    "ms_cb18879e9b2bcba7",
+    "ms_1bc81d5e64b92460",
+    "ms_6e012f38071f5fe3",
+    "ms_3310abeb58e62af8",
+    "ms_17746f00c28a044f",
+    "ms_90e369cbf5e7b92a",
+    "ms_b27d6b653cc1f27f",
+    "ms_7d2c6b5795837abe",
+    "ms_edba8c43b58cafff",
+    "ms_db4e158afec7f6dc",
+    "ms_cdeb32a234eff8aa",
+    "ms_35a07de9f21093be",
+    "ms_81f6f2a73bd1d8f9",
+    "ms_524386576cc36424",
+    "ms_2d722ed5a7e123ef"
+  ],
+  "completed": [
+    {
+      "id": "ms_0452cf809ca2ca6e",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_1.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_fd2114139ec74505",
+      "label": "data/finetune/middle_school_v1/labels/중2/일차함수_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/일차함수_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4d781b2d09442384",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_732468200c6fdf52",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d21215cc6634632b",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_3.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_1c8ab8a30114458d",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_4.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_3360ce9c6eeaf11a",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_5.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_8a06ea9e17c5d1f3",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_6.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_b76ca23b2fcf557f",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_94c6e23627f2a39c",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_8.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_e2c23fbd03b614ca",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_9.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_2e2aabb28850e891",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_3559203d0a2eaf33",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_084926eae6da587e",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_12.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_5f47fe82e3094678",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_13.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_1ae511d2487025fa",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_14.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_f1c797ca4ddf7f01",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_15.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_0244b30fa4c91c91",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_16.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_90bfe3451171e1ff",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_17.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_17.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4246777a2c78b04e",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_18.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_18.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_af486831981501e6",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_19.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_19.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4bc74b8851bda180",
+      "label": "data/finetune/middle_school_v1/labels/중1/기본도형과작도_20.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/기본도형과작도_20.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_89977896f02ea685",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_42c5a7ce18ffa66c",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d2a036f9c4b0288a",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_a9da55c3b53a9457",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b17d674c805a20cd",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_ecb18afd3b16b75f",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_772588c429f8552e",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_7.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_df6737f0d5af6b9a",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b2e49a83348c6376",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_569579a3cdb90faa",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_10.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_3dca53506364f4a6",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_54b25669ba085735",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_72c9bde2567010a9",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_13.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_07996e3ba6269b9b",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_14.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_fbede1234c94eaa3",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_15.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_786403fea00a85a0",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_16.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_1f8923ea2eb7501e",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_17.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_17.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_24e4a95268daa925",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_18.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_18.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_485e1c49bd962b80",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_19.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_19.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_ba158a2e40a06b37",
+      "label": "data/finetune/middle_school_v1/labels/중1/문자의사용과식_20.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/문자의사용과식_20.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_375276a62e6bd54d",
+      "label": "data/finetune/middle_school_v1/labels/중1/소인수분해_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/소인수분해_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7bdbf2f40419cd75",
+      "label": "data/finetune/middle_school_v1/labels/중1/소인수분해_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/소인수분해_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_9e573c1768e14cf4",
+      "label": "data/finetune/middle_school_v1/labels/중1/소인수분해_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/소인수분해_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_e5eb86827ced6b06",
+      "label": "data/finetune/middle_school_v1/labels/중1/소인수분해_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/소인수분해_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b5524d131324feae",
+      "label": "data/finetune/middle_school_v1/labels/중1/소인수분해_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/소인수분해_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_8da73ebb71c65805",
+      "label": "data/finetune/middle_school_v1/labels/중1/소인수분해_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/소인수분해_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_6d5e38658d28af08",
+      "label": "data/finetune/middle_school_v1/labels/중1/소인수분해_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/소인수분해_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d15f9d5950046663",
+      "label": "data/finetune/middle_school_v1/labels/중1/소인수분해_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/소인수분해_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_64a9d546020a304e",
+      "label": "data/finetune/middle_school_v1/labels/중1/소인수분해_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/소인수분해_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_cd87b15b8cc5ad6a",
+      "label": "data/finetune/middle_school_v1/labels/중1/소인수분해_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/소인수분해_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_2e230f3d0e964044",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_95ea4cd321f03b99",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_3d2c622d9df976a3",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_622d5ce7ba3e7366",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_822b31100c93dd81",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4bce12bd20c2c6af",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_6.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_6fcb1eba5799075d",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_7.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_38a8d3286358f7a2",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_a1805fcddb7c7815",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_c4aec8c98fcd8776",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d077715e41f5b8cd",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_c16e40ffe85fc66d",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_fd68cffe19918121",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d844b2f64e5cddda",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_58ad47ee466b5bd7",
+      "label": "data/finetune/middle_school_v1/labels/중1/정수와유리수_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/정수와유리수_15.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4efdc941ab439671",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_bded12f81f821b6f",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_2.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_144e9cca2f0f82e2",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_6fdff14268e36a55",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_08d0122814ba8577",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_5.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_dd2d90eaf9af741c",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_097cb8a05eb23cc9",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b2b42370e8c549a7",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_af916c51b753da49",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_5fda7a2b1f7727cf",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_2eb5987b1a6f409f",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_bb1561668a69c714",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_12.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_85ae0b7f42184169",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_cd79be6102e5fb4d",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_0df7c5ad49632e4f",
+      "label": "data/finetune/middle_school_v1/labels/중1/좌표평면과그래프_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/좌표평면과그래프_15.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_dce3d85cbe3dc296",
+      "label": "data/finetune/middle_school_v1/labels/중1/평면도형의성질_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/평면도형의성질_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d3239a9b88acdefe",
+      "label": "data/finetune/middle_school_v1/labels/중1/평면도형의성질_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/평면도형의성질_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_a0a42f30275ff66c",
+      "label": "data/finetune/middle_school_v1/labels/중1/평면도형의성질_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/평면도형의성질_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_de8951c0edaa66e1",
+      "label": "data/finetune/middle_school_v1/labels/중1/평면도형의성질_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/평면도형의성질_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_29e577643547a6a7",
+      "label": "data/finetune/middle_school_v1/labels/중1/평면도형의성질_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/평면도형의성질_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_318fc6aba6d57787",
+      "label": "data/finetune/middle_school_v1/labels/중1/평면도형의성질_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/평면도형의성질_6.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_e17e65e594740dd9",
+      "label": "data/finetune/middle_school_v1/labels/중1/평면도형의성질_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/평면도형의성질_7.json",
+      "quality_flags": [
+        "length_limit_reached",
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_2440acc265bec521",
+      "label": "data/finetune/middle_school_v1/labels/중1/평면도형의성질_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/평면도형의성질_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b1cf6e763c365854",
+      "label": "data/finetune/middle_school_v1/labels/중1/평면도형의성질_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/평면도형의성질_9.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_29f0e1ac91f187f2",
+      "label": "data/finetune/middle_school_v1/labels/중1/평면도형의성질_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중1/평면도형의성질_10.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_cde0ddc82b296996",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_896491d1ea4553ff",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_454e10687a68a818",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b9cdf03b59b51861",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b1cf95aa53524cf2",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b9358d5213ad1ab3",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f32776a67cdc0227",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_6811737f2fb5a1e8",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f59e8ec7a00265d3",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_2d68d305f5ce0f71",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7d571e3c5ba41de3",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_e94bf4eee7ca7173",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7b842a925c7c1560",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_e3b438fdcb9ccea5",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b30053b19259edd7",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_15.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_c96fd3d71fae75ad",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_16.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_3b670ae6f18641b9",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_17.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_17.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4f29d04923e51654",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_18.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_18.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_310c8831f4cbf5f6",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_19.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_19.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_42ed2c4f2253e1b0",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의닮음_20.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의닮음_20.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d281f11d177805a5",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_3e77e29cee1ee3e3",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f58bbb2bde85d3da",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7cea7d76a915df33",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_5b0ad124b2540b09",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_70ed6671bcc3378e",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_487f2572506ca4a6",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_2056e345d2b93e16",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_bf30c42f6a29ad33",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_a6a24c0ec55a3f31",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_853838fb5f21d879",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_c6fa942bf6fa0e36",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_541bb70fa2301dad",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_5032f381ac5dfb97",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_5cc1aec6ca2519c3",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_15.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b8bd02395f54f0d6",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_16.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_9cc42c527ce3738c",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_17.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_17.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_ebe853854645229b",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_18.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_18.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_3a923f39dff6fda6",
+      "label": "data/finetune/middle_school_v1/labels/중2/도형의성질_19.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/도형의성질_19.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_9b0192db3c56e1d5",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_1.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_cd18a14820fcaeee",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_8ce7b9a60e7bb974",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7bbb2115a0be6c7a",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f1fd8c037a9bed70",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_c2b6879d16262c7c",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_1bf2ea85aafc02ad",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_0826c9ee0abefafd",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_c2936f663b0ac442",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_15.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_89195f8562c29c89",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_16.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_a37533cdb932e927",
+      "label": "data/finetune/middle_school_v1/labels/중2/부등식_17.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/부등식_17.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_003ce3b9f3f2e00d",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_e359d6de320b566c",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_6593acde96bf440c",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_9b4906369d89f7b8",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_62cdf640977fba4d",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_cdecb3f1055b1858",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_48ea5d207fb6ada0",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_212e39b3ef205030",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_2b02a6145bfd6d7f",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_696b7e228bca9d71",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_cdf6e6afdf6fbcc7",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_a92e56a751f57a7d",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_08c7274187f6f0e2",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_2b6a830c3ba11221",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_17d81381728b38b5",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_15.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f493a41622368533",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_16.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_b9f434d61a286e9e",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_17.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_17.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_298287aec37c22f6",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_18.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_18.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_460437fcb5b406db",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_19.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_19.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_8295b8bb2a2085d4",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_20.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_20.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_ec61c842dd96e4de",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_21.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_21.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_47d2c778196334e2",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_22.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_22.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4b97afd410858c20",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_23.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_23.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_fc3f393a704cdfbf",
+      "label": "data/finetune/middle_school_v1/labels/중2/수와식의계산_24.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/수와식의계산_24.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_5133e9e24adba701",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7b06b5451a0151db",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_c3dce74582983694",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_0d5cdd60e7adcea3",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_47d14a55c005cb6b",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_dd09afed7f74f36b",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_75cf05a51d17dd0c",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_209e91309cebde36",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_cb904f45a2bdca3d",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_9386f18a3859267b",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_dbf3b71ff1d9c544",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_85d8d5124d4323a3",
+      "label": "data/finetune/middle_school_v1/labels/중2/연립방정식_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/연립방정식_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_a86e53969bef7817",
+      "label": "data/finetune/middle_school_v1/labels/중2/일차함수_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/일차함수_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b5cb2f3342bba6df",
+      "label": "data/finetune/middle_school_v1/labels/중2/일차함수_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/일차함수_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_e59f2ca0e9b7d5a9",
+      "label": "data/finetune/middle_school_v1/labels/중2/일차함수_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/일차함수_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_3d84442ed8b486d1",
+      "label": "data/finetune/middle_school_v1/labels/중2/일차함수_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/일차함수_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_2dceacc61a79fbaa",
+      "label": "data/finetune/middle_school_v1/labels/중2/일차함수_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/일차함수_10.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_da170f98a721ef31",
+      "label": "data/finetune/middle_school_v1/labels/중2/일차함수_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/일차함수_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f196afda35d2301d",
+      "label": "data/finetune/middle_school_v1/labels/중2/일차함수_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중2/일차함수_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f10e38e0d4650bb2",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_ddf2cbdff5c996e6",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_cc08ce9dcfc145f5",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_43d96ea0de9c7794",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_e57b96d7aa3ebb9f",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_fc37180cd141f775",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_6.json",
+      "quality_flags": [
+        "length_limit_reached",
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_1a808b83af582518",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_7.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_ad502089e5702334",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_8.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_7c7ce5728f58d7e6",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_43bb3d0f5296fb62",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_10.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_060b116ecdc854e8",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4f800d932ddc567f",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_89f4d7f51f4ccb84",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_13.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_850952af916e19f9",
+      "label": "data/finetune/middle_school_v1/labels/중3/삼각비_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/삼각비_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_61c34dba9ae4c07d",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d34c5ecac5b40baa",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7c2e4ef72500c201",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7524e5841f1daa93",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4da2252ed0adcfc4",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_0a0a908ec5c56fca",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7b1e81f81a1227f2",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_ddc134e68209b43d",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d5b87f1bc6aa725c",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_04dceefbfaf86d22",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_e970c61933cbbc72",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_433aece49b4d0d00",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4cb8c641abbf8c07",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_04feaf85a64b0f5d",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_15.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_54d4b0285a14d8ce",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_16.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_db5d51b400c22922",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_17.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_17.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_6f60dca15ff9bdc4",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_18.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_18.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_413e4eda8e37c3b5",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_19.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_19.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f1fa9e31c0ad22dd",
+      "label": "data/finetune/middle_school_v1/labels/중3/실수와그계산_20.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/실수와그계산_20.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f55a0b4e975f722e",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_0d354ff840552181",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_fec91626418e4494",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_eea48ba0fb63981b",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_ccd3131fa25ba5d5",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7a9ab4b6e55ead7e",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_6.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_754c4e8a17e9b7a6",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f9e8927b65b8b27a",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_00f68c9d355551bd",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_835b023430225cdc",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_33a11bcdcaca2dc9",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_827aed97b1c28fb3",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_12c0a7be14605818",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7647357127453277",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d6c125cdfe481659",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_15.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_37b1daffe2e3e0b3",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_16.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_abec6e0a5ccf4d05",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_17.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_17.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_16d1e600dcc8b4cc",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_18.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_18.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7c10869f2b0e3baf",
+      "label": "data/finetune/middle_school_v1/labels/중3/원의성질_19.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/원의성질_19.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_e40e4b106edab654",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_ccef6782c06c1757",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_113169afe8057829",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d84bb71ea69dda53",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_938ac860ebf42f1d",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_c648063a485abd30",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_dff66d8d002347ed",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_74b16cbbb7bb52b6",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_54c2698251821521",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_6072829ac388fa75",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_e6852060f4c06eec",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_c8cc7b48f67fccb7",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_abbefea3b87ac219",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_55870b39250d1537",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b463c6cb5714ed55",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_15.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_feab029ef4e8d01e",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_16.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_03745bbccdebcaca",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_17.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_17.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_69990e834fc94fa0",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_18.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_18.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_c34d0c40345a58aa",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_19.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_19.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_138fb5f7e010bf84",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차방정식_20.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차방정식_20.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_72794785fd5b10d1",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_3f49e2d90c38634f",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_ecf56d916ac8ef7e",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f4b38c0a0b7eba9f",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_9421f09d0ec66756",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_8a8bcee4b5d7e250",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7f7b9baa19f08c8f",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_cc948bb75cd5f9f6",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_196e63b2207b380a",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_15.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_e47ad11fc6adfc07",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_16.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_6c671253b46d567b",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_17.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_17.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_f289e987d9264ae3",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_18.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_18.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_07db1f490b8f22b2",
+      "label": "data/finetune/middle_school_v1/labels/중3/이차함수_19.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/이차함수_19.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_9194731b72ea46f1",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_45b51c0473517925",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4905923151c5ad54",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_966c7c54b6d3bfc7",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b8f82306e21f8ee1",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_4ffaf5fdbce688fe",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_d0dafb97e8f5b259",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_7.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7a8ebf032903722b",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_b14e201fd3a2090b",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_3e3ed3a2232a6f20",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_10.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_9ee4c740c062aa4f",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_239126457ae3a6be",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_76bfc658c23723ca",
+      "label": "data/finetune/middle_school_v1/labels/중3/인수분해_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/인수분해_13.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_1a1cbe4e76b15d03",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_1.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_1.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_cb18879e9b2bcba7",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_2.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_2.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_1bc81d5e64b92460",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_3.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_3.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_6e012f38071f5fe3",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_4.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_4.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_3310abeb58e62af8",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_5.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_5.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_17746f00c28a044f",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_6.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_6.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_90e369cbf5e7b92a",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_7.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_7.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_b27d6b653cc1f27f",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_8.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_8.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_7d2c6b5795837abe",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_9.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_9.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_edba8c43b58cafff",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_10.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_10.json",
+      "quality_flags": [
+        "length_limit_reached",
+        "missing_output_section",
+        "repeated_lines"
+      ]
+    },
+    {
+      "id": "ms_db4e158afec7f6dc",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_11.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_11.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_cdeb32a234eff8aa",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_12.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_12.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_35a07de9f21093be",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_13.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_13.json",
+      "quality_flags": [
+        "missing_output_section"
+      ]
+    },
+    {
+      "id": "ms_81f6f2a73bd1d8f9",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_14.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_14.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_524386576cc36424",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_15.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_15.json",
+      "quality_flags": []
+    },
+    {
+      "id": "ms_2d722ed5a7e123ef",
+      "label": "data/finetune/middle_school_v1/labels/중3/피타고라스정리_16.txt",
+      "draft_result": "data/finetune/middle_school_v1/ocr_results/중3/피타고라스정리_16.json",
+      "quality_flags": []
+    }
+  ]
+}

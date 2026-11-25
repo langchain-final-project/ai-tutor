@@ -1,0 +1,97 @@
+{
+  "validation": "passed",
+  "created_at": "2026-11-24T03:45:39.018605+00:00",
+  "scope": "CPU preprocessing and proposed assistant-target mask only; no model forward, backward, or training was run.",
+  "jsonl_sha256": "55dc7715f230bb9e098ec4d745f0833568d64df72ac5bc684d2f5d568e776a28",
+  "processor_size": {
+    "shortest_edge": 65536,
+    "longest_edge": 2097152
+  },
+  "versions": {
+    "torch": "2.11.0+cu128",
+    "transformers": "5.24.0",
+    "pillow": "13.0.0"
+  },
+  "samples": [
+    {
+      "id": "radicals_12_crop",
+      "input_tokens": 2549,
+      "prompt_tokens": 2361,
+      "supervised_tokens": 188,
+      "image_tokens": 2024,
+      "image_grid_thw": [
+        [
+          1,
+          92,
+          88
+        ]
+      ],
+      "prompt_fully_masked": true,
+      "target_round_trip_matches": true
+    },
+    {
+      "id": "simultaneous_07_crop",
+      "input_tokens": 2415,
+      "prompt_tokens": 2317,
+      "supervised_tokens": 98,
+      "image_tokens": 1980,
+      "image_grid_thw": [
+        [
+          1,
+          66,
+          120
+        ]
+      ],
+      "prompt_fully_masked": true,
+      "target_round_trip_matches": true
+    },
+    {
+      "id": "relative_frequency_08",
+      "input_tokens": 2592,
+      "prompt_tokens": 2365,
+      "supervised_tokens": 227,
+      "image_tokens": 2028,
+      "image_grid_thw": [
+        [
+          1,
+          104,
+          78
+        ]
+      ],
+      "prompt_fully_masked": true,
+      "target_round_trip_matches": true
+    },
+    {
+      "id": "polygon_06_crop",
+      "input_tokens": 2517,
+      "prompt_tokens": 2337,
+      "supervised_tokens": 180,
+      "image_tokens": 2000,
+      "image_grid_thw": [
+        [
+          1,
+          80,
+          100
+        ]
+      ],
+      "prompt_fully_masked": true,
+      "target_round_trip_matches": true
+    },
+    {
+      "id": "quadratic_graph_11",
+      "input_tokens": 2621,
+      "prompt_tokens": 2365,
+      "supervised_tokens": 256,
+      "image_tokens": 2028,
+      "image_grid_thw": [
+        [
+          1,
+          104,
+          78
+        ]
+      ],
+      "prompt_fully_masked": true,
+      "target_round_trip_matches": true
+    }
+  ]
+}

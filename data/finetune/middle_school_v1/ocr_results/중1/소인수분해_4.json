@@ -1,0 +1,30 @@
+{
+  "id": "ms_e5eb86827ced6b06",
+  "image": "파인튜닝 작업/중1/소인수분해_4.jpg",
+  "image_sha256": "8e83846d042b6376f759108e71b94af78f0563c5e37e17f24e40caaf66095f6d",
+  "purpose": "unreviewed_ocr_label_draft",
+  "review_status": "pending_user_review",
+  "training_eligible": false,
+  "model_id": "Qwen/Qwen3-VL-4B-Instruct",
+  "model_revision": "ebb281ec70b05090aa6165b016eac8ec08e71b17",
+  "adapter_used": false,
+  "prompt": "사진에 인쇄된 수학 문제를 그대로 전사하세요.\n풀이, 정답, 요약, 문장 교정은 하지 마세요.\n수식은 LaTeX로 표현하세요.\n\n다음 네 항목으로 출력하세요.\n\n[본문과 선택지]\n사진에 보이는 문장을 읽는 순서대로 옮기세요.\n\n[표]\n실제 표가 있을 때만 행과 열의 대응을 유지하여 옮기세요.\n[빈칸]은 표 안에 실제로 비어 있는 칸에만 사용하세요.\n표가 없으면 '없음'이라고 적으세요.\n\n[그림에 표시된 정보]\n도형·그래프에 실제로 표시된 문자, 수치, 단위, 기호와\n명시적으로 표시된 관계만 적으세요.\n서로 다른 도형의 표시는 구분하세요.\n같은 도형의 같은 표시에 대한 설명은 한 번만 작성하세요.\n표시가 없는 항목을 새로 만들거나 [빈칸]으로 채우지 마세요.\n모양만 보고 수치나 기하 관계를 추측하지 마세요.\n\n[판독 불가]\n실제로 표시가 있지만 읽을 수 없는 부분만 적으세요.\n그 부분은 본문이나 그림 정보에서도 [판독 불가]로 표시하세요.\n해당하는 부분이 없으면 '없음'이라고 적으세요.\n\n네 항목을 작성한 뒤 출력을 마치세요.",
+  "processor_size": {
+    "shortest_edge": 65536,
+    "longest_edge": 2097152
+  },
+  "generation": {
+    "max_new_tokens": 1024,
+    "do_sample": false,
+    "use_cache": true
+  },
+  "image_tokens": 1148,
+  "generation_seconds": 6.31337650000205,
+  "generated_tokens": 97,
+  "ended_with_eos": true,
+  "length_limit_reached": false,
+  "gpu_peak_allocated_gib": 3.7445311546325684,
+  "quality_flags": [],
+  "ocr_text": "[본문과 선택지]\n4\n180을 소인수분해 하면?\n① 2×3²×5\n② 2⁴×5\n③ 3⁴×5\n④ 2²×3²×5\n⑤ 2×3×5²\n\n[표]\n없음\n\n[그림에 표시된 정보]\n없음\n\n[판독 불가]\n없음",
+  "draft_label_sha256": "0a381ae731f11d1a412a3713aa0b8c25e1c885b544aa6631145d644e3a7e6063"
+}

@@ -1,0 +1,116 @@
+{
+  "image_count": 299,
+  "by_grade": {
+    "중1": 90,
+    "중2": 94,
+    "중3": 115
+  },
+  "by_topic": [
+    {
+      "grade": "중1",
+      "topic": "기본도형과작도",
+      "count": 20
+    },
+    {
+      "grade": "중1",
+      "topic": "문자의사용과식",
+      "count": 20
+    },
+    {
+      "grade": "중1",
+      "topic": "소인수분해",
+      "count": 10
+    },
+    {
+      "grade": "중1",
+      "topic": "정수와유리수",
+      "count": 15
+    },
+    {
+      "grade": "중1",
+      "topic": "좌표평면과그래프",
+      "count": 15
+    },
+    {
+      "grade": "중1",
+      "topic": "평면도형의성질",
+      "count": 10
+    },
+    {
+      "grade": "중2",
+      "topic": "도형의닮음",
+      "count": 20
+    },
+    {
+      "grade": "중2",
+      "topic": "도형의성질",
+      "count": 19
+    },
+    {
+      "grade": "중2",
+      "topic": "부등식",
+      "count": 11
+    },
+    {
+      "grade": "중2",
+      "topic": "수와식의계산",
+      "count": 24
+    },
+    {
+      "grade": "중2",
+      "topic": "연립방정식",
+      "count": 12
+    },
+    {
+      "grade": "중2",
+      "topic": "일차함수",
+      "count": 8
+    },
+    {
+      "grade": "중3",
+      "topic": "삼각비",
+      "count": 14
+    },
+    {
+      "grade": "중3",
+      "topic": "실수와그계산",
+      "count": 20
+    },
+    {
+      "grade": "중3",
+      "topic": "원의성질",
+      "count": 19
+    },
+    {
+      "grade": "중3",
+      "topic": "이차방정식",
+      "count": 20
+    },
+    {
+      "grade": "중3",
+      "topic": "이차함수",
+      "count": 13
+    },
+    {
+      "grade": "중3",
+      "topic": "인수분해",
+      "count": 13
+    },
+    {
+      "grade": "중3",
+      "topic": "피타고라스정리",
+      "count": 16
+    }
+  ],
+  "exact_duplicate_sets": [],
+  "decode_errors": [],
+  "existing_label_count": 0,
+  "training_ready_count": 0,
+  "source_group_review_required": true,
+  "split_status": "unassigned",
+  "suggested_smoke_images": [
+    "파인튜닝 작업/중1/기본도형과작도_1.jpg",
+    "파인튜닝 작업/중2/일차함수_5.jpg",
+    "파인튜닝 작업/중3/실수와그계산_1.jpg"
+  ]
+}

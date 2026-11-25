@@ -1,0 +1,17 @@
+[본문과 선택지]
+다음 그림과 같이 직사각형 $ABCD$에서 $\overline{CD}$의 중점을 $M$이라 하고, $\overline{BM}$ 위에 $\overline{AD} = \overline{PD}$가 되도록 점 $P$를 잡아 $\overline{AP}$의 중점을 $N$이라 하자. $\angle ADP = 28^\circ$일 때, $\angle RMC$의 크기를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- $A, B, C, D$: 직사각형의 꼭짓점
+- $M$: $\overline{CD}$의 중점
+- $P$: $\overline{BM}$ 위에 위치한 점, $\overline{AD} = \overline{PD}$
+- $N$: $\overline{AP}$의 중점
+- $\angle ADP = 28^\circ$
+- $R$: $\overline{BM}$ 위에 있는 점, $\angle RMC$를 구하려는 점
+- $\angle RMC$: 구하려는 각
+
+[판독 불가]
+없음

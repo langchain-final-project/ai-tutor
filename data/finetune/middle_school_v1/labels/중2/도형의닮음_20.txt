@@ -1,0 +1,21 @@
+[본문과 선택지]
+다음 그림과 같은 △ABC에서 $\overrightarrow{AB}=4$, $\overrightarrow{BC}=6$, $\overrightarrow{CA}=5$이고, $\overrightarrow{AD}=1$, $\overrightarrow{AF}=2$이다. $\overrightarrow{BE}$와 $\overrightarrow{CD}$의 교점은 $P$라고 하고, $\overrightarrow{BC}$ 위의 두 점 $Q$, $R$에 대하여 $\overrightarrow{AB} \parallel \overrightarrow{PQ}$, $\overrightarrow{AC} \parallel \overrightarrow{PR}$를 만족할 때, △ABC의 넓이는 △PQR의 넓이의 몇 배인지 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- △ABC
+- A, B, C
+- D, E, F
+- P
+- Q, R
+- AD = 1
+- AF = 2
+- BC = 6
+- AB, AC, BC의 길이 표시
+- BE, CD의 교점: P
+- PQ, PR의 방향: AB // PQ, AC // PR
+
+[판독 불가]
+없음

@@ -1,0 +1,11 @@
+[본문과 선택지]
+오른쪽 그림과 같이 $\overrightarrow{AB}=6$, $\overrightarrow{BC}=10$, $\overrightarrow{CA}=8$이고, $\angle A=90^\circ$인 직각삼각형 $ABC$에서 $\overrightarrow{AB}$, $\overrightarrow{AC}$에 항상 접하면서 크기가 변하는 원 $O$가 있다. 원의 중심 $O$가 빛된 $BC$ 위에 있을 때의 원의 반지름의 길이를 $R$라고 하고, $\widehat{PQ}$를 $\widehat{PQ}$에 대하여 접어서 $\widehat{PQ}$가 원의 중심 $O$를 지날 때의 원의 반지름의 길이를 $r$라 할 때, $R-r$의 값을 구하여라. (단, 두 점 $P$, $Q$는 원 $O$와 $BC$의 교점이다.)
+
+[표]
+없음
+
+[그림에 표시된 정보]
+$C$, $A$, $B$, $P$, $Q$, $O$, $6$, $8$, $10$
+
+[판독 불가]
+없음

@@ -1,0 +1,21 @@
+[본문과 선택지]
+07
+오른쪽 그림과 같이 $\overrightarrow{AB} = \overrightarrow{AC} = 13$,
+$\overrightarrow{BC} = 10$인 $\triangle ABC$에 정사각형
+PQRS가 내접하고 있을 때,
+$\square PQRS$의 한 변의 길이를 구하여
+라.
+
+[그림에 표시된 정보]
+A
+13
+P
+S
+13
+R
+C
+10
+Q
+
+[판독 불가]
+없음

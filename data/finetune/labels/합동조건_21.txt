@@ -1,0 +1,30 @@
+[본문과 선택지]
+21. 그림과 같이 $\angle A=26^\circ$, $\angle E=64^\circ$인 $\triangle ABC$, $\triangle BDE$가 있다. $\triangle ABC\cong\triangle BDE$일 때, $\angle AFE$의 크기를 구하는 과정이다.
+
+$\triangle ABC\cong\triangle BDE$이므로,
+$\angle FBC=\angle A=\boxed{(가)}$, $\angle FCB=\angle E=64^\circ$
+$\triangle FBC$에서 $\angle BFC=\boxed{(나)}-\boxed{(가)}-64^\circ$
+$=\boxed{(다)}$
+따라서 $\angle BFC$의 맞꼭지각 $\angle AFE=\boxed{(다)}$
+
+위의 (가), (나), (다)에 알맞은 크기를 각각 $a^\circ$, $b^\circ$, $c^\circ$라고 할 때, $a+b+c$의 값은? (5점)
+
+① 180
+② 206
+③ 244
+④ 293
+⑤ 334
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- 점 이름: $A, B, C, D, E$
+- 선분 $BD$ 위에 $C$가 표시되어 있다.
+- 선분 $AB$, $AC$, $BE$, $DE$가 그려져 있다.
+- $A$에서 선분 $AB$와 $AC$ 사이의 각에 $26^\circ$가 표시되어 있다.
+- $E$에서 선분 $EB$와 $ED$ 사이의 각에 $64^\circ$가 표시되어 있다.
+- 선분 $AC$와 $BE$가 교차하며, 교점에서 $A$와 $E$ 쪽으로 벌어진 각에 $x$가 표시되어 있다.
+
+[판독 불가]
+없음

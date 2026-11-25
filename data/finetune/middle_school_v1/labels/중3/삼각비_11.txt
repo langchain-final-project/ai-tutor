@@ -1,0 +1,22 @@
+[본문과 선택지]
+11
+오른쪽 그림과 같이
+∠BAC=45°, ∠BCA=60°인
+△ABC에서 $\overrightarrow{BC}$의 연장선 위의
+점 P에 대하여 ∠BPA=45°일
+때, $\frac{\overrightarrow{BC}}{\overrightarrow{EP}}$의 값을 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A
+45°
+B
+60°
+C
+45°
+P
+
+[판독 불가]
+없음

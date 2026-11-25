@@ -1,0 +1,22 @@
+[본문과 선택지]
+5
+다음 중 옳은 것은?
+
+① $a + a + a = a^3$
+
+② $2 \times 2 \times 2 = 3^2$
+
+③ $a \times a = 2 \times a$
+
+④ $2 \times 3 \times 2 \times 2 \times 3 = 2^3 \times 3^2$
+
+⑤ $\frac{1}{a} \times \frac{1}{a} \times \frac{1}{a} \times \frac{1}{a} = \frac{4}{a}$
+
+[표]
+없음
+
+[그림에 표시된 정보]
+없음
+
+[판독 불가]
+없음

@@ -1,0 +1,19 @@
+[본문과 선택지]
+17
+오른쪽 그림과 같이 ∠A=90°인
+직각삼각형 ABC에서
+$\overrightarrow{AB} + \overrightarrow{AC} = 16°$고, $\overrightarrow{DE}$, $\overrightarrow{FG}$,
+$\overrightarrow{HI}$에 의해 나누어지는 내 도형의
+넓이가 모두 같을 때, $\overrightarrow{RE} + \overrightarrow{CI}$의 값을 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, E, F, G, H, I
+DE ⊥ BC, FG ⊥ BC, HI ⊥ BC
+D, F, H는 AB, AC 위에 있음
+E, G, I는 BC 위에 있음
+
+[판독 불가]
+없음

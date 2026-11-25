@@ -1,0 +1,21 @@
+[본문과 선택지]
+17
+오른쪽 그림과 같이 $\overline{AB}=\overline{BC}$인 직각이등변삼각형 $ABC$에 외접하는
+원이 있다. 이 원의 내부의 한 점 $P$에
+대하여 $\overline{PA}=2$, $\overline{PB}=6$,
+$\overline{PC}=2\sqrt{7}$일 때, 외접원의 반지름의
+길이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, P
+$\overline{AB} = \overline{BC}$
+$\angle ABC = 90^\circ$
+$\overline{PA} = 2$
+$\overline{PB} = 6$
+$\overline{PC} = 2\sqrt{7}$
+
+[판독 불가]
+없음

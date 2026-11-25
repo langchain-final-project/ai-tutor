@@ -1,0 +1,16 @@
+[본문과 선택지]
+13 1경시 2문 유사
+오른쪽 그림과 같은 □ABCD에서
+$\overrightarrow{AD} = \overrightarrow{BC}$이고,
+$\angle DAB + \angle ABC = 120^\circ$이다.
+대각선 AC, BD의 중점을 각각 P, Q라 하고, $\overrightarrow{CD}$의 중점을 K라 할 때,
+$\angle PQR$의 크기를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, D, P, Q, R, K
+
+[판독 불가]
+없음

@@ -1,0 +1,9 @@
+[본문과 선택지]
+16
+다음 그림과 같이 $\overrightarrow{AC}$, $\overrightarrow{BC}$를 각각 $x$, $y$인 두 정사각형이 있다. 이때 $\overrightarrow{AB}$의 중점 $D$에 대하여 $\overrightarrow{AD}$, $\overrightarrow{CD}$를 각각 한 변으로 하는 두 정사각형을 만듦. $\overrightarrow{AC} = x$, $\overrightarrow{BC} = y$일 때, 새질한 부분의 넓이를 $x$, $y$를 사용하여 나타내면? (단, $x > y$)
+
+[그림에 표시된 정보]
+$\overrightarrow{AC} = x$, $\overrightarrow{BC} = y$, $\overrightarrow{AD}$, $\overrightarrow{CD}$, $x > y$
+
+[판독 불가]
+없음

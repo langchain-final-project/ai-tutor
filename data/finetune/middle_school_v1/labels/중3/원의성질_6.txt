@@ -1,0 +1,19 @@
+[본문과 선택지]
+⑥ 1등급 2출 문제
+오른쪽 그림과 같은 △ABC에서
+\(\overrightarrow{AD} \perp \overrightarrow{BC}\), \(\overrightarrow{BE} \perp \overrightarrow{AC}\), \(AH = 10\),
+\(\overrightarrow{BC} = 14\)일 때, △ABC의 외접원의
+넓이를 구하여라.
+
+[그림에 표시된 정보]
+A
+10
+H
+E
+B
+14
+D
+C
+
+[판독 불가]
+없음

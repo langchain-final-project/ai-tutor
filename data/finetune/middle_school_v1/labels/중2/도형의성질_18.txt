@@ -1,0 +1,17 @@
+[본문과 선택지]
+18
+다음 그림과 같이 정육각형 $ABCDEF$에서 $\overrightarrow{AB}$와 $\overrightarrow{CD}$의 연장선의 교점 $G$, $\overrightarrow{AF}$의 중점 $M$이라 하며, $\triangle AGM$의 넓이는 정육각형 $ABCDEF$의 넓이의 몇 배인지 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- 정육각형: $ABCDEF$
+- 점: $A, B, C, D, E, F, G, M$
+- 선분: $\overrightarrow{AB}, \overrightarrow{CD}, \overrightarrow{AF}$
+- 점 $G$: $\overrightarrow{AB}$와 $\overrightarrow{CD}$의 연장선의 교점
+- 점 $M$: $\overrightarrow{AF}$의 중점
+- 점 $M$은 선분 $AF$ 위에 위치
+
+[판독 불가]
+없음

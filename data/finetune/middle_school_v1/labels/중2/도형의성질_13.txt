@@ -1,0 +1,13 @@
+[본문과 선택지]
+13 1파고 7출 유사
+다음 그림과 같이 □ABCD의 각 변 AB, BC, CD, DA의 연장선 위에 $\overrightarrow{AP} = 3\overrightarrow{AB}$, $\overrightarrow{BQ} = 3\overrightarrow{BC}$, $\overrightarrow{CR} = 3\overrightarrow{CD}$, $\overrightarrow{DS} = 3\overrightarrow{DA}$가 되도록 점 P, Q, R, S를 잡았다.
+□ABCD의 넓이가 3일 때, □PQRS의 넓이를 구하라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+S, P, Q, R, A, B, C, D
+
+[판독 불가]
+없음

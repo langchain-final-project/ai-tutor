@@ -1,0 +1,11 @@
+[본문과 선택지]
+다음 그림과 같이 예각삼각형 ABC의 꼭짓점 A에서 $\overrightarrow{BC}$에 내린 수선의 발을 D라고 하고, $\overrightarrow{AC}$를 상동분한 점을 각각 E, F라 하자. 또 $\overrightarrow{BF}$와 $\overrightarrow{AD}$의 교점을 G, $\overrightarrow{CG}$의 연장선과 $\overrightarrow{AB}$의 교점을 H라고 하고, 점 A를 지나고 $\overrightarrow{BC}$와 평행인 직선 $l$과 $\overrightarrow{DE}$, $\overrightarrow{DH}$의 연장선의 교점을 각각 I, J라 하자. $\overrightarrow{AI} = 1$일 때, $\overrightarrow{AJ}$의 길이를 구하라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+J, A, I, l, G, H, D, E, F, C, B
+
+[판독 불가]
+없음

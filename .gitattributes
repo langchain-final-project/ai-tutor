@@ -1,0 +1,2 @@
+# Preserve exact bytes for OCR labels, datasets and their SHA-256 metadata.
+data/finetune/** -text

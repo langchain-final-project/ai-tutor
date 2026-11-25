@@ -1,0 +1,22 @@
+[본문과 선택지]
+06
+$\overrightarrow{BC} = \vec{a}, \overrightarrow{CA} = \vec{b}$인 $\triangle ABC$에서 $\angle C > 90^\circ$일 때의 $\overrightarrow{AB}$의 길이를 $p$, $\angle C < 90^\circ$일 때의 $\overrightarrow{AB}$의 길이를 $q$라 할 때, 다음 등호는 것은?
+
+① $\frac{q}{4} < \sqrt{a^2 + b^2} < \frac{p}{2}$
+
+② $\frac{q}{2} < \sqrt{a^2 + b^2} < \frac{p}{4}$
+
+③ $\frac{q}{4} < \sqrt{a^2 + b^2} < p$
+
+④ $q < \sqrt{a^2 + b^2} < p$
+
+⑤ $\frac{2}{q} < \sqrt{a^2 + b^2} < p$
+
+[표]
+없음
+
+[그림에 표시된 정보]
+없음
+
+[판독 불가]
+없음

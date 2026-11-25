@@ -1,0 +1,18 @@
+[본문과 선택지]
+09
+오른쪽 그림과 같은 원에서 $\widehat{AB}$, $\widehat{AC}$의 중점을 각각 $M$, $N$이라 하고, $\overline{MN}$과 $\overline{AB}$, $\overline{AC}$의 교점을 각각 $P$, $Q$라 한다. $\angle ABQ = 15^\circ$, $\angle PQB = 35^\circ$일 때, $\angle AQP$의 크기를 구하라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- 원
+- 점 $A$, $B$, $C$, $M$, $N$, $P$, $Q$
+- 선분 $\overline{AB}$, $\overline{AC}$, $\overline{MN}$
+- 각 $\angle ABQ = 15^\circ$
+- 각 $\angle PQB = 35^\circ$
+- 점 $P$는 $\overline{AB}$와 $\overline{MN}$의 교점
+- 점 $Q$는 $\overline{AC}$와 $\overline{MN}$의 교점
+
+[판독 불가]
+없음

@@ -1,0 +1,19 @@
+[본문과 선택지]
+오른쪽 그림과 같이 원 O는 △ABH에 내접하고 원 O'은 △ACH에 내접한다.  
+$\overline{AB} = 20$, $\overline{BC} = 21$, $\overline{AC} = 17$  
+이고, 두 원 O, O'과 AH의 접점을 각각 P, Q라 할 때, $\overline{PQ}$의 길이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+A, B, C, H, O, O', P, Q  
+$\overline{AB} = 20$, $\overline{BC} = 21$, $\overline{AC} = 17$  
+$\overline{BC} = 21$  
+$\overline{AH}$  
+O, O'는 각각 △ABH, △ACH에 내접  
+P는 O와 AH의 접점  
+Q는 O'와 AH의 접점
+
+[판독 불가]
+없음

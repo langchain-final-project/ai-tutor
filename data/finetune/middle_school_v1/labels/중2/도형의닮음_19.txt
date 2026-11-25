@@ -1,0 +1,18 @@
+[본문과 선택지]
+19
+다음 그림과 같이 $\overrightarrow{AD} \parallel \overrightarrow{BC}$인 사다리꼴 $ABCD$에서
+두 대각선 $AC$, $BD$의 교점 $E$라 하고, $BC$의 중점 $M$,
+$\overrightarrow{AM}$과 $\overrightarrow{BD}$의 교점을 $N$이라 하자. $\triangle ADE = 16$,
+$\triangle BCE = 64$일 때, $\square ENMC$의 넓이를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+$A$, $D$, $B$, $C$, $E$, $M$, $N$,
+$\overrightarrow{AD} \parallel \overrightarrow{BC}$,
+$\triangle ADE$, $\triangle BCE$,
+$\square ENMC$
+
+[판독 불가]
+없음

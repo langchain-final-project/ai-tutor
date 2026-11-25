@@ -1,0 +1,20 @@
+[본문과 선택지]
+12
+오른쪽 그림과 같은 원에서 $\widehat{AB}$의
+중점을 $M$이라 하고 $\overline{PM}$, $\overline{QM}$과
+$\overline{AB}$의 교점을 각각 $R$, $S$라 한다.
+$\angle MPQ = 65^\circ$, $\angle PMQ = 45^\circ$
+일 때, $\angle PRA$의 크기를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- 원: $P$, $Q$, $A$, $B$, $M$, $R$, $S$ 표시
+- $\angle MPQ = 65^\circ$
+- $\angle PMQ = 45^\circ$
+- $\angle R = 45^\circ$ (그림에 표시된 각)
+- $\angle PRA$: 그림에 표시되지 않음
+
+[판독 불가]
+없음

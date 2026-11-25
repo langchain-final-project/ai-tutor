@@ -1,0 +1,16 @@
+[본문과 선택지]
+05
+서로 다른 한 자리의 사연수 $m$, $n$에 대하여
+$$
+\langle m, n \rangle = 2(\langle 0, m \rangle + \langle 0, n \rangle) - (\langle 0, m \rangle n + \langle 0, n \rangle m)
+$$
+이라 할 때, $\langle 2, 4 \rangle \leq \langle m, n \rangle \leq \langle 3, 5 \rangle$를 만족하는 순서쌍 $(m, n)$의 개수를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+없음
+
+[판독 불가]
+없음
