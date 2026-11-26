@@ -117,7 +117,12 @@ export function LearningPathPanel({ snapshot, disabled, loginUrl }: { snapshot: 
           <p>{item.question_text}</p>{item.selection_reason && <p className="solution-help">{item.selection_reason}</p>}
         </li>)}</ol></details>}
       <p className="solution-help">독립 풀이와 복습은 이번 문제에서의 수행 기록이에요. 개념 전체의 숙달 여부는 더 많은 학습으로 확인해요.</p>
-    </> : !loading && availability && (availability.available ? <>
+    </> : !loading && availability && (availability.remediation_suggestion ? <>
+      <p className="solution-notice" role="status">{availability.remediation_suggestion}</p>
+      <button type="button" className="solution-button" disabled={blocked} onClick={() => void advance()}>
+        {pending ? "학습을 준비하고 있어요…" : "보충 학습 보기"}
+      </button>
+    </> : availability.available ? <>
       {eligible ? <><p className="solution-help">현재 문제의 결과를 바탕으로 지원되는 유형의 다음 학습을 확인할 수 있어요.</p>
         <button type="button" className="solution-button" disabled={blocked} onClick={() => void advance()}>{pending ? "학습을 준비하고 있어요…" : "다음 학습 시작하기"}</button></> :
         <details className="tutor-details"><summary>막힌 개념부터 보충할래요</summary>

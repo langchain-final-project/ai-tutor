@@ -14,7 +14,7 @@ from .problem_target import analyze_target
 from .session_model import create_tutor_client, TutorModelError, _student_message
 
 
-POLICY_VERSION = "didgo-tutor-policy-v5"
+POLICY_VERSION = "didgo-tutor-policy-v6"
 
 
 def initial_state():
@@ -97,35 +97,82 @@ def _verified_scaffold(observed):
             f"이제 {variable}를 혼자 남기려면 양변에 어떤 같은 계산을 할까요?")
 
 
-def _verified_constant_hint(observed, *, show_calculation):
-    """문자항을 유지한 채 상수항을 없애는 단계에서 양변에 할 계산을 안내한다."""
+def _constant_removal_hint(constant, other_value, side, *, show_calculation=False):
+    amount = abs(constant)
+    direction = "에 각각" if constant < 0 else "에서 각각"
+    operation = "더해" if constant < 0 else "빼"
+    other_side = "오른쪽" if side == 0 else "왼쪽"
+    hint = f"문자항과 함께 있는 상수항을 없애려면 양변{direction} {amount}만큼 {operation}야 해요."
+    if show_calculation:
+        symbol = "+" if constant < 0 else "-"
+        return f"{hint} {other_side}은 {other_value} {symbol} {amount}, 그 값을 계산해 볼까요?"
+    return f"{hint} {other_side}은 어떻게 바뀔까요?"
+
+
+def _verified_first_hint(observed):
+    """이미 전개된 분수 계수 방정식에서 상수항 제거 방향을 식으로 결정한다."""
+    source = observed["source"]
+    if not observed["tool_supported"] or source is None:
+        return None
+    equation, variable = source["equation"], source["variable"]
+    # 문자항이 괄호 안에 있는 식에는 먼저 전개할 기회를 남긴다.
+    if re.search(rf"\([^=]*{variable}[^=]*\)", equation):
+        return None
+    sides = guided_feedback._sides(equation, variable)
+    for side, (coefficient, constant) in enumerate(sides):
+        other_coefficient, other_value = sides[1 - side]
+        if coefficient.denominator > 1 and constant and not other_coefficient:
+            return _constant_removal_hint(constant, other_value, side)
+    return None
+
+
+def _verified_error_hint(observed, *, show_calculation):
+    """확인된 최초 오류 앞뒤의 식에서 학생이 다시 할 계산을 고른다."""
     result, source = observed["verification"], observed["source"]
     if not observed["tool_supported"] or source is None or result["first_error_step_id"] is None:
         return None
+    variable = source["variable"]
     lines = {row["step_id"]: row["text"] for row in result["steps"]}
     preceding = lines.get(result["valid_prefix_until_step_id"], source["equation"])
+    error_text = lines[result["first_error_step_id"]]
     try:
-        before = guided_feedback._sides(preceding, source["variable"])
-        after = guided_feedback._sides(lines[result["first_error_step_id"]], source["variable"])
+        before = guided_feedback._sides(preceding, variable)
+        after = guided_feedback._sides(error_text, variable)
     except ValueError:
         return None
 
     for side, (coefficient, constant) in enumerate(before):
         other = 1 - side
-        if (not coefficient or not constant or before[other][0] or after[other][0]
-                or after[side] != (coefficient, 0)):
+        if not coefficient or before[other][0]:
             continue
-        amount = abs(constant)
-        direction = "에 각각" if constant < 0 else "에서 각각"
-        operation = "더해" if constant < 0 else "빼"
-        other_side = "오른쪽" if other == 1 else "왼쪽"
-        hint = f"문자항과 함께 있는 상수항을 없애려면 양변{direction} {amount}만큼 {operation}야 해요."
-        if show_calculation:
-            symbol = "+" if constant < 0 else "-"
-            # 계산 결과는 학생이 다음 줄에 직접 적도록 남겨 둔다.
-            return f"{hint} {other_side}은 {before[other][1]} {symbol} {amount}, 그 값을 계산해 볼까요?"
-        return f"{hint} {other_side}은 어떻게 바뀔까요?"
-    return None
+        if constant and not after[other][0] and after[side] == (coefficient, 0):
+            return _constant_removal_hint(constant, before[other][1], side, show_calculation=show_calculation)
+        if not constant and coefficient != 1 and step_verifier._equation(error_text, variable)["complete"]:
+            # 검증기가 오답으로 확인한 학생 식을 그대로 인용한다.
+            hint = (f"적은 식 ‘{error_text}’을 다시 볼까요? "
+                    f"양변을 같은 수로 나눠 문자를 혼자 남겨 보세요. 나눌 수는 {coefficient}입니다.")
+            if show_calculation:
+                hint += f" 문자항이 없는 쪽은 {before[other][1]} ÷ ({coefficient})로 계산해 보세요."
+            return hint
+
+    side_name = observed["evidence"].get("target_side")
+    if side_name not in {"lhs", "rhs"}:
+        return None
+    side = 0 if side_name == "lhs" else 1
+    if not before[side][0] or before[side][0] != after[side][0]:
+        return None
+    # 반대쪽과 문자항이 유지되고, 괄호 전개로 달라진 상수항만 확인한다.
+    before_text = preceding.replace("＝", "=").split("=")[side]
+    after_text = error_text.replace("＝", "=").split("=")[side]
+    product = guided_feedback.distribution_product(before_text, variable)
+    if product is None or re.search(r"[()（）]", after_text):
+        return None
+    factor, inner = product
+    label = "왼쪽" if side == 0 else "오른쪽"
+    if show_calculation:
+        _, inner_constant = _linear_expression_value(inner, variable)
+        return f"{label}의 괄호 안 상수항에도 {factor}를 곱해요. ({factor}) × ({inner_constant})의 값은 얼마일까요?"
+    return f"{label} 괄호를 풀 때, 괄호 앞의 {factor}를 안쪽 상수항에도 곱했는지 확인해 볼까요?"
 
 
 def _evidence(turn):
@@ -282,12 +329,17 @@ def _policy(turn):
         action = "first_hint" if not active and not observed["student_text"] else "guide"
         reason, message, needs_model = ("no_work" if action == "first_hint" else "model_guidance_without_tool_proof"), "", True
         state["help_level"] = max(1, min(2, state["help_level"]))
-    if action in {"error_hint", "scaffold"} and verification["judgement"] == "incorrect":
-        verified_hint = _verified_constant_hint(observed, show_calculation=action == "scaffold")
+    if action == "first_hint":
+        verified_hint = _verified_first_hint(observed)
+        if verified_hint is not None:
+            message, needs_model = verified_hint, False
+            response_source = "verified_first_hint"
+    elif action in {"error_hint", "scaffold"} and verification["judgement"] == "incorrect":
+        verified_hint = _verified_error_hint(observed, show_calculation=action == "scaffold")
         if verified_hint is not None:
             message, needs_model = verified_hint, False
             response_source = "verified_error_hint"
-    if (needs_model or response_source in {"verified_scaffold", "verified_error_hint"}) and action != "answer":
+    if (needs_model or response_source in {"verified_first_hint", "verified_scaffold", "verified_error_hint"}) and action != "answer":
         state["hint_count"] += 1
         state["assisted"] = True
     state["max_help_level"] = max(state["max_help_level"], state["help_level"])

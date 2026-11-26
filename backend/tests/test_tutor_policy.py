@@ -84,6 +84,51 @@ class TutorPolicyTests(unittest.TestCase):
                 self.assertFalse(extra["state"]["answer_revealed"])
                 self.assertEqual(model.calls, 0)
 
+    def test_fraction_first_hint_uses_the_sign_of_the_visible_constant(self):
+        for equation, operation in (
+            ("(3/2)*x-4=5", "양변에 각각 4만큼 더해야"),
+            ("5=(3/2)*x+4", "양변에서 각각 4만큼 빼야"),
+        ):
+            with self.subTest(equation=equation):
+                model = Model("양변에서 4를 빼세요.")
+                result = run_turn(dict(PROBLEM, target_text=equation), {}, [], request("hint"), model_client=model)
+                self.assertEqual(result["response"]["action"], "first_hint")
+                self.assertEqual(result["response"]["source"], "verified_first_hint")
+                self.assertIn(operation, result["response"]["message"])
+                self.assertEqual(result["state"]["hint_count"], 1)
+                self.assertFalse(result["state"]["answer_revealed"])
+                self.assertEqual(model.calls, 0)
+
+    def test_distribution_error_gets_verified_hint_and_additional_help(self):
+        cases = (
+            (PROBLEM["target_text"], "2x+2=3x-3", "왼쪽", "(2) × (2)"),
+            ("2(x+2)=-3(x-1)", "2x+4=-3x-3", "오른쪽", "(-3) × (-1)"),
+        )
+        for equation, line, side, operation in cases:
+            with self.subTest(equation=equation):
+                problem, model = dict(PROBLEM, target_text=equation), Model("전개하면 2x+2가 맞아요.")
+                wrong = run_turn(problem, {}, [], request("submit", line), model_client=model)
+                extra = run_turn(problem, wrong["state"], [], request("more_help"), model_client=model)
+                self.assertEqual(wrong["response"]["verification"]["first_error_step_id"], "s1")
+                self.assertEqual(wrong["response"]["source"], "verified_error_hint")
+                self.assertIn(side, wrong["response"]["message"])
+                self.assertNotIn(operation, wrong["response"]["message"])
+                self.assertIn(operation, extra["response"]["message"])
+                self.assertEqual(extra["state"]["hint_count"], 2)
+                self.assertFalse(extra["state"]["answer_revealed"])
+                self.assertEqual(model.calls, 0)
+
+    def test_verified_division_hint_quotes_the_wrong_student_line_and_keeps_the_next_step(self):
+        model = Model("x=9가 정답입니다.")
+        result = run_turn(dict(PROBLEM, target_text="3x=12"), {}, [], request("submit", "x=9"), model_client=model)
+        self.assertEqual(result["response"]["source"], "verified_error_hint")
+        self.assertEqual(result["response"]["verification"]["judgement"], "incorrect")
+        self.assertIn("적은 식 ‘x=9’", result["response"]["message"])
+        self.assertIn("나눌 수는 3", result["response"]["message"])
+        self.assertNotIn("x=4", result["response"]["message"])
+        self.assertFalse(result["state"]["answer_revealed"])
+        self.assertEqual(model.calls, 0)
+
     def test_correct_prefix_gets_next_step_without_error_claim(self):
         result = run_turn(PROBLEM, initial_state(), [], request("submit", "2x+4=3x-3"), model_client=Model())
         self.assertEqual(result["response"]["action"], "next_step")
@@ -270,7 +315,7 @@ class TutorPolicyTests(unittest.TestCase):
 
     def test_observed_false_expansion_in_natural_language_is_not_published(self):
         message = "2(x+2)를 전개하면 2x+2가 되어야 해요. 왼쪽을 다시 확인해 볼까요?"
-        result = run_turn(PROBLEM, initial_state(), [], request("submit", "2x+2=3x-3"), model_client=Model(message))
+        result = run_turn(PROBLEM, initial_state(), [], request("submit", "x+4=3x-3"), model_client=Model(message))
         self.assertEqual(result["response"]["output_guard"], "generated_math_not_verified")
         self.assertNotIn("2x+2", result["response"]["message"])
         self.assertIn("왼쪽", result["response"]["message"])
@@ -278,7 +323,7 @@ class TutorPolicyTests(unittest.TestCase):
 
     def test_correct_expansion_relation_is_retained_without_claiming_prose_verification(self):
         message = "2(x+2)를 전개하면 2x+4가 돼요. 왼쪽의 상수항을 비교해 볼까요?"
-        result = run_turn(PROBLEM, initial_state(), [], request("submit", "2x+2=3x-3"), model_client=Model(message))
+        result = run_turn(PROBLEM, initial_state(), [], request("submit", "x+4=3x-3"), model_client=Model(message))
         self.assertEqual(result["response"]["message"], message)
         self.assertTrue(result["response"]["output_verification"]["expansions_checked"])
         self.assertFalse(result["response"]["output_verification"]["prose_verified"])

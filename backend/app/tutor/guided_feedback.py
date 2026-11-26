@@ -6,11 +6,14 @@
 # 학생 출력은 고정 템플릿이며 입력 변경·외부 호출은 하지 않음
 # 공통 입출력과 full/compact 문맥 계약은 solution_service.py를 따름
 
+import re
+
 from . import feedback_policy as previous_policy
 from . import step_verifier as verifier
 
 
 GUIDED_POLICY_VERSION = "guided-feedback-v1.0.1"
+_DISTRIBUTIVE_PRODUCT = re.compile(r"([+-]?(?:\d+(?:\.\d*)?|\.\d+|\([+-]?\d+/[+-]?\d+\)))\*?\(([^()]+)\)")
 SIDE_HINTS = {
     "lhs": "표시된 줄의 왼쪽 식이 변형 전과 같은 의미인지 다시 확인해 보세요.",
     "rhs": "표시된 줄의 오른쪽 식이 변형 전과 같은 의미인지 다시 확인해 보세요.",
@@ -47,6 +50,50 @@ def _sides(text, variable):
     if parser.current() is not None:
         raise ValueError("등식 표기를 끝까지 읽지 못했습니다.")
     return ((left.coefficient, left.constant), (right.coefficient, right.constant))
+
+
+def distribution_product(text, variable):
+    """한쪽 식이 수와 괄호의 단일 곱이면 두 부분을 반환한다."""
+    normalized = "".join(token.value for token in verifier._tokens(text, variable))
+    product = _DISTRIBUTIVE_PRODUCT.fullmatch(normalized)
+    return product.groups() if product else None
+
+
+def negative_distribution_error(target, response):
+    """확인된 첫 오류에서 음수 곱의 상수항만 반대 부호가 됐는지 확인한다."""
+    result = response.get("verification") or {}
+    evidence = response.get("evidence") or {}
+    side_name = evidence.get("target_side")
+    if (response.get("tool_supported") is not True or result.get("judgement") != "incorrect"
+            or result.get("earliest_unresolved_step_id") is not None or side_name not in {"lhs", "rhs"}):
+        return False
+    first_error = result.get("first_error_step_id")
+    rows = {row["step_id"]: row for row in result.get("steps", [])}
+    error = rows.get(first_error)
+    if not error or error.get("state") != "active" or error.get("judgement") != "incorrect":
+        return False
+    preceding = rows.get(evidence.get("previous_step_id"), {}).get("text", target)
+    letters = set(re.findall(r"[A-Za-z]", target))
+    if len(letters) != 1:
+        return False
+    variable = next(iter(letters))
+    side = 0 if side_name == "lhs" else 1
+    try:
+        before = _sides(preceding, variable)
+        after = _sides(error["text"], variable)
+        coefficient, constant = before[side]
+        if (before[1 - side] != after[1 - side] or not coefficient or constant <= 0
+                or after[side] != (coefficient, -constant)):
+            return False
+        if re.search(r"[()（）]", error["text"].replace("＝", "=").split("=")[side]):
+            return False
+        product = distribution_product(preceding.replace("＝", "=").split("=")[side], variable)
+        if product is None:
+            return False
+        factor = verifier._Parser(verifier._tokens(product[0], variable), variable).expression().constant
+        return factor < 0
+    except ValueError:
+        return False
 
 
 def error_evidence(problem: dict, work: dict, result: dict) -> dict:

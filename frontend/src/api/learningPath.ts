@@ -1,6 +1,6 @@
 import { ApiError } from "../auth";
 
-export type LearningAvailability = { available: boolean; reason: string };
+export type LearningAvailability = { available: boolean; reason: string; remediation_suggestion?: string };
 
 export type LearningPath = {
   id: number;

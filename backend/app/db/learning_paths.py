@@ -1,5 +1,6 @@
 """원본 튜터와 새 문항의 연습·독립 풀이·지연 복습 시도를 따로 보관한다."""
 
+from contextlib import closing
 from datetime import datetime, timedelta, timezone
 import json
 import re
@@ -8,8 +9,14 @@ from app.db import tutor_sessions
 from app.db.solution_records import ConflictError
 from app.db.submissions import create_text_submission, confirm_input_version
 from app.tutor import learning_catalog as catalog
+from app.tutor.guided_feedback import negative_distribution_error
 from app.tutor.step_verifier import _equation
 from app.tutor.unit_type_matcher import DEFAULT_BANK, equation_focus
+
+
+_BRACKETS_TYPE = '7103048'
+_SIGN_REVIEW_PROMPT = '서로 다른 문제에서 음수끼리 곱한 항의 부호를 놓쳤어요. 음수 곱셈과 분배법칙을 함께 복습해 볼까요?'
+_SIGN_REVIEW_TEXT = '음수끼리 곱하면 양수가 돼요. 괄호 앞의 음수를 안쪽 각 항에 곱하고, 상수항의 부호를 하나씩 확인해 보세요.'
 
 
 def _now(now=None):
@@ -82,18 +89,47 @@ def _candidate(connection, path, source, mode, bank_database, owner_id):
                                           for row in previous])
 
 
+def _repeated_distribution_error(connection, source, owner_id):
+    latest = next((event for event in reversed(source['events']) if event['intent'] == 'submit'), None)
+    if (source['attempt_mode'] != 'practice' or latest is None
+            or not negative_distribution_error(source['target_text'], latest['response'])):
+        return False
+    key = catalog._equation_key(source['target_text'])
+    if key is None:
+        return False
+    current_key = frozenset(key)
+    # 이전 버전의 검증 기록에서도 근거를 확인하고, 같은 등식의 재업로드는 한 문제로 센다.
+    with closing(connection.execute('''SELECT t.target_text, r.response_json
+        FROM problem_submissions s JOIN tutor_sessions t ON t.submission_id=s.id
+        JOIN tutor_turns r ON r.session_id=t.id
+        WHERE s.owner_id=? AND t.id<>? AND t.subject='mathematics' AND r.status='completed'
+          AND json_extract(r.request_json,'$.intent')='submit'
+          AND json_extract(r.response_json,'$.verification.judgement')='incorrect'
+          AND json_extract(r.response_json,'$.evidence.reason_code')='one_side_expression_changed'
+          AND t.input_version_id=(SELECT i.id FROM problem_input_versions i
+              WHERE i.submission_id=s.id ORDER BY i.version_number DESC LIMIT 1)
+        ''', (owner_id, source['id']))) as rows:
+        for target, response in rows:
+            key = catalog._equation_key(target)
+            if key is not None and frozenset(key) != current_key and negative_distribution_error(target, json.loads(response)):
+                return True
+    return False
+
+
 def snapshot(connection, *, path_id, owner_id, bank_database=DEFAULT_BANK, now=None):
     path = _owned(connection, path_id, owner_id)
     source = _source(connection, path, owner_id)
     activities = _activities(connection, path_id)
     active = next((item for item in activities if item['id'] == path['current_activity_id']), None)
+    active_session = (tutor_sessions.snapshot(connection, session_id=active['session_id'], owner_id=owner_id)
+                      if active and source['is_current'] else None)
     mode = _next_mode(path, active)
     next_action = {'label': '현재 문제 계속 풀기', 'reason': '현재 문항의 풀이와 확인을 마친 뒤 다음 학습으로 이어가요.', 'available': False}
     status = 'in_progress'
     if not source['is_current']:
         status = 'source_changed'
         next_action['reason'] = '원본 문제가 수정되었어요. 최신 문제에서 새 튜터와 학습 경로를 시작해 주세요.'
-    elif active and not tutor_sessions.snapshot(connection, session_id=active['session_id'], owner_id=owner_id)['is_current']:
+    elif active_session and not active_session['is_current']:
         status = 'activity_changed'
         next_action['reason'] = '학습 문항이 수정되어 이전 시도의 결과를 이어 쓸 수 없어요. 원래 문제에서 새 학습을 확인해 주세요.'
     elif path['phase'] == 'review_due' and _now(now) < _time(path['review_due_at']):
@@ -114,10 +150,13 @@ def snapshot(connection, *, path_id, owner_id, bank_database=DEFAULT_BANK, now=N
         'outcome': json.loads(item['outcome_json']), 'created_at': item['created_at'], 'completed_at': item['completed_at'],
     } for item in activities]
     remediation = None
-    if path['phase'] == 'remediation':
+    repeat_source = source if path['phase'] == 'remediation' else active_session if path['phase'] == 'practice' else None
+    repeated = (path['type_code'] == _BRACKETS_TYPE and repeat_source and repeat_source['is_current']
+                and _repeated_distribution_error(connection, repeat_source, owner_id))
+    if path['phase'] == 'remediation' or repeated:
         remediation = {
-            'title': path['type_name'] + ' 다시 보기',
-            'text': catalog.TYPES[path['type_code']][1],
+            'title': '음수 곱셈과 분배법칙 다시 보기' if repeated else path['type_name'] + ' 다시 보기',
+            'text': _SIGN_REVIEW_TEXT if repeated else catalog.TYPES[path['type_code']][1],
             'concept_cards': catalog.concept_cards(path['type_code']),
         }
     return {
@@ -174,7 +213,10 @@ def availability(connection, *, session_id, owner_id, bank_database=DEFAULT_BANK
     except (ValueError, ConflictError) as error:
         return {'available': False, 'reason': str(error)}
     item, _, reason = _candidate(connection, {'type_code': code}, source, 'practice', bank_database, owner_id)
-    return {'available': item is not None, 'reason': reason}
+    result = {'available': item is not None, 'reason': reason}
+    if code == _BRACKETS_TYPE and _repeated_distribution_error(connection, source, owner_id):
+        result['remediation_suggestion'] = _SIGN_REVIEW_PROMPT
+    return result
 
 
 def create(connection, *, source_session_id, owner_id, bank_database=DEFAULT_BANK, now=None):

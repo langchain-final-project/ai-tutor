@@ -104,6 +104,48 @@ def independent(client, source):
     return next_activity(client, read(client, path))
 
 
+def test_repeated_sign_error_across_distinct_problems_offers_existing_remediation(learner):
+    _, app, client, _, _ = learner
+
+    def availability(browser, session):
+        response = browser.get(f"/tutor-sessions/{session['id']}/learning-availability")
+        assert response.status_code == 200, response.text
+        return response.json()
+
+    first = new_tutor(client, '-2(x-3)=8')
+    turn(client, first['id'], '-2x-6=8')
+    turn(client, first['id'], '-2x-6=8')
+    assert 'remediation_suggestion' not in availability(client, first)
+
+    same_problem = new_tutor(client, '8=-2(y-3)')
+    turn(client, same_problem['id'], '8=-2y-6')
+    assert 'remediation_suggestion' not in availability(client, same_problem)
+
+    with TestClient(app) as other:
+        login(other, 'learning-second@example.com')
+        other_problem = new_tutor(other, '-3(x-2)=12')
+        turn(other, other_problem['id'], '-3x-6=12')
+        assert 'remediation_suggestion' not in availability(other, other_problem)
+
+    second = new_tutor(client, '-3(x-2)=12')
+    turn(client, second['id'], '-3x-5=12')
+    assert 'remediation_suggestion' not in availability(client, second)
+
+    snapshot, _ = turn(client, second['id'], '-3x-6=12')
+    assert '음수 곱셈과 분배법칙' in availability(client, second)['remediation_suggestion']
+    assert snapshot['events'][-1]['response']['verification']['judgement'] == 'incorrect'
+    # 덧붙인 힌트 요청이나 화면 재진입 후에도 마지막 제출의 추천을 볼 수 있다.
+    turn(client, second['id'], intent='more_help')
+    assert 'remediation_suggestion' in availability(client, second)
+    assert client.get(f"/tutor-sessions/{second['id']}/learning-path").status_code == 404
+
+    path = start(client, second)
+    assert path['phase'] == 'remediation'
+    assert '음수끼리 곱하면 양수' in path['remediation']['text']
+    assert any(card['concept_id'] == 'm1.s1.u03.c007' for card in path['remediation']['concept_cards'])
+    assert next_activity(client, path)['phase'] == 'practice'
+
+
 def test_cycle_uses_new_attempts_waits_for_review_and_restores(learner):
     database, _, client, source, clock = learner
     assert client.get(f"/tutor-sessions/{source['id']}/learning-path").status_code == 404
