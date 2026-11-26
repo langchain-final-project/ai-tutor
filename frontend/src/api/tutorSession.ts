@@ -10,6 +10,10 @@ export type TutorTurn = {
   student_text: string;
   steps: Step[];
 };
+export type TutorWorkPhoto = {
+  lines: Pick<Step, "text" | "state">[];
+  recognition_seconds: number;
+};
 export type TutorState = {
   attempts?: number;
   help_level?: number;
@@ -118,6 +122,17 @@ export const tutorApi = {
     }),
   turn: (id: number, body: TutorTurn, signal?: AbortSignal) =>
     request<TutorSnapshot>(`/tutor-sessions/${id}/turns`, signal, body),
+  async workPhoto(id: number, file: File, signal: AbortSignal): Promise<TutorWorkPhoto> {
+    const body = new FormData();
+    body.append("file", file);
+    const response = await fetch(`/api/tutor-sessions/${id}/work-photo`, {
+      method: "POST", credentials: "same-origin", body, signal,
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) throw new ApiError(response.status, payload?.detail);
+    if (!payload?.lines?.length) throw new Error("인식한 풀이를 읽을 수 없어요.");
+    return payload as TutorWorkPhoto;
+  },
 };
 
 export function tutorMessage(error: unknown): string {

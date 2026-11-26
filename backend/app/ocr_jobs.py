@@ -36,25 +36,23 @@ def configured_qwen_model():
     return os.getenv("DIDGO_QWEN_MODEL", "").strip() or None
 
 
-def build_qwen_pipeline():
-    qwen_url = os.getenv(
-        "DIDGO_QWEN_URL",
-        "http://127.0.0.1:8081/v1",
-    )
-
-    backend = Backend(
-        url=qwen_url,
+def build_qwen_backend() -> Backend:
+    return Backend(
+        url=os.getenv("DIDGO_QWEN_URL", "http://127.0.0.1:8081/v1"),
         timeout=float(os.getenv("DIDGO_OCR_TIMEOUT", "120")),
         image_tokens=(256, 2048),
         model_name=configured_qwen_model(),
     )
 
+
+def build_qwen_pipeline():
+    backend = build_qwen_backend()
     condition_backend = Backend(
-        url=qwen_url,
+        url=backend.url,
         timeout=float(
             os.getenv("DIDGO_CONDITION_TIMEOUT", "180")
         ),
-        model_name=configured_qwen_model(),
+        model_name=backend.model_name,
     )
 
     return OCRPipeline(

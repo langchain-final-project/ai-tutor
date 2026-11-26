@@ -7,6 +7,7 @@ import os
 from pathlib import Path
 import secrets
 import sqlite3
+from time import monotonic
 from typing import Annotated, Callable
 from urllib.parse import quote
 import warnings
@@ -30,12 +31,14 @@ from app.db.submissions import (
     save_student_input_version,
     submission_connection,
 )
+from app.db import tutor_sessions
 from app.ocr_api import create_ocr_router
-from app.ocr_jobs import OCRJobManager, build_qwen_pipeline
+from app.ocr_jobs import OCRJobManager, build_qwen_backend, build_qwen_pipeline
 from app.solution_api import create_solution_router
 from app.tutor_api import create_tutor_router
 from app.learning_api import create_learning_router
 from app.ocr.images import open_image
+from app.ocr.llama import OCRError
 from app.ocr.selection import crop_photo_region
 from app.ocr.quality import check_photo_quality, requires_photo_retake
 from app.db.type_matches import ensure_type_match_schema, load_type_match, save_type_match
@@ -47,6 +50,7 @@ from app.tutor.unit_type_matcher import (
     classify_for_tutoring,
     get_unit_matcher,
 )
+from app.tutor.work_photo import read_student_work
 
 ROOT = Path(__file__).resolve().parents[2]
 MAX_IMAGE_BYTES = 30 * 1024 * 1024
@@ -342,6 +346,37 @@ def create_submission_app(
 
         finally:
             upload.file.close()
+
+    @app.post("/tutor-sessions/{session_id}/work-photo")
+    def recognize_work_photo(
+        session_id: int,
+        file: Annotated[UploadFile, File()],
+        student_id: Annotated[str, Depends(current_owner)],
+    ):
+        try:
+            with submission_connection(database) as connection:
+                session = tutor_sessions.snapshot(connection, session_id=session_id, owner_id=student_id)
+        except LookupError as error:
+            raise HTTPException(404, "튜터 기록을 찾을 수 없어요.") from error
+        if not session["can_submit"] or (session["pending_request"] or {}).get("status") == "running":
+            raise HTTPException(409, "현재 풀이를 확인한 뒤 사진을 올려 주세요.")
+
+        try:
+            content = file.file.read(MAX_IMAGE_BYTES + 1)
+        finally:
+            file.file.close()
+        validate_photo(content)
+        started = monotonic()
+        try:
+            lines = read_student_work(build_qwen_backend(), content)
+        except (OCRError, ValueError) as error:
+            logger.warning("풀이 사진 인식 실패: session=%s, reason=%s", session_id, error)
+            raise HTTPException(503, "풀이 사진을 인식하지 못했어요. 다시 시도하거나 직접 입력해 주세요.") from error
+        if not lines:
+            raise HTTPException(422, "읽을 풀이를 찾지 못했어요. 풀이가 잘 보이는 사진으로 다시 올려 주세요.")
+
+        # 사진은 저장하지 않고, 학생이 확인한 줄을 기존 튜터 제출에서 저장한다.
+        return {"lines": lines, "recognition_seconds": round(monotonic() - started, 3)}
 
     @app.post("/submissions/{submission_id}/equation", status_code=201)
     def submit_photo_equation(

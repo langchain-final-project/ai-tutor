@@ -7,6 +7,7 @@ import { tutorApi, tutorMessage } from "./api/tutorSession";
 import type { TutorEvent, TutorIntent, TutorSnapshot, TutorTargetChoice, TutorTargetPreview, TutorTurn, TypeMatch } from "./api/tutorSession";
 import { MathFormula } from "./components/MathFormula";
 import { ProblemConditions } from "./components/ProblemConditions";
+import { TutorWorkPhoto } from "./components/TutorWorkPhoto";
 import { LearningPathList, LearningPathPanel } from "./LearningPathPanel";
 import "./tutor-workspace.css";
 
@@ -98,6 +99,8 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
   const [target, setTarget] = useState("");
   const [confirmed, setConfirmed] = useState(false);
   const [steps, setSteps] = useState<Step[]>([newStep()]);
+  const [photoSteps, setPhotoSteps] = useState<Step[] | null>(null);
+  const [readingPhoto, setReadingPhoto] = useState(false);
   const [studentText, setStudentText] = useState("");
   const [retry, setRetry] = useState<Pending | null>(null);
   const [loading, setLoading] = useState(true);
@@ -254,7 +257,7 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
     finally { busy.current = false; if (alive.current) setPending(""); }
   }
   async function send(intent: TutorIntent, saved?: Pending) {
-    if (busy.current || !snapshot || !canSubmit) return;
+    if (busy.current || !snapshot || !canSubmit || readingPhoto || photoSteps) return;
     const active = steps.filter((step) => step.text.trim() || step.state === "uncertain");
     if (!saved && intent === "submit" && !active.length && !studentText.trim()) {
       setError("풀이 한 줄이나 생각한 내용을 적어 주세요. 풀이 없이 시작하려면 첫 힌트를 선택해 주세요."); return;
@@ -281,7 +284,9 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
     finally { busy.current = false; if (alive.current) setPending(""); }
   }
   function updateStep(index: number, changes: Partial<Step>) {
-    setSteps((current) => current.map((step, position) => position === index ? { ...step, ...changes } : step));
+    const update = (current: Step[]) => current.map((step, position) => position === index ? { ...step, ...changes } : step);
+    if (photoSteps) setPhotoSteps(update(photoSteps));
+    else setSteps(update);
   }
   const disabled = loading || pending !== "";
   const running = snapshot?.pending_request?.status === "running" &&
@@ -294,9 +299,11 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
   const independentAttempt = snapshot?.attempt_mode === "independent" || snapshot?.attempt_mode === "review";
   const requiresTarget = snapshot?.target_selection?.status === "selection_required";
   const canSubmit = snapshot?.is_current === true && snapshot.can_submit !== false && !requiresTarget;
+  const editingDisabled = disabled || !canSubmit || !!retry || readingPhoto;
+  const submittingDisabled = editingDisabled || photoSteps !== null;
   const startTarget = source ? target.trim() : target.trim() || question.trim();
   const last = snapshot?.events?.at(-1);
-  const currentCheck = last?.intent === "submit" && JSON.stringify(last.steps) === JSON.stringify(steps.filter((step) => step.text.trim() || step.state === "uncertain")) ? last.response.verification : null;
+  const currentCheck = !photoSteps && last?.intent === "submit" && JSON.stringify(last.steps) === JSON.stringify(steps.filter((step) => step.text.trim() || step.state === "uncertain")) ? last.response.verification : null;
 
   return <div className="solution-workspace tutor-workspace" aria-busy={disabled}>
     <div className="solution-section-header tutor-top-links">
@@ -402,32 +409,46 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
           <section className="solution-card"><p className="solution-eyebrow">02 · 내 시도</p><h2>풀이와 생각을 적어 주세요</h2>
             <p className="solution-help">{independentAttempt ? "먼저 도움 없이 풀어보세요. 막히면 도움을 요청할 수 있어요." : "풀이를 아직 시작하지 않았다면 바로 첫 힌트를 요청해도 돼요."} 수정한 줄은 다시 제출하면 새 기록으로 남아요.</p>
             {independentAttempt && <p className="solution-notice">풀이 제출은 자동 힌트 없이 확인해요. 힌트나 답·해설을 요청하면 도움받은 기록을 남기고, 이번 문제의 독립 수행은 다시 확인해야 해요.</p>}
+            <TutorWorkPhoto key={snapshot.id} sessionId={snapshot.id} loginUrl={loginUrl} disabled={editingDisabled}
+              reviewing={photoSteps !== null} onReading={setReadingPhoto} onRead={setPhotoSteps} />
+            {photoSteps && <p className="solution-notice" role="status">사진과 대조해서 줄을 고쳐 주세요. 읽기 어려운 줄은 ‘확인 필요’로 남겨 주세요.</p>}
             <form className="solution-form" onSubmit={(event) => { event.preventDefault(); void send("submit"); }}>
-              <ol className="solution-work-lines">{steps.map((step, index) => {
+              <ol className="solution-work-lines">{(photoSteps ?? steps).map((step, index) => {
                 const checked = currentCheck?.steps?.find((item) => item.step_id === step.id);
                 return <li key={step.id} className={`solution-line ${checked?.judgement === "incorrect" ? "is-error" : ""} ${step.state === "uncertain" ? "is-unresolved" : ""} ${step.state === "deleted" ? "is-deleted" : ""}`}>
                   <span className="solution-line-number">{index + 1}</span><label className="solution-label solution-line-input">풀이 {index + 1}번째 줄
-                    <input className="solution-input" value={step.text} maxLength={10000} disabled={disabled || !canSubmit || !!retry}
+                    <input className="solution-input" value={step.text} maxLength={10000} disabled={editingDisabled}
                       onChange={(event) => updateStep(index, { text: event.target.value })} placeholder="내가 계산한 식 또는 풀이" /></label>
-                  <label className="solution-label solution-line-state">줄 상태<select className="solution-input" value={step.state} disabled={disabled || !canSubmit || !!retry}
+                  <label className="solution-label solution-line-state">줄 상태<select className="solution-input" value={step.state} disabled={editingDisabled}
                     onChange={(event) => updateStep(index, { state: event.target.value as Step["state"] })}>
                     <option value="active">사용</option><option value="uncertain">확인 필요</option><option value="deleted">지운 줄</option></select></label>
                 </li>;
               })}</ol>
-              <button className="solution-button is-secondary" type="button" disabled={disabled || !canSubmit || !!retry || steps.length >= 100} onClick={() => setSteps((value) => [...value, newStep()])}>+ 풀이 줄 추가</button>
+              <button className="solution-button is-secondary" type="button" disabled={editingDisabled || (photoSteps ?? steps).length >= 100} onClick={() => {
+                if (photoSteps) setPhotoSteps([...photoSteps, newStep()]);
+                else setSteps((value) => [...value, newStep()]);
+              }}>+ 풀이 줄 추가</button>
+              {photoSteps && <div className="tutor-actions">
+                <button className="solution-button" type="button" disabled={editingDisabled} onClick={() => {
+                  setSteps(photoSteps);
+                  setPhotoSteps(null);
+                  setNotice("확인한 사진 풀이를 입력했어요. 제출하면 튜터 기록에 저장돼요.");
+                }}>{steps.some((step) => step.text.trim()) ? "사진 속 줄로 풀이 바꾸기" : "확인한 줄 사용하기"}</button>
+                <button className="solution-button is-secondary" type="button" onClick={() => setPhotoSteps(null)}>사진 풀이 취소</button>
+              </div>}
               <label className="solution-label" htmlFor="tutor-student-text">궁금한 점·내 생각<textarea id="tutor-student-text" className="solution-input" rows={3} maxLength={10000}
-                value={studentText} disabled={disabled || !canSubmit || !!retry} onChange={(event) => setStudentText(event.target.value)} placeholder="어디에서 막혔는지 자유롭게 적어 주세요." /></label>
+                value={studentText} disabled={editingDisabled} onChange={(event) => setStudentText(event.target.value)} placeholder="어디에서 막혔는지 자유롭게 적어 주세요." /></label>
               <p className="solution-help">도움을 요청하거나 제출하면 입력한 풀이를 확인한 것으로 기록해요. 읽기 어려운 줄은 ‘확인 필요’로 표시해 주세요.</p>
               <div className="tutor-actions">
-                <button className="solution-button" disabled={disabled || !canSubmit || !!retry}>{
+                <button className="solution-button" disabled={submittingDisabled}>{
                   independentAttempt ? "풀이 확인 (자동 힌트 없음)" :
                   snapshot.target_selection?.status === "open_problem" ? "풀이 제출" : "풀이 제출하고 도움받기"
                 }</button>
-                <button className="solution-button is-secondary" type="button" disabled={disabled || !canSubmit || !!retry} onClick={() => void send("hint")}>첫 힌트 보기</button>
-                <button className="solution-button is-secondary" type="button" disabled={disabled || !canSubmit || !!retry} onClick={() => void send("more_help")}>조금 더 도와주세요</button>
+                <button className="solution-button is-secondary" type="button" disabled={submittingDisabled} onClick={() => void send("hint")}>첫 힌트 보기</button>
+                <button className="solution-button is-secondary" type="button" disabled={submittingDisabled} onClick={() => void send("more_help")}>조금 더 도와주세요</button>
               </div>
               <details className="tutor-details"><summary>답과 전체 해설이 필요해요</summary><p className="solution-help">답을 보면 공개 이력이 남아요. 혼자 푸는 능력은 이후 다른 문제에서 따로 확인해요.</p>
-                <button className="solution-button is-secondary" type="button" disabled={disabled || !canSubmit || !!retry} onClick={() => void send("answer")}>답·해설 보기</button></details>
+                <button className="solution-button is-secondary" type="button" disabled={submittingDisabled} onClick={() => void send("answer")}>답·해설 보기</button></details>
             </form>
           </section>
         </div>

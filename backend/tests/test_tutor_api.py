@@ -1,7 +1,7 @@
 """실제 쿠키와 임시 DB로 튜터의 소유권·중복·응답 공개 경계를 검사한다."""
 
 from concurrent.futures import ThreadPoolExecutor
-from contextlib import closing
+from contextlib import closing, nullcontext
 from copy import deepcopy
 from io import BytesIO
 import importlib.util
@@ -137,6 +137,56 @@ def test_tutor_requires_cookie_and_keeps_other_students_out(tutor):
             "expected_input_version_number": 1, "target_text": QUESTION,
         }).status_code == 404
     assert runner.calls == []
+
+
+def test_work_photo_keeps_ocr_draft_separate_from_student_submission(tutor, monkeypatch):
+    _, app, client, runner, _ = tutor
+    session = start(client, problem(client))
+    endpoint = f"/tutor-sessions/{session['id']}"
+    image = BytesIO()
+    Image.new("RGB", (8, 8), "white").save(image, format="PNG")
+    upload = {"file": ("work.png", image.getvalue(), "image/png")}
+
+    class PhotoReader:
+        finish_reason = "stop"
+
+        def connect(self):
+            return nullcontext(self)
+
+        def stream(self, image, prompt, _max_tokens):
+            assert image.startswith(b"\x89PNG") and "Preserve wrong calculations" in prompt
+            yield {"type": "complete", "finish_reason": self.finish_reason, "text": json.dumps({"lines": [
+                {"text": "x=5", "state": "active"},
+                {"text": "x=4", "state": "deleted"},
+                {"text": "x=?", "state": "active"},
+            ]})}
+
+    reader = PhotoReader()
+    monkeypatch.setattr(submission_api, "build_qwen_backend", lambda: reader)
+    with closing(TestClient(app)) as other:
+        assert other.post(endpoint + "/work-photo", files=upload).status_code == 401
+        login(other, "photo-other@example.com")
+        assert other.post(endpoint + "/work-photo", files=upload).status_code == 404
+    assert client.post(endpoint + "/work-photo", files={"file": ("bad.png", b"not a picture")}).status_code == 400
+
+    recognized = client.post(endpoint + "/work-photo", files=upload)
+    assert recognized.status_code == 200, recognized.text
+    assert recognized.json()["lines"] == [
+        {"text": "x=5", "state": "active"},
+        {"text": "x=4", "state": "deleted"},
+        {"text": "x=?", "state": "uncertain"},
+    ]
+    assert recognized.json()["recognition_seconds"] >= 0
+    reader.finish_reason = "length"
+    assert client.post(endpoint + "/work-photo", files=upload).status_code == 503
+    assert client.get(endpoint).json()["events"] == []
+    assert len(client.get("/submissions").json()) == 1
+    assert runner.calls == []
+
+    reviewed = [{"id": "confirmed-line", "text": "x=7", "state": "active"}]
+    response = client.post(endpoint + "/turns", json={**turn(intent="submit"), "steps": reviewed})
+    assert response.status_code == 200, response.text
+    assert client.get(endpoint).json()["events"][-1]["steps"] == reviewed
 
 
 def test_start_needs_confirmed_current_input_and_is_idempotent(tutor):

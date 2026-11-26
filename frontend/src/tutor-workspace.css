@@ -12,6 +12,10 @@
 .tutor-details summary { cursor: pointer; color: #35547b; line-height: 1.6; }
 .tutor-details[open] summary { margin-bottom: .75rem; }
 .tutor-source-photo { display: block; max-width: 100%; max-height: 460px; object-fit: contain; margin: 1rem 0; }
+.tutor-work-photo { margin-block: 1rem; }
+.tutor-work-photo .tutor-details, .tutor-work-photo p { margin: .5rem 0; }
+.tutor-work-photo-image { max-height: 320px; }
+.tutor-work-photo [role="alert"] { color: #9b2635; }
 .tutor-event-list { list-style: none; padding: 0; margin: 0; }
 .tutor-event { border-bottom: 1px solid #d7e0ed; padding: 1.2rem 0; }
 .tutor-event:first-child { padding-top: .5rem; }
