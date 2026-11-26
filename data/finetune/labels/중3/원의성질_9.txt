@@ -1,0 +1,16 @@
+[본문과 선택지]
+오른쪽 그림과 같은 원에서 $\widehat{AB}$, $\widehat{AC}$ 의 중점을 각각 M, N이라 하고, $\overline{MN}$과 $\overline{AB}$, $\overline{AC}$ 의 교점을 각각 P, Q라 한다. $\angle ABQ=15^{\circ}$, $\angle PQB=35^{\circ}$일 때, $\angle AQP$의 크기를 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- 원 위에 점 A, B, C, M, N이 표시됨.
+- 선분 AB, AC, MN이 표시됨.
+- 점 P는 선분 AB와 MN의 교점.
+- 점 Q는 선분 AC와 MN의 교점.
+- 각 ABQ에 15°가 표시됨.
+- 각 PQB에 35°가 표시됨.
+
+[판독 불가]
+없음

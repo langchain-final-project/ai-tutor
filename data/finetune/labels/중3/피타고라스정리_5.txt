@@ -1,0 +1,12 @@
+[본문과 선택지]
+05
+$\overline{\mathrm{AB}}=3, \overline{\mathrm{AC}}=4, \overline{\mathrm{BC}}=2$ 인 $\triangle \mathrm{ABC}$ 에서 $\overline{\mathrm{BC}}$ 를 4등분한 점을 차례로 D, E, F 라 할 때, $\overline{\mathrm{AD}}^{2}+\overline{\mathrm{AF}}^{2}$ 의 값을 구하여라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+없음
+
+[판독 불가]
+없음

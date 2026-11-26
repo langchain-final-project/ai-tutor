@@ -1,0 +1,19 @@
+[본문과 선택지]
+오른쪽 그림에서
+\[
+\overline{AB} = \frac{1}{2} \overline{BC}
+\]
+이고
+점 M, N은 각각 \(\overline{AB}\), \(\overline{BC}\)의 중점이다.
+\[
+\overline{AB} = 8 \, \text{cm} \quad \text{일 때}, \quad \overline{MN} \quad \text{의 길이를 구하시오}.
+\]
+
+[그림에 표시된 정보]
+- 수직선 위에 A, M, B, N, C 순서로 점들이 표시됨
+- A와 B 사이에는 "8 cm"라고 표시됨
+- 점 M은 AB의 중점, 점 N은 BC의 중점임 (문서 정보)
+- AB = 8 cm (문서 정보)
+
+[판독 불가]
+없음

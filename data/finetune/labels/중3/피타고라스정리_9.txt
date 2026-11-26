@@ -1,0 +1,46 @@
+[본문과 선택지]
+없음
+
+[표]
+없음
+
+[그림에 표시된 정보]
+- 정사각형 ABCD의 변 AB, BC, CD, DA의 길이는 각각 12cm입니다.
+- 정사각형 ABCD 내부에 정사각형 AECF가 겹쳐 있습니다.
+- 정사각형 AECF의 변 AE와 AF는 정사각형 ABCD의 대각선 AC와 BD 위에 위치합니다.
+- 정사각형 AECF의 변 EF는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 CF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 DE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 BF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 CE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 DF는 정사각형 ABCD의 변 CD 위에 위치합니다.
+- 정사각형 AECF의 변 BE는 정사각형 ABCD의 변 AB 위에 위치합니다.
+- 정사각형 AECF의 변 CF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 DE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 BF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 CE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 DF는 정사각형 ABCD의 변 CD 위에 위치합니다.
+- 정사각형 AECF의 변 BE는 정사각형 ABCD의 변 AB 위에 위치합니다.
+- 정사각형 AECF의 변 CF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 DE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 BF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 CE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 DF는 정사각형 ABCD의 변 CD 위에 위치합니다.
+- 정사각형 AECF의 변 BE는 정사각형 ABCD의 변 AB 위에 위치합니다.
+- 정사각형 AECF의 변 CF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 DE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 BF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 CE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 DF는 정사각형 ABCD의 변 CD 위에 위치합니다.
+- 정사각형 AECF의 변 BE는 정사각형 ABCD의 변 AB 위에 위치합니다.
+- 정사각형 AECF의 변 CF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 DE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 BF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 CE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 DF는 정사각형 ABCD의 변 CD 위에 위치합니다.
+- 정사각형 AECF의 변 BE는 정사각형 ABCD의 변 AB 위에 위치합니다.
+- 정사각형 AECF의 변 CF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 DE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사각형 AECF의 변 BF는 정사각형 ABCD의 변 BC 위에 위치합니다.
+- 정사각형 AECF의 변 CE는 정사각형 ABCD의 변 AD 위에 위치합니다.
+- 정사

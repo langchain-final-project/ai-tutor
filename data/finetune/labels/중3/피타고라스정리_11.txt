@@ -1,0 +1,20 @@
+[본문과 선택지]
+사진에 보이는 문장을 읽는 순서대로 옮기세요.
+
+11
+오른쪽 그림과 같이
+$\overline{AB}=\overline{AC}=\overline{BD}=\overline{CD}=3$
+이고, $\overline{AD}=\overline{BC}=2$인 사면체
+A-BCD에 내접하는 구의 반
+지름의 길이를 구하라.
+
+[표]
+없음
+
+[그림에 표시된 정보]
+사면체 A-BCD의 꼭짓점 A, B, C, D가 표시되어 있습니다.
+사면체의 모가 $\overline{AB}$, $\overline{AC}$, $\overline{BD}$, $\overline{CD}$, $\overline{AD}$, $\overline{BC}$로 표시되어 있습니다.
+그중 $\overline{AB}$, $\overline{AC}$, $\overline{BD}$, $\overline{CD}$는 실선으로, $\overline{AD}$와 $\overline{BC}$는 점선으로 표시되어 있습니다.
+
+[판독 불가]
+없음

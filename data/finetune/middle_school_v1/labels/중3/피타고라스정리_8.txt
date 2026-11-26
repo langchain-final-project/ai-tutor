@@ -3,7 +3,7 @@
 다음 그림과 같이 직사각형 모양의 종이 ABCD를 $\overrightarrow{EF}$  
 와 $\overrightarrow{GH}$를 선으로 하여 $\overrightarrow{EA'}\parallel\overrightarrow{GD'}$이 되도록 각각  
 절었다. $\overline{AB}=1$, $\overline{EF}=3$일 때, $\triangle EFP$와 $\triangle CQH$의 넓  
-이의 比를 구하여라.
+이의 비를 구하여라.
 
 [표]  
 없음
