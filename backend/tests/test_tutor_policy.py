@@ -63,6 +63,27 @@ class TutorPolicyTests(unittest.TestCase):
         self.assertEqual(result["response"]["verification"]["judgement"], "incorrect")
         self.assertFalse(result["state"]["solved"])
 
+    def test_constant_removal_hint_uses_verified_direction_without_a_model(self):
+        cases = (
+            ("(x-6)+(x-6)+(x-6)=18", ("(x-6)+(x-6)+(x-6)=18", "3x-18=18", "3x=38", "x=12"),
+             "s3", "양변에 각각 18만큼 더해야", "오른쪽은 18 + 18"),
+            ("14=2x+4", ("16=2x",), "s1", "양변에서 각각 4만큼 빼야", "왼쪽은 14 - 4"),
+        )
+        for equation, lines, error_step, direction, calculation in cases:
+            with self.subTest(equation=equation):
+                problem = dict(PROBLEM, target_text=equation)
+                model = Model("3x - 18 = 18에서 18을 양변에서 빼면 어떻게 되나요?")
+                wrong = run_turn(problem, initial_state(), [], request("submit", *lines), model_client=model)
+                self.assertEqual(wrong["response"]["verification"]["first_error_step_id"], error_step)
+                self.assertIn(direction, wrong["response"]["message"])
+                self.assertNotIn(calculation, wrong["response"]["message"])
+                extra = run_turn(problem, wrong["state"], [], request("more_help"), model_client=model)
+                self.assertIn(calculation, extra["response"]["message"])
+                self.assertEqual(extra["state"]["hint_count"], 2)
+                self.assertTrue(extra["state"]["assisted"])
+                self.assertFalse(extra["state"]["answer_revealed"])
+                self.assertEqual(model.calls, 0)
+
     def test_correct_prefix_gets_next_step_without_error_claim(self):
         result = run_turn(PROBLEM, initial_state(), [], request("submit", "2x+4=3x-3"), model_client=Model())
         self.assertEqual(result["response"]["action"], "next_step")

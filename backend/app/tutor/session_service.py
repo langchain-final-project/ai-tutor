@@ -14,7 +14,7 @@ from .problem_target import analyze_target
 from .session_model import create_tutor_client, TutorModelError, _student_message
 
 
-POLICY_VERSION = "didgo-tutor-policy-v4"
+POLICY_VERSION = "didgo-tutor-policy-v5"
 
 
 def initial_state():
@@ -95,6 +95,37 @@ def _verified_scaffold(observed):
     particle = "에서" if left_coefficient > 0 else "에"
     return (f"양변{particle} {term}를 {operation} {equation}이 돼요. "
             f"이제 {variable}를 혼자 남기려면 양변에 어떤 같은 계산을 할까요?")
+
+
+def _verified_constant_hint(observed, *, show_calculation):
+    """문자항을 유지한 채 상수항을 없애는 단계에서 양변에 할 계산을 안내한다."""
+    result, source = observed["verification"], observed["source"]
+    if not observed["tool_supported"] or source is None or result["first_error_step_id"] is None:
+        return None
+    lines = {row["step_id"]: row["text"] for row in result["steps"]}
+    preceding = lines.get(result["valid_prefix_until_step_id"], source["equation"])
+    try:
+        before = guided_feedback._sides(preceding, source["variable"])
+        after = guided_feedback._sides(lines[result["first_error_step_id"]], source["variable"])
+    except ValueError:
+        return None
+
+    for side, (coefficient, constant) in enumerate(before):
+        other = 1 - side
+        if (not coefficient or not constant or before[other][0] or after[other][0]
+                or after[side] != (coefficient, 0)):
+            continue
+        amount = abs(constant)
+        direction = "에 각각" if constant < 0 else "에서 각각"
+        operation = "더해" if constant < 0 else "빼"
+        other_side = "오른쪽" if other == 1 else "왼쪽"
+        hint = f"문자항과 함께 있는 상수항을 없애려면 양변{direction} {amount}만큼 {operation}야 해요."
+        if show_calculation:
+            symbol = "+" if constant < 0 else "-"
+            # 계산 결과는 학생이 다음 줄에 직접 적도록 남겨 둔다.
+            return f"{hint} {other_side}은 {before[other][1]} {symbol} {amount}, 그 값을 계산해 볼까요?"
+        return f"{hint} {other_side}은 어떻게 바뀔까요?"
+    return None
 
 
 def _evidence(turn):
@@ -251,7 +282,12 @@ def _policy(turn):
         action = "first_hint" if not active and not observed["student_text"] else "guide"
         reason, message, needs_model = ("no_work" if action == "first_hint" else "model_guidance_without_tool_proof"), "", True
         state["help_level"] = max(1, min(2, state["help_level"]))
-    if (needs_model or response_source == "verified_scaffold") and action != "answer":
+    if action in {"error_hint", "scaffold"} and verification["judgement"] == "incorrect":
+        verified_hint = _verified_constant_hint(observed, show_calculation=action == "scaffold")
+        if verified_hint is not None:
+            message, needs_model = verified_hint, False
+            response_source = "verified_error_hint"
+    if (needs_model or response_source in {"verified_scaffold", "verified_error_hint"}) and action != "answer":
         state["hint_count"] += 1
         state["assisted"] = True
     state["max_help_level"] = max(state["max_help_level"], state["help_level"])
