@@ -10,13 +10,14 @@ from app.db.solution_records import ConflictError
 from app.db.submissions import create_text_submission, confirm_input_version
 from app.tutor import learning_catalog as catalog
 from app.tutor.guided_feedback import negative_distribution_error
+from app.tutor.problem_target import analyze_target, expression_type
 from app.tutor.step_verifier import _equation
 from app.tutor.unit_type_matcher import DEFAULT_BANK, equation_focus
 
 
-_BRACKETS_TYPE = '7103048'
 _SIGN_REVIEW_PROMPT = '서로 다른 문제에서 음수끼리 곱한 항의 부호를 놓쳤어요. 음수 곱셈과 분배법칙을 함께 복습해 볼까요?'
 _SIGN_REVIEW_TEXT = '음수끼리 곱하면 양수가 돼요. 괄호 앞의 음수를 안쪽 각 항에 곱하고, 상수항의 부호를 하나씩 확인해 보세요.'
+_SIGN_PREREQUISITES = ('m1.s1.u02.c015', 'm1.s1.u02.c019', 'm1.s1.u03.c007')
 
 
 def _now(now=None):
@@ -94,26 +95,32 @@ def _repeated_distribution_error(connection, source, owner_id):
     if (source['attempt_mode'] != 'practice' or latest is None
             or not negative_distribution_error(source['target_text'], latest['response'])):
         return False
-    key = catalog._equation_key(source['target_text'])
-    if key is None:
+    current_key = _error_problem_key(source['target_text'])
+    if current_key is None:
         return False
-    current_key = frozenset(key)
-    # 이전 버전의 검증 기록에서도 근거를 확인하고, 같은 등식의 재업로드는 한 문제로 센다.
+    # 이전 버전의 검증 기록에서도 근거를 확인하고, 같은 식의 재업로드는 한 문제로 센다.
     with closing(connection.execute('''SELECT t.target_text, r.response_json
         FROM problem_submissions s JOIN tutor_sessions t ON t.submission_id=s.id
         JOIN tutor_turns r ON r.session_id=t.id
-        WHERE s.owner_id=? AND t.id<>? AND t.subject='mathematics' AND r.status='completed'
+        WHERE s.owner_id=? AND t.id<>? AND r.id<? AND t.subject='mathematics' AND r.status='completed'
           AND json_extract(r.request_json,'$.intent')='submit'
           AND json_extract(r.response_json,'$.verification.judgement')='incorrect'
-          AND json_extract(r.response_json,'$.evidence.reason_code')='one_side_expression_changed'
+          AND json_extract(r.response_json,'$.evidence.reason_code') IN ('one_side_expression_changed','linear_expression_changed')
           AND t.input_version_id=(SELECT i.id FROM problem_input_versions i
               WHERE i.submission_id=s.id ORDER BY i.version_number DESC LIMIT 1)
-        ''', (owner_id, source['id']))) as rows:
+        ''', (owner_id, source['id'], latest['id']))) as rows:
         for target, response in rows:
-            key = catalog._equation_key(target)
-            if key is not None and frozenset(key) != current_key and negative_distribution_error(target, json.loads(response)):
+            key = _error_problem_key(target)
+            if key is not None and key != current_key and negative_distribution_error(target, json.loads(response)):
                 return True
     return False
+
+
+def _error_problem_key(text):
+    key = catalog.problem_key(text)
+    if key is not None and key[0] == 'equation':
+        return key[0], frozenset(key[1])
+    return key
 
 
 def snapshot(connection, *, path_id, owner_id, bank_database=DEFAULT_BANK, now=None):
@@ -151,13 +158,13 @@ def snapshot(connection, *, path_id, owner_id, bank_database=DEFAULT_BANK, now=N
     } for item in activities]
     remediation = None
     repeat_source = source if path['phase'] == 'remediation' else active_session if path['phase'] == 'practice' else None
-    repeated = (path['type_code'] == _BRACKETS_TYPE and repeat_source and repeat_source['is_current']
+    repeated = (repeat_source and repeat_source['is_current']
                 and _repeated_distribution_error(connection, repeat_source, owner_id))
     if path['phase'] == 'remediation' or repeated:
         remediation = {
             'title': '음수 곱셈과 분배법칙 다시 보기' if repeated else path['type_name'] + ' 다시 보기',
             'text': _SIGN_REVIEW_TEXT if repeated else catalog.TYPES[path['type_code']][1],
-            'concept_cards': catalog.concept_cards(path['type_code']),
+            'concept_cards': catalog.concept_cards(path['type_code'], prerequisite_ids=_SIGN_PREREQUISITES if repeated else ()),
         }
     return {
         'id': path['id'], 'revision': path['revision'], 'source_session_id': path['source_session_id'],
@@ -186,18 +193,28 @@ def get_for_session(connection, *, session_id, owner_id, bank_database=DEFAULT_B
 def _new_path_type(source):
     if not source['is_current']:
         raise ConflictError('확인한 최신 문제에서 학습 경로를 시작해 주세요.')
-    letters = set(re.findall(r'[A-Za-z]', source['target_text']))
-    if source['subject'] != 'mathematics' or len(letters) != 1:
-        raise ValueError('이번 학습 경로는 해가 하나인 일차방정식을 지원해요.')
+    if source['subject'] != 'mathematics':
+        raise ValueError('이번 학습 경로는 일차식 계산과 해가 하나인 일차방정식을 지원해요.')
+    target = source['target_text']
+    reference = source.get('type_match') or {}
+    selected = reference.get('selected_type') or {}
+    selected_code = selected.get('source_topic_code')
+    target_info = analyze_target(target)
+    if target_info['status'] == 'linear_expression':
+        if selected_code in catalog.EXPRESSION_TYPES and (reference.get('status') == 'curated_reference' or reference.get('is_provisional') is False):
+            return selected_code
+        return expression_type(target_info['normalized_text'])
+    letters = set(re.findall(r'[A-Za-z]', target))
+    if len(letters) != 1:
+        raise ValueError('이번 학습 경로는 일차식 계산과 해가 하나인 일차방정식을 지원해요.')
     try:
         if _equation(source['target_text'], next(iter(letters)))['root'] is None:
             raise ValueError
     except ValueError:
         raise ValueError('검수한 유일해 일차방정식에서만 학습 경로를 시작할 수 있어요.') from None
-    selected = (source.get('type_match') or {}).get('selected_type') or {}
     # 본문 전체의 잠정 참고 유형 대신 학생이 확인한 단일 등식을 기존 분류 규칙에 전달한다.
     # 원래 제출의 유형 저장값은 그대로 두고 이번 학습 목표만 정한다.
-    code = equation_focus('방정식 ' + source['target_text'] + ' 풀어라')[0] or selected.get('source_topic_code')
+    code = equation_focus('방정식 ' + target + ' 풀어라')[0] or selected_code
     # 선택한 식은 이미 평문으로 확인됐다. (x+1)/2 같은 수 분모도 분수 계수 유형이다.
     if code in {'7103047', '7103048'} and '/' in source['target_text']:
         code = '7103050'
@@ -214,7 +231,7 @@ def availability(connection, *, session_id, owner_id, bank_database=DEFAULT_BANK
         return {'available': False, 'reason': str(error)}
     item, _, reason = _candidate(connection, {'type_code': code}, source, 'practice', bank_database, owner_id)
     result = {'available': item is not None, 'reason': reason}
-    if code == _BRACKETS_TYPE and _repeated_distribution_error(connection, source, owner_id):
+    if _repeated_distribution_error(connection, source, owner_id):
         result['remediation_suggestion'] = _SIGN_REVIEW_PROMPT
     return result
 

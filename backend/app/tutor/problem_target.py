@@ -2,7 +2,7 @@
 
 import re
 
-from .step_verifier import MAX_TEXT, _equation
+from .step_verifier import MAX_TEXT, _equation, expression_notation, expression_value, is_simplified_expression
 
 
 MAX_SOURCE = 24000
@@ -18,14 +18,16 @@ _HEADER = re.compile(
     r'\s*(?:\d{1,3}[.)]\s*)?(?:(?:다음|각)\s*)?(?:일차\s*)?방정식(?:들)?\s*'
     r'(?:을\s*풀(?:어라|어보세요|어보자|으시오)|의\s*해를\s*구(?:하여라|하시오|하세요))\s*[.:：]?\s*'
 )
+_EXPRESSION_HEADER = re.compile(r'\s*(?:다음\s*(?:일차)?식(?:을)?|다음을)\s*(?:간단히\s*하|계산하)(?:여라|시오|세요|여\s*보세요)[.:：]?\s*')
+_EXPRESSION_SUFFIX = re.compile(r'\s*(?:을|를)\s*(?:간단히\s*하|계산하)(?:여라|시오|세요|여\s*보세요)[.。]?\s*$')
 _JOINT_OR_CHOICE = re.compile(r'연립|동시에|동시|조건|일\s*때|다음\s*중|고르|옳|알맞|보기|객관식|[①-⑳]')
 
 
-def _open(message='이번에 풀 부분을 확인해 주세요. 이 문제는 지원되는 단일 일차방정식으로 자동 확정하지 않았어요.'):
+def _open(message='이번에 풀 문제나 식을 확인해 주세요.'):
     return {'status': 'open_problem', 'normalized_text': None, 'choices': [], 'message': message}
 
 
-def _normalize(text):
+def _notation(text, *, expression=False):
     """숫자 분모의 분수와 수식 표식만 변환하며 모호한 평문 나눗셈은 보류한다."""
     if len(text) > MAX_CHOICE_TEXT:
         return None
@@ -35,6 +37,9 @@ def _normalize(text):
     }))
     value = value.replace(r'\{', '{').replace(r'\}', '}')
     value = re.sub(r'\\(?:left|right)\s*(?=[()[\]{}])', '', value)
+    if expression:
+        for token, symbol in ((r'\lbrack', '['), (r'\rbrack', ']'), (r'\lbrace', '{'), (r'\rbrace', '}')):
+            value = value.replace(token, symbol)
     value = re.sub(r'\\[()[\]]', ' ', value).replace('$', ' ')
     value = re.sub(r'\\(?:displaystyle|textstyle|qquad|quad)\b|\\[,;! ]', ' ', value)
     value = re.sub(r'\\(?:cdot|times)\b', '*', value)
@@ -59,9 +64,16 @@ def _normalize(text):
         return grouped
 
     value = _FRACTION.sub(fraction, value)
-    value = value.translate(str.maketrans({'[': '(', ']': ')', '{': '(', '}': ')'}))
+    value = expression_notation(value) if expression else value.translate(str.maketrans({'[': '(', ']': ')', '{': '(', '}': ')'}))
     value = value.strip()
     if not value or len(value) > MAX_TEXT:
+        return None
+    return value
+
+
+def _normalize(text):
+    value = _notation(text)
+    if value is None:
         return None
     letters = set(re.findall(r'[A-Za-z]', value))
     if len(letters) != 1:
@@ -74,9 +86,38 @@ def _normalize(text):
     return re.sub(r'\s+', '', value) if parsed['root'] is not None else None
 
 
+def normalize_expression(text):
+    try:
+        value = _notation(text, expression=True)
+    except ValueError:
+        return None
+    letters = set(re.findall(r'[A-Za-z]', value or ''))
+    if len(letters) != 1:
+        return None
+    try:
+        expression_value(value, next(iter(letters)))
+    except ValueError:
+        return None
+    return re.sub(r'\s+', '', value)
+
+
+def expression_type(text):
+    """확인한 연산의 구조를 기존 문제은행 유형에 연결한다."""
+    variable = re.search(r'[A-Za-z]', text or '')
+    if variable is None or is_simplified_expression(text, variable[0]):
+        return None
+    if re.search(r'\([^()]*\(|\d\*?\(', text):
+        return '7103030'
+    return '7103028'
+
+
 def _single(text):
     normalized = _normalize(text)
     if normalized is None:
+        normalized = normalize_expression(text)
+        if normalized is not None and expression_type(normalized):
+            return {'status': 'linear_expression', 'normalized_text': normalized, 'choices': [],
+                    'message': '확인한 일차식의 계산을 지원 범위에서 검증할 수 있어요.'}
         return _open()
     return {'status': 'single_equation', 'normalized_text': normalized, 'choices': [],
             'message': '확인한 단일 일차방정식을 지원 범위에서 검증할 수 있어요.'}
@@ -93,7 +134,9 @@ def analyze_target(text):
     if len(markers) >= 2:
         numbers = [int(match.group(1)) for match in markers]
         prefix = original[:markers[0].start()]
-        clear_header = _HEADER.fullmatch(prefix) is not None
+        equation_header = _HEADER.fullmatch(prefix) is not None
+        expression_header = _EXPRESSION_HEADER.fullmatch(prefix) is not None
+        clear_header = equation_header or expression_header
         separate = not prefix.strip() or clear_header
         sequential = numbers == list(range(numbers[0], numbers[0] + len(numbers)))
         if separate and sequential and not _JOINT_OR_CHOICE.search(original):
@@ -101,11 +144,12 @@ def analyze_target(text):
             for index, marker in enumerate(markers):
                 end = markers[index + 1].start() if index + 1 < len(markers) else len(original)
                 part = original[marker.end():end].strip(' \t\r\n;；')
-                normalized = _normalize(part)
+                parsed = _single(part)
+                normalized = parsed['normalized_text']
                 # 명확한 풀이 지시가 있으면 표기 미지원도 먼저 소문항을 고르게 한다.
                 # 이때 모호한 4/3x 등에 괄호를 넣어 정답 검증 대상으로 바꾸지 않는다.
                 if (not part or len(part) > MAX_CHOICE_TEXT
-                        or (normalized is None and not (clear_header and part.count('=') + part.count('＝') == 1))):
+                        or (normalized is None and not (equation_header and part.count('=') + part.count('＝') == 1))):
                     valid = False
                     break
                 number = marker.group(1)
@@ -115,7 +159,7 @@ def analyze_target(text):
                 return {'status': 'selection_required', 'normalized_text': None, 'choices': choices,
                         'message': '여러 소문항이 있어요. 이번에 풀 번호를 골라 주세요.'}
     # 명확한 풀이 지시 뒤의 단일 식만 분리한다. 일반 서술의 조건은 지우지 않는다.
-    header = _HEADER.match(original)
+    header = _HEADER.match(original) or _EXPRESSION_HEADER.match(original)
     if header is not None and not _JOINT_OR_CHOICE.search(original):
         body = original[header.end():].strip()
         marker = _MARKER.match(body)
@@ -127,4 +171,4 @@ def analyze_target(text):
         # 번호 뒤 수식 구분자가 있을 때만 소문항 번호로 간주한다.
         if after.startswith(('$', r'\(', r'\[')):
             return _single(after)
-    return _single(original)
+    return _single(_EXPRESSION_SUFFIX.sub('', original))

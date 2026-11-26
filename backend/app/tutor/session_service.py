@@ -14,7 +14,7 @@ from .problem_target import analyze_target
 from .session_model import create_tutor_client, TutorModelError, _student_message
 
 
-POLICY_VERSION = "didgo-tutor-policy-v6"
+POLICY_VERSION = "didgo-tutor-policy-v8"
 
 
 def initial_state():
@@ -170,7 +170,7 @@ def _verified_error_hint(observed, *, show_calculation):
     factor, inner = product
     label = "왼쪽" if side == 0 else "오른쪽"
     if show_calculation:
-        _, inner_constant = _linear_expression_value(inner, variable)
+        _, inner_constant = step_verifier.expression_value(inner, variable)
         return f"{label}의 괄호 안 상수항에도 {factor}를 곱해요. ({factor}) × ({inner_constant})의 값은 얼마일까요?"
     return f"{label} 괄호를 풀 때, 괄호 앞의 {factor}를 안쪽 상수항에도 곱했는지 확인해 볼까요?"
 
@@ -180,19 +180,19 @@ def _evidence(turn):
     steps = deepcopy(request.get("steps", []) if request["intent"] == "submit"
                      else request.get("steps") or state.get("last_steps", []))
     student_text = request.get("student_text", "").strip()
-    # 평문 등식만 수학 관찰로 옮기고, 모르겠다는 말이나 자유 설명은 등식으로 취급하지 않는다.
-    inline_equation = ("=" in student_text or "＝" in student_text) and re.fullmatch(
-        r"[\dA-Za-z\s+*/()=\.\-−×÷（）＝]+", student_text,
-    )
-    if not steps and request["intent"] == "submit" and inline_equation:
-        steps = [{"id": "response", "text": student_text, "state": "active"}]
     raw_target = problem["target_text"].strip()
     is_math = problem.get("subject", "mathematics") == "mathematics"
     target_analysis = analyze_target(raw_target) if is_math else {
         "status": "open_problem", "normalized_text": None, "choices": [], "message": "",
     }
-    # 확인한 원문은 보존하고 선택된 한 등식의 명확한 표기만 계산 관찰에 사용한다.
-    target = target_analysis["normalized_text"] if target_analysis["status"] == "single_equation" else raw_target
+    expression = target_analysis["status"] == "linear_expression"
+    # 확인한 원문은 보존하고 평문 풀이만 관찰 줄로 옮긴다.
+    inline_work = (expression or "=" in student_text or "＝" in student_text) and re.fullmatch(
+        r"[\dA-Za-z\s+*/()=\.\-−×÷（）＝\[\]{}]+" if expression else r"[\dA-Za-z\s+*/()=\.\-−×÷（）＝]+", student_text,
+    )
+    if not steps and request["intent"] == "submit" and inline_work:
+        steps = [{"id": "response", "text": student_text, "state": "active"}]
+    target = target_analysis["normalized_text"] or raw_target
     letters = set(re.findall(r"[A-Za-z]", target))
     verification = _generic_verification()
     evidence, source, observed, solution = {}, None, None, None
@@ -203,7 +203,7 @@ def _evidence(turn):
             "schema_version": "verification-problem-v1", "id": str(problem.get("id", "tutor")),
             "revision": str(problem.get("input_version_number", "1")), "equation": target,
             "variable": next(iter(letters)), "domain": "real", "confirmed": True,
-            "profile": "linear-equation-v1",
+            "profile": step_verifier.EXPRESSION_PROFILE if expression else "linear-equation-v1",
         }
         observed = {"schema_version": "verification-work-v1", "problem_id": source["id"],
                     "problem_revision": source["revision"], "steps": [
@@ -212,7 +212,12 @@ def _evidence(turn):
         try:
             verification = step_verifier.verify(source, observed)
             supported = verification["action"] != "unsupported"
-            if supported:
+            if supported and expression:
+                lines = {row["step_id"]: row["text"] for row in verification["steps"]}
+                if first_error := verification["first_error_step_id"]:
+                    previous = verification["valid_prefix_until_step_id"]
+                    evidence = guided_feedback.expression_error_evidence(lines.get(previous, target), lines[first_error], source["variable"])
+            elif supported:
                 evidence = guided_feedback.error_evidence(source, observed, verification)
                 solution = step_verifier._equation(target, source["variable"])["root"]
             else:
@@ -226,7 +231,7 @@ def _evidence(turn):
             and _variable_denominator_in_stem(raw_target)):
         verification["reason_code"] = "variable_denominator"
     uncertain = any(step["state"] == "uncertain" for step in steps)
-    if supported and not uncertain and verification["action"] == "ask_confirmation":
+    if supported and not expression and not uncertain and verification["action"] == "ask_confirmation":
         # 학생이 확인한 표현을 도구가 읽지 못하는 경우와 OCR 확인 필요를 구분한다.
         verification.update(action="unsupported", judgement="undetermined", reason_code="unsupported_observation",
                             reason="현재 풀이 표현은 자동 검증 범위 밖이에요. 오답으로 판단하지 않았어요.")
@@ -243,7 +248,23 @@ def _evidence(turn):
                             "evidence": evidence, "tool_supported": supported, "source": source,
                             "target_analysis": target_analysis,
                             "solution": solution, "fingerprint": fingerprint,
-                            "help_comment": bool(re.search(r"모르겠|힌트|어떻게|막혔|도와", student_text)) and not inline_equation}}
+                            "help_comment": bool(re.search(r"모르겠|힌트|어떻게|막혔|도와", student_text)) and not inline_work}}
+
+
+def _expression_help(observed, action):
+    """검증된 항을 바탕으로 일차식의 다음 한 단계만 안내한다."""
+    source, evidence = observed["source"], observed["evidence"]
+    if action == "answer":
+        value = step_verifier.expression_value(source["equation"], source["variable"])
+        return f"정리한 식은 {_linear_text(*value, source['variable'])}이에요. 괄호를 풀고 문자항끼리, 상수항끼리 각각 더하거나 빼면 돼요.", "verified_answer"
+    if distribution := evidence.get("distribution"):
+        return (f"괄호 앞의 {distribution['factor']}를 상수항에도 곱해요. "
+                f"({distribution['factor']}) × ({distribution['constant']})의 부호는 무엇일까요?", "verified_error_hint")
+    if evidence.get("constant_changed") and not evidence.get("coefficient_changed"):
+        return "문자항의 계수는 맞아요. 표시된 줄에서 상수항끼리 계산할 때 부호를 다시 확인해 볼까요?", "verified_error_hint"
+    if evidence.get("coefficient_changed"):
+        return "표시된 줄에서 문자항의 계수가 달라졌어요. 같은 문자가 있는 항의 계수를 다시 모아 볼까요?", "verified_error_hint"
+    return "괄호가 남아 있으면 먼저 풀어 보세요. 같은 문자끼리, 숫자끼리 각각 어떤 항을 모을 수 있을까요?", "verified_scaffold"
 
 
 def _policy(turn):
@@ -269,6 +290,7 @@ def _policy(turn):
     response_source = "policy"
     mode = turn["problem"].get("attempt_mode", "practice")
     assessment = mode in {"independent", "review"}
+    expression = observed["tool_supported"] and observed["target_analysis"]["status"] == "linear_expression"
     if needs_selection:
         # 여러 문항의 풀이를 한 문제의 연속 과정으로 추측하거나 첫 문제를 대신 고르지 않는다.
         action, reason, needs_model = "select_target", "multiple_subquestions", False
@@ -297,7 +319,8 @@ def _policy(turn):
             message = "이 표현은 자동 판정 범위 밖이라 독립 수행을 확인하지 않았어요. 오답으로 판단하지 않았어요."
     elif completed:
         action, reason, needs_model = "complete", "verified_current_work", False
-        message = "입력한 활성 풀이와 마지막 답이 확인한 등식의 해를 유지해요. 다른 문제를 도움 없이 푸는 독립 확인은 별도로 진행해요."
+        message = ("입력한 풀이가 원래 식과 같은 값을 유지했고, 문자항과 상수항을 정리했어요."
+                   if expression else "입력한 활성 풀이와 마지막 답이 확인한 등식의 해를 유지해요. 다른 문제를 도움 없이 푸는 독립 확인은 별도로 진행해요.")
         state.update(help_level=0, needs_independent_check=True)
     elif request["intent"] == "submit" and verification["action"] == "unsupported" and has_work:
         # 풀이를 자동 확인할 수 없으면 저장 사실을 알리고 도움 요청은 학생에게 맡긴다.
@@ -329,7 +352,10 @@ def _policy(turn):
         action = "first_hint" if not active and not observed["student_text"] else "guide"
         reason, message, needs_model = ("no_work" if action == "first_hint" else "model_guidance_without_tool_proof"), "", True
         state["help_level"] = max(1, min(2, state["help_level"]))
-    if action == "first_hint":
+    if needs_model and expression:
+        message, response_source = _expression_help(observed, action)
+        needs_model = False
+    elif action == "first_hint":
         verified_hint = _verified_first_hint(observed)
         if verified_hint is not None:
             message, needs_model = verified_hint, False
@@ -447,15 +473,6 @@ def _variable_denominator_in_stem(text):
     return False
 
 
-def _linear_expression_value(text, variable):
-    """지원 문법의 두 일차식이 같은지 비교하며 서술 문장의 의미는 추론하지 않는다."""
-    parser = step_verifier._Parser(step_verifier._tokens(text, variable), variable)
-    parsed = parser.expression()
-    if parser.current() is not None:
-        raise ValueError("지원 문법으로 식을 끝까지 읽을 수 없습니다.")
-    return parsed.coefficient, parsed.constant
-
-
 def _verified_answer(observed):
     variable = observed["source"]["variable"]
     (left, constant), (right, other) = guided_feedback._sides(observed["source"]["equation"], variable)
@@ -468,7 +485,14 @@ def _verified_answer(observed):
 
 def _guard_output(response, observed):
     """모델 문장의 권위보다 지원 수식의 계산 근거와 답 공개 정책을 우선한다."""
-    equations, claims, expansions = _output_math(response["message"])
+    # 응답 검사용 사본에서만 줄 첫 목록 기호를 제거하고, 수식·코드 블록의 부호는 보존한다.
+    check_text = re.sub(
+        r"(?m)(?P<literal>^[ \t]*```[^\n]*\n[\s\S]*?^[ \t]*```[ \t]*\r?$"
+        r"|\$\$[\s\S]*?\$\$|\\\[[\s\S]*?\\\]|\\\([\s\S]*?\\\))|^[ \t]*-[ \t]+",
+        lambda match: match.group("literal") or "",
+        response["message"],
+    )
+    equations, claims, expansions = _output_math(check_text)
     side = observed["evidence"].get("target_side")
     safe_hint = ("표시된 줄의 " + ("왼쪽" if side == "lhs" else "오른쪽") + " 식이 앞 식과 같은 의미인지 확인해 볼까요?"
                  if side in {"lhs", "rhs"} else "현재 식에서 어떤 항을 먼저 정리할 수 있을까요? 한 단계만 적어 주세요.")
@@ -478,7 +502,7 @@ def _guard_output(response, observed):
         variable = observed["source"]["variable"]
         for before, after in expansions:
             try:
-                mismatch = mismatch or _linear_expression_value(before, variable) != _linear_expression_value(after, variable)
+                mismatch = mismatch or step_verifier.expression_value(before, variable) != step_verifier.expression_value(after, variable)
             except ValueError:
                 mismatch = True
         for text in equations:

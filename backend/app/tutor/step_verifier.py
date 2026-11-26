@@ -16,6 +16,7 @@ import re
 
 
 VERIFIER_VERSION = "linear-equation-v1.0.1"
+EXPRESSION_PROFILE = "linear-expression-v1"
 MAX_TEXT = 512
 MAX_TOKENS = 256
 MAX_DEPTH = 32
@@ -197,6 +198,50 @@ def _equation(text, variable):
     return {"coefficient": coefficient, "constant": constant, "root": root, "complete": complete}
 
 
+def expression_notation(text):
+    """종류가 맞는 괄호를 확인한 뒤 같은 계산 기호로 읽는다."""
+    text = text.translate(str.maketrans({"（": "(", "）": ")"}))
+    closing = {"(": ")", "[": "]", "{": "}"}
+    stack = []
+    for character in text:
+        if character in closing:
+            stack.append(closing[character])
+        elif character in ")]}":
+            if not stack or stack.pop() != character:
+                raise _ExpressionIssue("invalid_syntax", "괄호의 짝을 확인해 주세요.")
+    if stack:
+        raise _ExpressionIssue("invalid_syntax", "괄호의 짝을 확인해 주세요.")
+    return text.translate(str.maketrans({"[": "(", "]": ")", "{": "(", "}": ")"}))
+
+
+def expression_value(text, variable):
+    """문자 한 개의 식을 정확한 계수와 상수 쌍으로 계산한다."""
+    if len(text) > MAX_TEXT:
+        raise _ExpressionIssue("expression_limit", "한 줄의 수식이 너무 깁니다.")
+    parser = _Parser(_tokens(expression_notation(text), variable), variable)
+    value = parser.expression()
+    if parser.current() is not None:
+        raise _ExpressionIssue("invalid_syntax", "한 줄의 식을 끝까지 해석할 수 없습니다.")
+    return value.coefficient, value.constant
+
+
+def is_simplified_expression(text, variable):
+    """전개한 뒤 문자항과 상수항을 각각 한 항으로 정리했는지 확인한다."""
+    number = r"(?:\d+(?:\.\d*)?|\.\d+)(?:/(?:\d+(?:\.\d*)?|\.\d+))?"
+    term = rf"(?:(?:{number}|\({number}\))\*?)?{re.escape(variable)}(?:/\d+)?"
+    pattern = rf"[+-]?(?:{term}(?:[+-]{number})?|{number}(?:[+-]{term})?)"
+    compact = "".join(text.split()).translate(str.maketrans({"−": "-", "×": "*", "÷": "/", "（": "(", "）": ")"}))
+    return re.fullmatch(pattern, compact) is not None
+
+
+def expression_parts(text, variable):
+    """풀이 한 줄의 등호가 연결한 식을 각각 검증한다."""
+    if len(text) > MAX_TEXT:
+        raise _ExpressionIssue("expression_limit", "한 줄의 수식이 너무 깁니다.")
+    parts = expression_notation(text).replace("＝", "=").split("=")
+    return [(part, expression_value(part, variable)) for part in parts]
+
+
 def _mapping(value, fields, label):
     if type(value) is not dict or set(value) != fields:
         raise ValueError(label + " 필드가 계약과 다릅니다.")
@@ -288,21 +333,27 @@ def verify(problem: dict, work: dict) -> dict:
         return _blocked(result, work, "problem_revision_mismatch", "현재 문제와 풀이가 연결된 문제 버전을 확인해 주세요.")
     if not problem["confirmed"]:
         return _blocked(result, work, "problem_unconfirmed", "원래 문제의 식과 조건을 먼저 확인해 주세요.")
-    if problem["domain"] != "real" or problem["profile"] != "linear-equation-v1":
+    profile = problem["profile"]
+    expression = profile == EXPRESSION_PROFILE
+    if problem["domain"] != "real" or profile not in ("linear-equation-v1", EXPRESSION_PROFILE):
         return _blocked(result, work, "unsupported_profile", "현재는 실수 범위의 유일해 일차방정식만 검증합니다.", "unsupported")
+    variable = problem["variable"]
     try:
-        original = _equation(problem["equation"], problem["variable"])
+        original = expression_value(problem["equation"], variable) if expression else _equation(problem["equation"], variable)["root"]
     except _ExpressionIssue as error:
         return _blocked(result, work, error.code, str(error), "unsupported")
-    if original["root"] is None:
+    if original is None:
         return _blocked(result, work, "nonunique_problem", "해가 없거나 무수히 많은 원문은 현재 검증 범위 밖입니다.", "unsupported")
+    if expression:
+        result.update(verification_basis="confirmed_linear_expression_coefficients",
+                      verifier_version=EXPRESSION_PROFILE)
 
     prefix_open, previous, first_error_index, unresolved_index = True, None, None, None
     last_active, final_correct, active_count = None, False, 0
     for index, step in enumerate(work["steps"]):
         row = {"step_id": step["id"], "text": step["text"], "state": step["state"],
                "previous_step_id": previous, "judgement": "undetermined", "skipped": False}
-        parsed = None
+        complete = False
         if step["state"] == "deleted" and step["confirmed"]:
             row.update(skipped=True, reason_code="deleted", reason="삭제한 것으로 확인된 줄은 검증 대상에서 제외합니다.")
             result["steps"].append(row)
@@ -314,8 +365,20 @@ def verify(problem: dict, work: dict) -> dict:
             row.update(reason_code="step_unconfirmed", reason="이 줄의 원문·순서·활성 여부를 먼저 확인해 주세요.")
         else:
             try:
-                parsed = _equation(step["text"], problem["variable"])
-                if parsed["root"] == original["root"]:
+                if expression:
+                    parts = expression_parts(step["text"], variable)
+                    matches = all(value == original for _, value in parts)
+                    complete = is_simplified_expression(parts[-1][0], variable)
+                else:
+                    parsed = _equation(step["text"], variable)
+                    matches, complete = parsed["root"] == original, parsed["complete"]
+                if expression and matches:
+                    row.update(judgement="correct", reason_code="equivalent_expression",
+                               reason="원래 식과 문자항의 계수와 상수항이 같아요.")
+                elif expression:
+                    row.update(judgement="incorrect", reason_code="linear_expression_changed",
+                               reason="이 줄에서 원래 식과 값이 다른 식이 나왔어요.")
+                elif matches:
                     row.update(judgement="correct", reason_code="equivalent_solution_set",
                                reason="지원 범위에서 확인된 원래 식과 같은 해집합을 유지합니다. 생략한 연산은 추측하지 않습니다.")
                 else:
@@ -335,7 +398,7 @@ def verify(problem: dict, work: dict) -> dict:
             result["valid_prefix_until_step_id"] = step["id"]
         else:
             prefix_open = False
-        final_correct = bool(parsed and parsed["complete"] and row["judgement"] == "correct")
+        final_correct = complete and row["judgement"] == "correct"
         result["steps"].append(row)
 
     if active_count == 0:

@@ -169,7 +169,7 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
           const { submission: value, preview } = await readSource(sourceId, signal);
           if (!alive.current) return;
           setSelectedSource(String(value.id)); setSource(value); setTargetPreview(preview);
-          setTarget(preview?.status === "single_equation" ? preview.normalized_text ?? "" : ""); setConfirmed(false);
+          setTarget(preview?.normalized_text ?? ""); setConfirmed(false);
         }
       }
     } catch (reason) { fail(reason); }
@@ -242,7 +242,7 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
       const { submission: current, preview } = await readSource(Number(value), controller.current?.signal);
       if (alive.current && sourceRequest.current === request) {
         setSource(current); setTargetPreview(preview);
-        setTarget(preview?.status === "single_equation" ? preview.normalized_text ?? "" : "");
+        setTarget(preview?.normalized_text ?? "");
       }
     } catch (reason) { if (sourceRequest.current === request) fail(reason); }
     finally { if (alive.current && sourceRequest.current === request) setSourceLoading(false); }
@@ -335,7 +335,7 @@ export function TutorWorkspace({ sessionId, sourceSubmissionId, loginUrl, userId
               <TypeReference match={source.type_match} />
             </> : selectedSource ? <p className="solution-help" role="status">{sourceLoading ? "선택한 문제를 불러오고 있어요…" : "문제를 불러오지 못했어요. 저장한 문제를 다시 선택해 주세요."}</p> : <label className="solution-label" htmlFor="tutor-question">문제의 본문·식
               <textarea id="tutor-question" className="solution-input" rows={4} value={question} maxLength={10000} required disabled={disabled}
-                placeholder="예: 일차방정식 2(x+2)=3(x-1)을 풀어라." onChange={(event) => { setQuestion(event.target.value); setConfirmed(false); }} /></label>}
+                placeholder="예시 (4x+5)+(2x-6)을 간단히 하세요." onChange={(event) => { setQuestion(event.target.value); setConfirmed(false); }} /></label>}
             {savedForSource.length > 0 && <section className="tutor-target-preview" aria-labelledby="tutor-saved-source-title">
               <h3 id="tutor-saved-source-title">이 사진으로 풀던 기록</h3>
               <ul className="solution-list">{savedForSource.map((item) => <li key={item.id}>

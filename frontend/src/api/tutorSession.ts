@@ -62,7 +62,7 @@ export type TutorEvent = {
 };
 export type TutorTargetChoice = { id: string; label: string; display_text: string; target_text: string };
 export type TutorTargetSelection = {
-  status: "single_equation" | "selection_required" | "open_problem";
+  status: "single_equation" | "linear_expression" | "selection_required" | "open_problem";
   normalized_text: string | null;
   choices: TutorTargetChoice[];
   message: string;

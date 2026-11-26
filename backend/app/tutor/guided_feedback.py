@@ -59,18 +59,58 @@ def distribution_product(text, variable):
     return product.groups() if product else None
 
 
+def expression_error_evidence(preceding, current, variable):
+    """일차식에서 바뀐 항과 정확히 확인한 음수 곱 오류만 기록한다."""
+    try:
+        before = verifier.expression_parts(preceding, variable)[-1][1]
+        after_text, after = next((text, value) for text, value in verifier.expression_parts(current, variable)
+                                 if value != before)
+    except (ValueError, StopIteration):
+        return {}
+    evidence = {"target_side": "expression", "reason_code": "linear_expression_changed",
+                "coefficient_changed": before[0] != after[0], "constant_changed": before[1] != after[1]}
+    if before[0] != after[0] or re.search(r"[()（）]", after_text):
+        return evidence
+    preceding = preceding.replace("＝", "=").split("=")[-1]
+    tokens = [token.value for token in verifier._tokens(verifier.expression_notation(preceding), variable)]
+    start, depth, terms = 0, 0, []
+    for index, token in enumerate(tokens):
+        if depth == 0 and token in ("+", "-") and index and tokens[index - 1] not in "+-*/":
+            terms.append("".join(tokens[start:index]))
+            start = index
+        depth += (token == "(") - (token == ")")
+    terms.append("".join(tokens[start:]))
+    matches = []
+    for term in terms:
+        product = distribution_product(term, variable)
+        if product is None:
+            continue
+        factor, inner = product
+        scalar = verifier.expression_value(factor, variable)[1]
+        inner_constant = verifier.expression_value(inner, variable)[1]
+        if scalar < 0 and inner_constant < 0 and before[1] - after[1] == 2 * scalar * inner_constant:
+            matches.append({"factor": factor, "constant": str(inner_constant)})
+    if len(matches) == 1:
+        evidence.update(concept_error="negative_distribution_sign", distribution=matches[0])
+    return evidence
+
+
 def negative_distribution_error(target, response):
     """확인된 첫 오류에서 음수 곱의 상수항만 반대 부호가 됐는지 확인한다."""
     result = response.get("verification") or {}
     evidence = response.get("evidence") or {}
     side_name = evidence.get("target_side")
     if (response.get("tool_supported") is not True or result.get("judgement") != "incorrect"
-            or result.get("earliest_unresolved_step_id") is not None or side_name not in {"lhs", "rhs"}):
+            or result.get("earliest_unresolved_step_id") is not None):
         return False
     first_error = result.get("first_error_step_id")
     rows = {row["step_id"]: row for row in result.get("steps", [])}
     error = rows.get(first_error)
     if not error or error.get("state") != "active" or error.get("judgement") != "incorrect":
+        return False
+    if side_name == "expression":
+        return evidence.get("concept_error") == "negative_distribution_sign"
+    if side_name not in {"lhs", "rhs"}:
         return False
     preceding = rows.get(evidence.get("previous_step_id"), {}).get("text", target)
     letters = set(re.findall(r"[A-Za-z]", target))

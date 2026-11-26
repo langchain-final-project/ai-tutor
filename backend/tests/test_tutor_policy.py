@@ -191,13 +191,35 @@ class TutorPolicyTests(unittest.TestCase):
         self.assertEqual(model.calls, 0)
 
     def test_unsupported_problem_still_allows_guidance_without_tool_proof(self):
-        problem = dict(PROBLEM, target_text="(4x+5)+(2x-6)을 간단히 하세요.")
+        problem = dict(PROBLEM, target_text="(4x^2+5)+(2x-6)을 간단히 하세요.")
         model = Model()
         result = run_turn(problem, initial_state(), [], request("hint"), model_client=model)
         self.assertEqual(result["response"]["action"], "first_hint")
         self.assertFalse(result["response"]["tool_supported"])
         self.assertEqual(result["response"]["verification"]["judgement"], "undetermined")
         self.assertNotIn("invalid_syntax", json.dumps(model.context))
+
+    def test_expression_marks_first_error_checks_completion_and_requests_clarification(self):
+        problem = dict(PROBLEM, target_text="(4x+5)+(2x-6)을 간단히 하세요.")
+        model = Model()
+        wrong = run_turn(problem, {}, [], request("submit", "6x+1", "6x-1"), model_client=model)
+        result = wrong["response"]["verification"]
+        self.assertEqual(result["first_error_step_id"], "s1")
+        self.assertEqual(result["judgement"], "incorrect")
+        self.assertIn("상수항", wrong["response"]["message"])
+        self.assertFalse(wrong["state"]["solved"])
+
+        valid = run_turn(problem, wrong["state"], [], request("submit", "4x+5+2x-6"), model_client=model)
+        self.assertEqual(valid["response"]["verification"]["completion"], "incomplete")
+        solved = run_turn(problem, valid["state"], [], request("submit", "4x+5+2x-6=6x-1"), model_client=model)
+        self.assertTrue(solved["state"]["solved"])
+        self.assertEqual(solved["response"]["target_analysis"]["status"], "linear_expression")
+
+        uncertain = run_turn(problem, {}, [], request("submit", "6x+?"), model_client=model)
+        self.assertEqual(uncertain["response"]["action"], "ask_confirmation")
+        self.assertEqual(uncertain["response"]["verification"]["judgement"], "undetermined")
+        self.assertFalse(uncertain["state"]["solved"])
+        self.assertEqual(model.calls, 0)
 
     def test_numbered_subquestions_request_selection_without_calling_a_model(self):
         targets = ("다음 방정식을 풀어라.\n(1) 4/3x-3=x+6\n(2) 1/4x-1/2=-2/5x+2\n(3) 2/3x-1/6=3/2x",
@@ -334,6 +356,34 @@ class TutorPolicyTests(unittest.TestCase):
         self.assertEqual(result["response"]["message"], text)
         self.assertEqual(result["response"]["output_verification"]["status"], "checked")
         self.assertFalse(result["response"]["output_verification"]["prose_verified"])
+
+    def test_correct_equations_in_a_list_keep_the_full_answer(self):
+        message = "x = 7\n\n1. 양변을 전개해요.\n   - 2x + 4 = 3x - 3\n   - -x = -7\n- 7 = x"
+        result = run_turn(PROBLEM, {}, [], request("answer"), model_client=Model(message))
+        self.assertEqual(result["response"]["message"], message)
+        self.assertEqual(result["response"]["source"], "model")
+        self.assertEqual(result["response"]["output_verification"]["status"], "checked")
+
+    def test_negative_equations_keep_their_sign(self):
+        for equation in ("-x = -7", "− x = -7", "$$\n- x = -7\n$$",
+                         "\\[\n- x = -7\n\\]", "```\n- x = -7\n```"):
+            with self.subTest(equation=equation):
+                message = f"x = 7\n\n{equation}"
+                result = run_turn(PROBLEM, {}, [], request("answer"), model_client=Model(message))
+                self.assertEqual(result["response"]["message"], message)
+                self.assertEqual(result["response"]["output_verification"]["status"], "checked")
+
+    def test_list_format_does_not_bypass_math_or_answer_exposure_checks(self):
+        for equation in ("- 2x + 2 = 3x - 3", "- -x = 7", "$$\n- x = 7\n$$"):
+            with self.subTest(equation=equation):
+                model = Model(f"x = 7\n\n{equation}")
+                result = run_turn(PROBLEM, {}, [], request("answer"), model_client=model)
+                self.assertEqual(result["response"]["output_guard"], "generated_answer_replaced")
+
+        result = run_turn(PROBLEM, {}, [], request("hint"), model_client=Model("- x = 7"))
+        self.assertEqual(result["response"]["output_guard"], "terminal_answer_removed")
+        self.assertTrue(result["response"]["answer_exposure_blocked"])
+        self.assertFalse(result["state"]["answer_revealed"])
 
     def test_independent_and_review_submissions_do_not_receive_automatic_help(self):
         for mode in ("independent", "review"):

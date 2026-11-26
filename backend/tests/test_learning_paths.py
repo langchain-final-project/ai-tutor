@@ -184,6 +184,48 @@ def test_cycle_uses_new_attempts_waits_for_review_and_restores(learner):
         assert restored.get(f'/tutor-sessions/{independent_id}/learning-path').json()['id'] == path['id']
 
 
+def test_expression_uses_equation_error_for_remediation_and_completes_learning_cycle(learner):
+    database, _, client, _, clock = learner
+    first = new_tutor(client, '-2(x-3)=8')
+    wrong, _ = turn(client, first['id'], '-2x-6=8')
+    assert wrong['events'][-1]['response']['action'] == 'error_hint'
+
+    expression = new_tutor(client, '-3(x-2)+4x')
+    wrong, _ = turn(client, expression['id'], '-3x-6+4x')
+    assert wrong['events'][-1]['response']['evidence']['concept_error'] == 'negative_distribution_sign'
+    availability = client.get(f"/tutor-sessions/{expression['id']}/learning-availability").json()
+    assert '음수 곱셈과 분배법칙' in availability['remediation_suggestion']
+    source = start(client, expression)
+    assert source['type']['code'] == '7103030'
+    assert '음수 곱셈과 분배법칙' in source['remediation']['title']
+    assert {'m1.s1.u02.c015', 'm1.s1.u02.c019'} <= {card['concept_id'] for card in source['remediation']['concept_cards']}
+    solved, _ = turn(client, expression['id'], 'x+6')
+    assert solved['state']['solved'] is True
+
+    path = next_activity(client, read(client, source))
+    assert path['phase'] == 'practice'
+    turn(client, path['active_session_id'], '4x+2')
+    path = next_activity(client, read(client, path))
+    assert path['phase'] == 'independent'
+    wrong, _ = turn(client, path['active_session_id'], '3x+1')
+    assert wrong['events'][-1]['response']['action'] == 'retry' and not wrong['state']['assisted']
+    solved, _ = turn(client, path['active_session_id'], '3x-1')
+    assert solved['state']['independent_verified'] is True
+    path = read(client, path)
+    assert path['status'] == 'review_scheduled'
+    clock['now'] += timedelta(days=1)
+    path = next_activity(client, read(client, path))
+    assert path['phase'] == 'review'
+    turn(client, path['active_session_id'], '5x-3')
+    path = read(client, path)
+    assert [activity['outcome']['code'] for activity in path['history']] == ['practice_complete', 'independent_pass', 'review_pass']
+    assert len({activity['source_question_id'] for activity in path['history']}) == 3
+
+    with TestClient(create_student_app(database, pipeline_factory=no_pipeline, tutor_runner=runner)) as restored:
+        login(restored, register=False)
+        assert read(restored, path) == path
+
+
 def test_independent_help_is_not_a_pass_and_delayed_review_can_reuse(learner):
     _, _, client, source, clock = learner
     path = independent(client, source)
@@ -306,7 +348,7 @@ def test_catalog_is_bounded_and_missing_bank_is_unavailable(learner, tmp_path, m
     _, _, client, source, _ = learner
     items, error = learning_catalog.load_catalog()
     assert error is None and len(items) >= 14
-    assert {item['type_code'] for item in items} == {'7103047', '7103048', '7103050'}
+    assert {item['type_code'] for item in items} == {'7103028', '7103030', '7103047', '7103048', '7103050'}
     assert all('answer' not in item for item in items)
     # 곱셈 기호·변수 표기만 바꾼 원문을 새 독립 문항으로 내지 않는다.
     selected, fresh, _ = learning_catalog.choose(items, type_code='7103047',

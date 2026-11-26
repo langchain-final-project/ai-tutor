@@ -8,7 +8,8 @@ import uuid
 
 from app.db.solution_records import ConflictError, solution_connection
 from app.db.submissions import get_submission
-from app.tutor.problem_target import analyze_target
+from app.tutor.learning_catalog import EXPRESSION_TYPES, TYPES
+from app.tutor.problem_target import analyze_target, expression_type
 
 
 def _json(value):
@@ -174,6 +175,16 @@ def create(connection, *, owner_id, submission_id, expected_input_version_number
         'target_confirmed': True, 'type_match': _type_reference(source.get('type_match')),
         'condition_extraction': source.get('condition_extraction'),
     }
+    if target_selection['status'] == 'linear_expression':
+        reference = source.get('type_match') or {}
+        current_type = (reference.get('selected_type') or {}).get('source_topic_code')
+        if current_type not in EXPRESSION_TYPES or not reference.get('matched_question_id'):
+            code = expression_type(target_text)
+            problem['type_match'] = {
+                'status': 'classified', 'is_provisional': True,
+                'selected_type': {'source_topic_code': code, 'source_topic_name': TYPES[code][0]},
+                'reasons': ['확인한 일차식의 구조를 문제은행 유형에 연결했어요.'],
+            }
     if learning_context is not None:
         # 학습 시도 종류는 학습 경로가 서버에서 정한다. 학생 요청으로 독립 평가를 위조하지 않는다.
         if learning_context.get('mode') not in {'practice', 'independent', 'review'}:

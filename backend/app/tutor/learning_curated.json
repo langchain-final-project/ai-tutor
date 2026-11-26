@@ -46,5 +46,95 @@
     "type_code": "7103048",
     "target_text": "-3(2x-1)+2x=-x-6",
     "source_text_sha256": "5df9787ac582a8fafaf63d6ec2623707c61aad02f745692f2c661ddcb7235f39"
+  },
+  {
+    "question_id": "M1_1_03_00041_41983.png",
+    "type_code": "7103028",
+    "target_text": "(9a-7)+(4a+5)",
+    "source_text_sha256": "3ec0810b7bd00ef55dad6d1651ecf4dac970f232d6096448c57a9b3b9d931bb0",
+    "source_expression": "(9a‒7)+(4a+5)",
+    "expected_answer": "13a-2",
+    "source_answer_sha256": "750e91b4431dffd8a1f5d7bcd33937c28fa0fd2b99c4fe4e77a9946b3c517e6f"
+  },
+  {
+    "question_id": "M1_1_03_00041_41984.png",
+    "type_code": "7103028",
+    "target_text": "(4x-8)+(2x+3)",
+    "source_text_sha256": "90eeb37f274dfe039c82e3453631e4614e2f3096c0619f30e48db7bde557db46",
+    "source_expression": "[4 x-8]+[2 x+3]",
+    "expected_answer": "6x-5",
+    "source_answer_sha256": "962c6697542b708a869d35d145ac49944ffed923d46099861ef6230baa98c72f"
+  },
+  {
+    "question_id": "M1_1_03_00041_42043.png",
+    "type_code": "7103028",
+    "target_text": "(6x-7)-(2x-3)",
+    "source_text_sha256": "513fb7abf044b2bb90957d95930af0895203eb99e41ba9c75861858a85aed54d",
+    "source_expression": "[6 x-7]-[2 x-3]",
+    "expected_answer": "4x-4",
+    "source_answer_sha256": "5a37fd2de05e9eeda9aee92afcc9aa95dae1830e04555dce43ce292308ab9a94"
+  },
+  {
+    "question_id": "M1_1_03_00041_45846.png",
+    "type_code": "7103028",
+    "target_text": "2x-3+5x+2",
+    "source_text_sha256": "a05a2b6757827a894cf2b5418351241059c908e8f145be2e81cf2d7187222630",
+    "source_expression": "2 x-3+5 x+2",
+    "expected_answer": "7x-1",
+    "source_answer_sha256": "4c6814e2ced7fc1aeb25c0f336be02c1795313aa80dfe821370587862ae74152"
+  },
+  {
+    "question_id": "M1_1_03_00041_63034.png",
+    "type_code": "7103028",
+    "target_text": "10a-7a+3a-a",
+    "source_text_sha256": "77681e6b00d41c7bcf672db4a351cb573bb5a12effb25f6367b1b3fcaf319f19",
+    "source_expression": "10 a-7 a+3 a-a",
+    "expected_answer": "5a",
+    "source_answer_sha256": "6c43df135a998cf74c2277557c6c3f42a25a3912305ca537963fcd68fcd7660b"
+  },
+  {
+    "question_id": "M1_1_03_00041_45854.png",
+    "type_code": "7103030",
+    "target_text": "2x-(-3x+(2x-(x+2)))",
+    "source_text_sha256": "5445e0478225d9991e5721fff1a59bb04fd8f6e5e5c9138281d584a73e660a65",
+    "source_expression": "2 x-[-3 x+\\{2 x-(x+2)\\}]",
+    "expected_answer": "4x+2",
+    "source_answer_sha256": "22e84539c8ed3f37eb9197ca30fa3414e80b874bfd5d24155a985b929abc3542"
+  },
+  {
+    "question_id": "M1_1_03_00041_45884.png",
+    "type_code": "7103030",
+    "target_text": "4x-(3x+(x-(3x-1)))",
+    "source_text_sha256": "a6bde91fc15b1088da4e44329c0dce87ca664f27a04ac536019c0d34884aedcf",
+    "source_expression": "4 x-[3 x+\\{x-(3 x-1)\\}]",
+    "expected_answer": "3x-1",
+    "source_answer_sha256": "c25b72a08b71bc2bbb98fb8ad5853ca6e0312ceb1769ab78371b835d60245024"
+  },
+  {
+    "question_id": "M1_1_03_00041_45885.png",
+    "type_code": "7103030",
+    "target_text": "-2x+(4x-3(2x-(3x-1)))",
+    "source_text_sha256": "5c0e1b3bddc4f8eb8b7506d498a7099c7efceb0afbea0e18cfea54ef8269f813",
+    "source_expression": "-2 x+[4 x-3\\{2 x-(3 x-1)\\}]",
+    "expected_answer": "5x-3",
+    "source_answer_sha256": "cde301e1aa20b65e37d8cb7c4874604b64514553b0c0c0d3d9eafeca2f2d5351"
+  },
+  {
+    "question_id": "M1_1_03_00041_61509.png",
+    "type_code": "7103030",
+    "target_text": "-x-(-(7-x)-4(2-x))",
+    "source_text_sha256": "bf2c0e0808b124041a202601636ee8f1f949da767a265b9b4ecb92e73a041f89",
+    "source_expression": "-x-\\{-(7-x)-4(2-x)\\}",
+    "expected_answer": "-6x+15",
+    "source_answer_sha256": "cd3cc7e7670b6a1cb664fbfcd72b2d03703e0fec6f0a2358a414fcfb39c69988"
+  },
+  {
+    "question_id": "M1_1_03_00042_97092.png",
+    "type_code": "7103030",
+    "target_text": "3x+(10+2(2x-1))",
+    "source_text_sha256": "e7e4347a75fb22cdba26b607f3c2f3b00718a7d36cc1591dd9685b00e6328b9e",
+    "source_expression": "3 x+\\{10+2(2 x-1)\\}",
+    "expected_answer": "7x+8",
+    "source_answer_sha256": "c049527833d033aaba94180615b99fb487f894edab60c379a6514adab030f3a2"
   }
 ]

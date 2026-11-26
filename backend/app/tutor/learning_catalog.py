@@ -13,13 +13,16 @@ import sqlite3
 from scripts.lookup_problem_concepts import DEFAULT_CONCEPTS, load_index
 
 from .guided_feedback import _sides
-from .problem_target import analyze_target
-from .step_verifier import _equation
+from .problem_target import analyze_target, normalize_expression
+from .step_verifier import _equation, _tokens, expression_value, is_simplified_expression
 from .unit_type_matcher import DEFAULT_BANK, canonical
 
 
-POLICY_VERSION = 'didgo-learning-cycle-v2'
+POLICY_VERSION = 'didgo-learning-cycle-v3'
+EXPRESSION_TYPES = {'7103028', '7103030'}
 TYPES = {
+    '7103028': ('간단한 일차식의 덧셈, 뺄셈', '같은 문자가 들어 있는 항끼리 모으고, 숫자만 있는 항은 따로 계산해요.'),
+    '7103030': ('복잡한 괄호가 포함된 일차식의 덧셈, 뺄셈', '안쪽 괄호부터 정리하고, 괄호 앞의 수와 부호가 안쪽의 각 항에 적용되는지 확인해요.'),
     '7103047': ('간단한 일차방정식의 풀이', '양변에 같은 계산을 해도 해가 유지되는지 확인해 보세요. 문자가 있는 항과 상수항을 정리한 다음 원래 등식에 대입해 확인해요.'),
     '7103048': ('괄호가 있는 일차방정식의 풀이', '괄호 앞의 수를 괄호 안의 각 항에 곱해 보세요. 부호를 확인하고 양변에 같은 계산을 하며 문자를 혼자 남겨요.'),
     '7103050': ('계수에 분수가 있는 일차방정식의 풀이', '양변에 분모의 최소공배수를 곱해 분수를 없앤 뒤 식을 정리해 보세요.'),
@@ -29,12 +32,14 @@ CURATED_DATA = Path(__file__).with_name('learning_curated.json')
 
 
 def _item(row, equation):
+    expression = row['source_topic_code'] in EXPRESSION_TYPES
+    instruction = '다음 식을 간단히 하세요.' if expression else '다음 일차방정식을 풀어보세요.'
     return {
-        'id': row['id'] + ':equation', 'source_question_id': row['id'],
+        'id': row['id'] + (':expression' if expression else ':equation'), 'source_question_id': row['id'],
         'source_id': row['source_id'], 'question_filename': row['question_filename'],
         'source_question_text': row['question_text'], 'type_code': row['source_topic_code'],
         'type_name': row['source_topic_name'], 'target_text': equation,
-        'question_text': '다음 일차방정식을 풀어보세요.\n' + equation,
+        'question_text': instruction + '\n' + equation,
     }
 
 
@@ -52,6 +57,19 @@ def _verified_equation(row):
         return None
 
 
+def _curated_target(row, entry):
+    target = entry['target_text']
+    if entry['type_code'] not in EXPRESSION_TYPES:
+        return target if canonical(target) in canonical(row['question_text']) and _equation_key(target) else None
+    source = entry['source_expression']
+    answer = entry['expected_answer']
+    if (canonical(source) not in canonical(row['question_text']) or normalize_expression(source) != target
+            or hashlib.sha256(canonical(row['answer'] or '').encode()).hexdigest() != entry['source_answer_sha256']):
+        return None
+    variable = re.search(r'[A-Za-z]', target)[0]
+    return target if is_simplified_expression(answer, variable) and expression_value(target, variable) == expression_value(answer, variable) else None
+
+
 def load_catalog(bank_database=DEFAULT_BANK):
     """기존 검수 목록을 보존하고 식과 답이 일치하는 검수 문항을 이어 붙인다."""
     items = []
@@ -65,19 +83,18 @@ def load_catalog(bank_database=DEFAULT_BANK):
                 AND coalesce(trim(q.figure_text),'')='' '''
             for entry in curated:
                 row = connection.execute(scope + 'AND q.id=?', (*UNIT, entry['question_id'])).fetchone()
-                equation = entry['target_text']
                 if (row is None or row['source_topic_code'] != entry['type_code']
-                        or hashlib.sha256(canonical(row['question_text']).encode()).hexdigest() != entry['source_text_sha256']
-                        or canonical(equation) not in canonical(row['question_text'])
-                        or analyze_target(equation)['normalized_text'] is None):
+                        or hashlib.sha256(canonical(row['question_text']).encode()).hexdigest() != entry['source_text_sha256']):
                     continue
-                items.append(_item(row, equation))
+                if target := _curated_target(row, entry):
+                    items.append(_item(row, target))
             used_ids = {item['source_question_id'] for item in items}
             signatures = {_equation_key(item['target_text']) for item in items}
-            placeholders = ','.join('?' for _ in TYPES)
+            equation_types = TYPES.keys() - EXPRESSION_TYPES
+            placeholders = ','.join('?' for _ in equation_types)
             rows = connection.execute(scope + f'''AND q.source_topic_code IN ({placeholders})
                 AND q.review_status='verified' AND q.question_type='단답형'
-                AND q.subquestion_number IS NULL ORDER BY q.id''', (*UNIT, *TYPES))
+                AND q.subquestion_number IS NULL ORDER BY q.id''', (*UNIT, *equation_types))
             for row in rows:
                 if row['id'] in used_ids:
                     continue
@@ -97,12 +114,13 @@ def _concept_index(root):
     return load_index(root)
 
 
-def concept_cards(type_code):
+def concept_cards(type_code, *, prerequisite_ids=()):
     root = Path(os.getenv('DIDGO_CONCEPT_BANK_DIR', str(DEFAULT_CONCEPTS))).resolve()
     try:
         _, by_id, mapping, _ = _concept_index(root)
         match = mapping.get((*UNIT, type_code), {})
-        cards = [by_id[ident][1] for ident in match.get('concept_ids', [])]
+        identifiers = dict.fromkeys((*prerequisite_ids, *match.get('concept_ids', [])))
+        cards = [by_id[ident][1] for ident in identifiers]
     except (OSError, KeyError, TypeError, ValueError):
         return []
     # 연습에 앞서 필요한 정의와 규칙부터 보여준다. 문제은행의 답과 해설은 전달하지 않는다.
@@ -118,22 +136,34 @@ def _equation_key(text):
         return None
 
 
+def problem_key(text):
+    equation = _equation_key(text)
+    if equation is not None:
+        return 'equation', equation
+    expression = normalize_expression(text)
+    if expression is not None:
+        variable = re.search(r'[A-Za-z]', expression)[0]
+        tokens = tuple('variable' if token.value == variable else token.value for token in _tokens(expression, variable))
+        return 'expression', tokens
+    return None
+
+
 def choose(items, *, type_code, source_text, source_target, used_ids, mode, seen_questions=()):
     """계정 전체에서 새 문항을 고르며 복습만 지연 후 기존 문항을 허용한다."""
     original, equation = canonical(source_text), canonical(source_target)
-    source_key = _equation_key(source_target)
+    source_key = problem_key(source_target)
     source_families = {item['source_id'] for item in items
                        if canonical(item['source_question_text']) == original
                        or canonical(item['target_text']) == equation
-                       or (source_key is not None and _equation_key(item['target_text']) == source_key)}
+                       or (source_key is not None and problem_key(item['target_text']) == source_key)}
     # 문항 ID가 없던 일반 튜터에서도 본문·확인한 식으로 이미 본 문항을 찾는다.
     used_ids = list(used_ids)
     for seen in seen_questions:
-        seen_key = _equation_key(seen['target_text'])
+        seen_key = problem_key(seen['target_text'])
         seen_source = canonical(seen['source_text'])
         used_ids.extend(item['id'] for item in items
                         if canonical(item['source_question_text']) == seen_source
-                        or (seen_key is not None and _equation_key(item['target_text']) == seen_key))
+                        or (seen_key is not None and problem_key(item['target_text']) == seen_key))
     candidates = [item for item in items if item['type_code'] == type_code
                   and canonical(item['target_text']) != equation
                   and canonical(item['source_question_text']) != original
