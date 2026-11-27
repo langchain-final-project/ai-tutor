@@ -4,13 +4,13 @@
 다음 중 △ABC가 하나로 정해지기 위해 더 필요한
 조건이 아닌 것을 모두 고르면? (정답 2개)
 
-① $\overrightarrow{AB}$, $\overrightarrow{AC}$의 길이
+① $\overline{AB}$, $\overline{AC}$의 길이
 
-② $\overrightarrow{AC}$, $\overrightarrow{BC}$의 길이
+② $\overline{AC}$, $\overline{BC}$의 길이
 
-③ ∠A의 크기, $\overrightarrow{AC}$의 길이
+③ ∠A의 크기, $\overline{AC}$의 길이
 
-④ ∠B의 크기, $\overrightarrow{BC}$의 길이
+④ ∠B의 크기, $\overline{BC}$의 길이
 
 ⑤ ∠A, ∠B의 크기
 
